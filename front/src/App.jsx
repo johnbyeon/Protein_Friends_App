@@ -57,6 +57,7 @@ function App() {
         <Route index element={<Home />} />
         <Route path="about" element={<About />} />
         <Route path="shop" element={<Shop />} />
+        <Route path="upload-test" element={<UploadTest />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
