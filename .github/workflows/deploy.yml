@@ -1,0 +1,60 @@
+name: CI/CD Monorepo
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'back/**'
+      - 'front/**'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: backend
+            context: back
+            imagename: protein-friends-back
+          - name: frontend
+            context: front
+            imagename: protein-friends-front     # ← 앞의 네임스페이스는 빼고
+
+    steps:
+      - name: Checkout
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push ${{ matrix.name }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.imagename }}:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.imagename }}:${{ github.sha }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy on EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+            host: ${{ secrets.EC2_HOST }}
+            username: ${{ secrets.EC2_USER }}
+            key: ${{ secrets.EC2_SSH_KEY }}
+            script: |
+              set -e
+              cd ~/app/infra || { mkdir -p ~/app/infra; cd ~/app/infra; }
+              docker compose --env-file .env.prod -f docker-compose.prod.yml pull
+              docker compose --env-file .env.prod -f docker-compose.prod.yml up -d
