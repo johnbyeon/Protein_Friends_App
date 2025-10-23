@@ -1,0 +1,60 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: local
+    group:
+      local:
+        - common
+      prod:
+        - common
+
+---
+spring:
+  config:
+    activate:
+      on-profile: common
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/myapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update   # \uCD5C\uCD08 \uAC1C\uBC1C \uB2E8\uACC4\uC5D0\uB9CC update \uAD8C\uC7A5 \u2192 \uC0DD\uC131 \uD6C4 validate\uB85C \uBCC0\uACBD
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+app:
+  allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3000}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${RDS_ENDPOINT:my-prod-database}:3306/myapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: validate # \uC6B4\uC601\uC740 validate \uACE0\uC815
+    properties:
+      hibernate:
+        show_sql: false
+
+app:
+  allowed-origins: ${ALLOWED_ORIGINS:https://YOUR_DOMAIN}

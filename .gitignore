@@ -1,0 +1,13 @@
+
+# infra 전체 제외
+infra/
+
+# (선택) infra 아래 특정 파일만 추적하고 싶다면 예외 추가
+# !infra/docker-compose.prod.yml
+# !infra/README.md
+
+# 환경변수/비밀정보 전반
+*.env
+*.env.*
+.env
+.env.*
