@@ -3,6 +3,7 @@ package com.my.back.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -78,7 +79,7 @@ public class PurchaseLog {
      * 주문 일시 (not null, 자동 생성)
      * - 결제 완료 시점
      */
-    @CreationTimestamp
+    @CreatedDate
     @Column(name = "order_datetime", nullable = false, updatable = false)
     private LocalDateTime orderDatetime;
 

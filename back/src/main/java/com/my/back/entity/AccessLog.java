@@ -3,6 +3,8 @@ package com.my.back.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+
 
 import java.time.LocalDateTime;
 
@@ -55,7 +57,7 @@ public class AccessLog {
      * 출입 등록 시간 (not null, 자동 생성)
      * - 입장/퇴장 시점
      */
-    @CreationTimestamp
+    @CreatedDate
     @Column(name = "access_time", nullable = false, updatable = false)
     private LocalDateTime accessTime;
 

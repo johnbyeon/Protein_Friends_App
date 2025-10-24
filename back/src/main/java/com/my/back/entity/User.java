@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -60,12 +62,12 @@ public class User {
     private UserRole userRole;
 
     /** 가입일시 (not null, 자동 생성) */
-    @CreationTimestamp
+    @CreatedDate
     @Column(name = "create_at", nullable = false, updatable = false)
     private LocalDateTime createAt;
 
     /** 마지막 로그인/수정일시 (not null, 자동 갱신) */
-    @UpdateTimestamp
+    @LastModifiedDate
     @Column(name = "update_at", nullable = false)
     private LocalDateTime updateAt;
 
