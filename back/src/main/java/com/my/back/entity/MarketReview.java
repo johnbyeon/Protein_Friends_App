@@ -74,7 +74,7 @@ public class MarketReview {
     // === 관계 매핑 (LAZY) ===
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", insertable = false, updatable = false)
-    private User reviewer;
+    private Users reviewer;
 
     // p_id에 대한 관계는 MarketProduct 엔티티가 정의될 때 추가
 }

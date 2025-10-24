@@ -2,7 +2,6 @@ package com.my.back.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -62,5 +61,5 @@ public class GymReview {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", insertable = false, updatable = false)
-    private User reviewer;
+    private Users reviewer;
 }
