@@ -51,7 +51,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: validate # \uC6B4\uC601\uC740 validate \uACE0\uC815
+      ddl-auto: create # \uC6B4\uC601\uC740 validate \uACE0\uC815
     properties:
       hibernate:
         show_sql: false
