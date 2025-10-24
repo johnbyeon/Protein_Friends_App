@@ -2,7 +2,6 @@ package com.my.back.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -75,5 +74,5 @@ public class PtReservation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", insertable = false, updatable = false)
-    private User user;
+    private Users users;
 }

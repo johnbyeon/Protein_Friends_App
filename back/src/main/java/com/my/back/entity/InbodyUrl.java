@@ -36,7 +36,7 @@ public class InbodyUrl {
     /** 유저아이디 (user 테이블 FK, not null, number) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", nullable = false)
-    private User user;
+    private Users users;
 
     /** 인바디 사진 URL (not null, string) */
     @Column(name = "inbody_pic_url", nullable = false)

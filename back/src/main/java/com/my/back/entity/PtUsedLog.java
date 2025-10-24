@@ -31,7 +31,7 @@ public class PtUsedLog {
     /** 유저 아이디 (user 테이블 FK) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", nullable = false)
-    private User user;
+    private Users users;
 
     /** 트레이너 등록번호 (trainer_info 테이블 FK) */
     @ManyToOne(fetch = FetchType.LAZY)

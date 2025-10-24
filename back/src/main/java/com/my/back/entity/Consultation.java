@@ -34,7 +34,7 @@ public class Consultation {
     /** 유저아이디 (user 테이블 FK, number) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id")
-    private User user;
+    private Users users;
 
     /** 트레이너 등록번호 (trainer_info 테이블 FK, not null, number) */
     @ManyToOne(fetch = FetchType.LAZY)
