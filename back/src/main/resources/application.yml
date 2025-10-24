@@ -23,7 +23,7 @@ spring:
       on-profile: local
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/myapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/proteinfriends_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: ${MYSQL_USER}
     password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
@@ -51,7 +51,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: update # \uC6B4\uC601\uC740 validate \uACE0\uC815
+      ddl-auto: create # \uC6B4\uC601\uC740 validate \uACE0\uC815
     properties:
       hibernate:
         show_sql: false
