@@ -31,12 +31,12 @@ public class PtUsedLog {
     /** 유저 아이디 (user 테이블 FK) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", nullable = false)
-    private UserEntity user;
+    private User user;
 
     /** 트레이너 등록번호 (trainer_info 테이블 FK) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "t_id", nullable = false)
-    private TrainerInfoEntity trainer;
+    private TrainerInfo trainer;
 
     /** 사용일 (not null, date time) */
     @Column(name = "date", nullable = false)
@@ -57,5 +57,5 @@ public class PtUsedLog {
     /** PT 클래스 번호 (pt_class_info 테이블 FK, not null, number) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pt_class_id", nullable = false)
-    private PtClassInfoEntity ptClass;
+    private PTClassInfo ptClass;
 }
