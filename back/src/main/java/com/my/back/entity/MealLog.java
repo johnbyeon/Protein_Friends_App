@@ -25,7 +25,7 @@ public class MealLog {
     /** 유저아이디 */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", nullable = false)
-    private User user;
+    private Users users;
 
     /** 트레이너 등록번호 */
     @ManyToOne(fetch = FetchType.LAZY)
