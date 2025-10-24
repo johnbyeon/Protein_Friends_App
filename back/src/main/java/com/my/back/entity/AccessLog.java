@@ -2,7 +2,6 @@ package com.my.back.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 
@@ -65,7 +64,7 @@ public class AccessLog {
     /** 회원 정보 (N:1) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", insertable = false, updatable = false)
-    private User user;
+    private Users users;
 
     /** 지점 정보 (N:1) */
     @ManyToOne(fetch = FetchType.LAZY)

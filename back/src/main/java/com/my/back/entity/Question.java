@@ -30,7 +30,7 @@ public class Question {
     /** 유저 아이디 (user 테이블 FK, not null, number) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", nullable = false)
-    private User user;
+    private Users users;
 
     /** 질문 제목 (not null, string) */
     @Column(name = "q_title", nullable = false)

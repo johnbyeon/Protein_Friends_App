@@ -31,7 +31,7 @@ public class ClassUserInfo {
     /** 유저 id (user 테이블 FK, not null, number) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", nullable = false)
-    private User user;
+    private Users users;
 
     /** 신청 날짜 (not null, date time) */
     @Column(name = "datetime", nullable = false)

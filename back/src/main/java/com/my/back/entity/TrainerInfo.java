@@ -95,7 +95,7 @@ public class TrainerInfo {
     // === 관계 매핑 (LAZY) ===
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", insertable = false, updatable = false)
-    private User user;
+    private Users users;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "g_id", insertable = false, updatable = false)
