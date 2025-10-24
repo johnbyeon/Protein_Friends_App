@@ -53,5 +53,5 @@ public class BoardViewer {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", insertable = false, updatable = false)
-    private User user;
+    private Users users;
 }

@@ -2,8 +2,6 @@ package com.my.back.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -18,12 +16,12 @@ import java.util.List;
  * - user_role: ADMIN, TRAINER, USER
  */
 @Entity
-@Table(name = "user")  // DB 테이블명 명시 (필수)
+@Table(name = "users")  // DB 테이블명 명시 (필수)
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class Users {
 
     /** 회원 고유번호 (PK, auto increment) */
     @Id
@@ -46,17 +44,11 @@ public class User {
     /** 휴대전화번호 (nullable, ex: 010-1234-5678) */
     @Column(nullable = false)
     private String phone;
-
     /**
-     * 소셜 연결 코드 (nullable)
-     * - google: "g001", "g002"...
-     * - naver: "n001", "n002"...
-     * - kakao: "k001", "k002"...
-     * - null = 미연결
-     */
-    private String google;
-    private String naver;
-    private String kakao;
+     * 회원정보 테이블 (1_1. user)
+     * - u_id: 숫자 auto increment PK
+     * - email: 로그인용 아이디 (unique)
+     * - user_role: ADMIN, TRAINER
 
     /** 회원 역할 (not null, enum) */
     @Enumerated(EnumType.STRING)
@@ -77,10 +69,10 @@ public class User {
     @Column(name = "profile_picture")
     private String profilePicture;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserInfo userInfo;
 
     /** 소셜 연결 상세 정보 (1:N, 단방향) */
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SocialAccount> socialAccounts = new ArrayList<>();
 }

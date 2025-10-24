@@ -2,8 +2,6 @@ package com.my.back.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -38,7 +36,7 @@ public class UserInfo {
     @OneToOne
     @MapsId  // uId = user.uId 자동 설정
     @JoinColumn(name = "u_id")
-    private User user;
+    private Users users;
 
     /** 성별 (nullable, ex: "남자", "여자", "기타") */
     private String gender;
