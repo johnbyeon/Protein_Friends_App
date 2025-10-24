@@ -31,7 +31,7 @@ public class DiscountLog {
     /** 유저 아이디 (user 테이블 FK, not null, number) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", nullable = false)
-    private User user;
+    private Users users;
 
     /** 할인 쿠폰 id (discount_service 테이블 FK, not null, number) */
     @ManyToOne(fetch = FetchType.LAZY)
