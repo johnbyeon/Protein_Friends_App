@@ -40,9 +40,11 @@ public class User {
     private String password;
 
     /** 회원 이름 (nullable) */
+    @Column(nullable = false)
     private String name;
 
     /** 휴대전화번호 (nullable, ex: 010-1234-5678) */
+    @Column(nullable = false)
     private String phone;
 
     /**
