@@ -1,1 +1,21 @@
+/* src/index.css */
 @import "tailwindcss";
+@plugin "@tailwindcss/forms";
+
+/* 기본값 = 유저(초록) */
+@theme {
+  --color-primary: #39ff14;
+  --color-background-light: #000000;
+  --color-background-dark: #000000;
+  --color-surface-light: #1F2937;
+  --color-surface-dark: #1F2937;
+  --color-text-light: #FFFFFF;
+  --color-text-dark: #FFFFFF;
+  --color-border-light: #374151;
+  --color-border-dark: #374151;
+}
+
+/* 관리자일 때만 빨강으로 오버라이드 */
+:root[data-role="admin"] { --color-primary: #DC2626; }
+/* 유저 명시(선택) */
+:root[data-role="user"]  { --color-primary: #39ff14; }

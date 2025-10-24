@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/s3")
+@ResponseBody
 public class S3Controller {
 
     private final S3PresignService s3Service;

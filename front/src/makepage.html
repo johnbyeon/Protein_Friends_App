@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stitch Design</title>
+<link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#39ff14", 
+              "background-light": "#f0f0f0",
+              "background-dark": "#000000",
+            },
+            fontFamily: {
+              display: ["Inter"],
+            },
+            borderRadius: {
+              DEFAULT: "0rem",
+              lg: "0rem",
+              xl: "0rem",
+              full: "9999px"
+            },
+          },
+        },
+      };
+    </script>
+<style>
+      .form-input::placeholder {
+        color: #a3a3a3;}
+      .dark .form-input::placeholder {
+        color: #737373;
+      }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+<div class="flex min-h-screen flex-col">
+<main class="flex flex-1 items-center justify-center py-12 sm:px-6 lg:px-8">
+<div class="w-full max-w-md space-y-8 p-8">
+<div>
+<div class="flex items-center justify-center gap-4 text-gray-800 dark:text-white mb-6">
+<h2 class="text-3xl font-bold">프로틴 프랜즈 비밀번호 찾기</h2>
+</div>
+</div>
+<form action="#" class="mt-8 space-y-6" method="POST">
+<div class="space-y-4 rounded-md">
+<div>
+<label class="sr-only" for="email-address">이메일 주소</label>
+<input autocomplete="email" class="form-input relative block w-full appearance-none rounded-none border-0 bg-gray-900 px-3 py-4 text-white placeholder-gray-500 focus:z-10 focus:outline-none focus:ring-primary sm:text-sm" id="email-address" name="email" placeholder="이메일 ID" required="" type="email"/>
+</div>
+</div>
+<div>
+<button class="group relative flex w-full justify-center rounded-none border border-transparent bg-primary px-4 py-3 text-sm font-semibold text-black hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark" type="submit">
+                        비밀번호 재설정 링크 발송
+                    </button>
+</div>
+</form>
+<div class="text-center text-sm">
+<a class="font-medium text-primary hover:text-primary/90" href="#">
+                        로그인으로 돌아가기
+                    </a>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

@@ -1,67 +1,50 @@
-import { useState } from 'react' 
+// src/App.jsx
+import { useState } from 'react'
 import './App.css'
-import { Routes, Route, Link } from 'react-router-dom'
-import UploadTest from './pages/UploadTest'
+import { Routes, Route } from 'react-router-dom'
+import { RequireAuth, RequireRole } from './components/guards'
+import Navbar from './components/Navbar'  // 경로 오타 수정!
+import LoginForm from './components/LoginForm'
+import SignUpForm from './components/SignUpForm'
+import FindIdForm from './components/FindIdForm'
+import ResetPasswordForm from './components/ResetPasswordForm'
 
-function Home() {
-  return (
-    <section className="p-8">
-      <h1 className="text-3xl font-extrabold">Home</h1>
-      <p className="text-gray-600 mt-2">메인 페이지</p>
-    </section>
-  )
-}
+// 페이지가 아직 없다면 임시 컴포넌트로 대체해도 됩니다.
+const MyPage = () => <div>마이페이지</div>
+const AdminDash = () => <div>관리자 대시보드</div>
+const TrainerDash = () => <div>트레이너 대시보드</div>
 
-function About() {
-  return (
-    <section className="p-8">
-      <h1 className="text-2xl font-bold">About</h1>
-      <p className="text-gray-600 mt-2">소개 페이지</p>
-    </section>
-  )
-}
-
-function Shop() {
-  return (
-    <section className="p-8">
-      <h1 className="text-2xl font-bold">Shop</h1>
-      <p className="text-gray-600 mt-2">마켓 리스트</p>
-    </section>
-  )
-}
-
-function NotFound() {
-  return (
-    <section className="p-8">
-      <h1 className="text-xl font-bold">404</h1>
-      <p className="text-gray-600 mt-2">페이지를 찾을 수 없습니다.</p>
-    </section>
-  )
-}
-
-function App() {
+export default function App() {
   const [count, setCount] = useState(0)
 
   return (
     <>
-      {/* 간단한 네비게이션 */}
-      <header className="p-4 border-b flex gap-4">
-        <Link className="hover:underline" to="/">Home</Link>
-        <Link className="hover:underline" to="/about">About</Link>
-        <Link className="hover:underline" to="/shop">Shop</Link>
-        <Link className="hover:underline" to="/upload-test">UploadTest</Link> 
-      </header>
+      <Navbar />
+      <main className="p-8 text-white">
+        <Routes>
+          <Route path="/" element={<div>홈</div>} />
+          <Route path="/members" element={<div>회원 목록</div>} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/auth/register" element={<SignUpForm />} />
+          <Route path="/auth/find-id" element={<FindIdForm />} />
+          <Route path="/auth/reset-password" element={<ResetPasswordForm />} />
+          <Route path="/trainers" element={<div>트레이너 목록</div>} />
+          <Route path="/settings" element={<div>설정 페이지</div>} />
 
-      {/* 라우팅 영역 */}
-      <Routes>
-        <Route index element={<Home />} />
-        <Route path="about" element={<About />} />
-        <Route path="shop" element={<Shop />} />
-        <Route path="upload-test" element={<UploadTest />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          {/* 보호 구간 */}
+          <Route element={<RequireAuth />}>
+            <Route path="/me" element={<MyPage />} />
+
+            <Route element={<RequireRole anyOf={['ROLE_ADMIN']} />}>
+              <Route path="/admin/*" element={<AdminDash />} />
+            </Route>
+
+            <Route element={<RequireRole anyOf={['ROLE_TRAINER', 'ROLE_ADMIN']} />}>
+              <Route path="/trainer/*" element={<TrainerDash />} />
+            </Route>
+          </Route>
+        </Routes>
+      </main>
     </>
   )
 }
-
-export default App
