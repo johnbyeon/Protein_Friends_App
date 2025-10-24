@@ -1,1 +1,16 @@
-﻿push test by chsys14-eng
+﻿=========================
+Git Push Test File
+=========================
+
+작성자: sanbonsalza14
+날짜: 2025-10-24
+
+테스트 목적:
+- Sourcetree에서 OAuth 인증 후 푸시 기능 정상 작동 확인
+- 협업 저장소 (johnbyeon/Protein_Friends_App)로 push 테스트
+
+내용:
+이번 푸시는 sanbonsalza14 계정(OAuth)으로 실행되었습니다.
+정상적으로 반영되면 GitHub 저장소에 push-test 브랜치의 최신 커밋으로 표시됩니다.
+
+끝.
