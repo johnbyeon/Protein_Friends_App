@@ -1,6 +1,6 @@
 package com.my.back.controller;
 
-import com.my.back.Service.S3PresignService;
+import com.my.back.service.S3PresignService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

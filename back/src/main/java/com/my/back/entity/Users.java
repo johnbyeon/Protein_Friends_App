@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,7 +17,8 @@ import java.util.List;
  * - user_role: ADMIN, TRAINER, USER
  */
 @Entity
-@Table(name = "users")  // DB 테이블명 명시 (필수)
+@Table(name = "users")
+@EntityListeners(AuditingEntityListener.class)// DB 테이블명 명시 (필수)
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -38,17 +40,10 @@ public class Users {
     private String password;
 
     /** 회원 이름 (nullable) */
-    @Column(nullable = false)
     private String name;
 
     /** 휴대전화번호 (nullable, ex: 010-1234-5678) */
-    @Column(nullable = false)
     private String phone;
-    /**
-     * 회원정보 테이블 (1_1. user)
-     * - u_id: 숫자 auto increment PK
-     * - email: 로그인용 아이디 (unique)
-     * - user_role: ADMIN, TRAINER
 
     /** 회원 역할 (not null, enum) */
     @Enumerated(EnumType.STRING)
@@ -68,6 +63,19 @@ public class Users {
     /** 프로필 사진 URL (nullable, ex: https://...) */
     @Column(name = "profile_picture")
     private String profilePicture;
+
+    /** 소셜 계정 연결 여부 */
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean googleLinked = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean naverLinked = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean kakaoLinked = false;
 
     @OneToOne(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserInfo userInfo;

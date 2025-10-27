@@ -2,73 +2,100 @@
 <html class="dark" lang="ko"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Stitch Design</title>
+<title>내 인바디 데이터 - Stitch Design</title>
 <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-<script>
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              primary: "#39ff14", 
-              "background-light": "#f0f0f0",
-              "background-dark": "#000000",
-            },
-            fontFamily: {
-              display: ["Inter"],
-            },
-            borderRadius: {
-              DEFAULT: "0rem",
-              lg: "0rem",
-              xl: "0rem",
-              full: "9999px"
-            },
-          },
-        },
-      };
-    </script>
-<style>
-      .form-input::placeholder {
-        color: #a3a3a3;}
-      .dark .form-input::placeholder {
-        color: #737373;
-      }
+<script defer="" src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<style type="text/tailwindcss">
+        :root {
+            --primary: #ff1744;
+            --background-light: #1a1a1a;
+            --background-dark: #000000;
+        }
+        [x-cloak] { display: none !important; }
     </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "var(--primary)",
+                        "background-light": "var(--background-light)",
+                       "background-dark": "var(--background-dark)",
+                    },
+                    fontFamily: {
+                        display: ["Inter"],
+                        sans: ['Noto Sans KR', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    },
+                },
+            },
+        };
+    </script>
 </head>
-<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
-<div class="flex min-h-screen flex-col">
-<main class="flex flex-1 items-center justify-center py-12 sm:px-6 lg:px-8">
-<div class="w-full max-w-md space-y-8 p-8">
+<body class="bg-background-dark font-sans text-gray-200">
+<div class="flex min-h-screen w-full flex-col" x-data="{ showModal: false, modalImage: '' }">
+<main class="flex-1 bg-background-dark">
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+<div class="mb-8 text-center">
+<h1 class="text-3xl font-bold text-white">내 인바디 데이터</h1>
+<p class="text-gray-400 mt-2">박도윤 회원님 (#PT00125)</p>
+</div>
+<div class="space-y-10">
 <div>
-<div class="flex items-center justify-center gap-4 text-gray-800 dark:text-white mb-6">
-<h2 class="text-3xl font-bold">프로틴 프랜즈 비밀번호 찾기</h2>
+<h2 class="text-xl font-semibold text-gray-300 mb-4 border-b border-lime-400 pb-2">2024년 5월 11일</h2>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+<div @click="showModal = true; modalImage = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAf91iV5VThofm1FnsxpvNhi-J-eKGSaJW6WYIn9rxQrwhuG5s1myCHp3E3AKo6McFYwfhtDg3B2Znk_AwCz-3pY13C23SSzMovqu7jEARIYMBw8BkFohyZnrTszaxJsT47_DJ2nuc4N18b8pD3aeb1RCUo-jxDcoKIErhrvEIC_wNeBohPCcDQitRcEg176x9tKyGNLe7dIuQmsLMmTPSdrPiPVfEkv5UUywzCNjX1EiUa5TyOBfw4b6wxb6PdA7z-bE5REDGK2z3v'" class="cursor-pointer">
+<img alt="인바디 이미지 1" class="rounded-lg object-cover w-full h-auto aspect-[3/4] transition-transform duration-300 hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAf91iV5VThofm1FnsxpvNhi-J-eKGSaJW6WYIn9rxQrwhuG5s1myCHp3E3AKo6McFYwfhtDg3B2Znk_AwCz-3pY13C23SSzMovqu7jEARIYMBw8BkFohyZnrTszaxJsT47_DJ2nuc4N18b8pD3aeb1RCUo-jxDcoKIErhrvEIC_wNeBohPCcDQitRcEg176x9tKyGNLe7dIuQmsLMmTPSdrPiPVfEkv5UUywzCNjX1EiUa5TyOBfw4b6wxb6PdA7z-bE5REDGK2z3v"/>
+</div>
+<div @click="showModal = true; modalImage = 'https://lh3.googleusercontent.com/aida-public/AB6AXuC-pHAJh1YIDBCP_mAvWPZ-_lKV-TQCKUwdIxPpvVzPh_lACdD1_YXTym3TEQ2WaDZxkLC-8DAfMWB9O2-cjDYMQakMGxGdHGq31Km1XxixLjBt4cyUp1UKkc6n7xRV2nQRkRCFZpYhhKIITtAGVnJ8zixE2bStefJU-W2ams2_Ds1_O_XFadCuWDQF-LTc1-egWFb9Wktuq36BPcX20fxv2kLGijOObSddqZ1laQGvl8LzPCNxA82OSB0a060qZjw1RX4bVCv37IId'" class="cursor-pointer">
+<img alt="인바디 이미지 2" class="rounded-lg object-cover w-full h-auto aspect-[3/4] transition-transform duration-300 hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-pHAJh1YIDBCP_mAvWPZ-_lKV-TQCKUwdIxPpvVzPh_lACdD1_YXTym3TEQ2WaDZxkLC-8DAfMWB9O2-cjDYMQakMGxGdHGq31Km1XxixLjBt4cyUp1UKkc6n7xRV2nQRkRCFZpYhhKIITtAGVnJ8zixE2bStefJU-W2ams2_Ds1_O_XFadCuWDQF-LTc1-egWFb9Wktuq36BPcX20fxv2kLGijOObSddqZ1laQGvl8LzPCNxA82OSB0a060qZjw1RX4bVCv37IId"/>
 </div>
 </div>
-<form action="#" class="mt-8 space-y-6" method="POST">
-<div class="space-y-4 rounded-md">
+</div>
 <div>
-<label class="sr-only" for="email-address">이메일 주소</label>
-<input autocomplete="email" class="form-input relative block w-full appearance-none rounded-none border-0 bg-gray-900 px-3 py-4 text-white placeholder-gray-500 focus:z-10 focus:outline-none focus:ring-primary sm:text-sm" id="email-address" name="email" placeholder="이메일 ID" required="" type="email"/>
+<h2 class="text-xl font-semibold text-gray-300 mb-4 border-b border-lime-400 pb-2">2024년 4월 25일</h2>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+<div @click="showModal = true; modalImage = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAf91iV5VThofm1FnsxpvNhi-J-eKGSaJW6WYIn9rxQrwhuG5s1myCHp3E3AKo6McFYwfhtDg3B2Znk_AwCz-3pY13C23SSzMovqu7jEARIYMBw8BkFohyZnrTszaxJsT47_DJ2nuc4N18b8pD3aeb1RCUo-jxDcoKIErhrvEIC_wNeBohPCcDQitRcEg176x9tKyGNLe7dIuQmsLMmTPSdrPiPVfEkv5UUywzCNjX1EiUa5TyOBfw4b6wxb6PdA7z-bE5REDGK2z3v'" class="cursor-pointer">
+<img alt="인바디 이미지 3" class="rounded-lg object-cover w-full h-auto aspect-[3/4] transition-transform duration-300 hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAf91iV5VThofm1FnsxpvNhi-J-eKGSaJW6WYIn9rxQrwhuG5s1myCHp3E3AKo6McFYwfhtDg3B2Znk_AwCz-3pY13C23SSzMovqu7jEARIYMBw8BkFohyZnrTszaxJsT47_DJ2nuc4N18b8pD3aeb1RCUo-jxDcoKIErhrvEIC_wNeBohPCcDQitRcEg176x9tKyGNLe7dIuQmsLMmTPSdrPiPVfEkv5UUywzCNjX1EiUa5TyOBfw4b6wxb6PdA7z-bE5REDGK2z3v"/>
+</div>
 </div>
 </div>
 <div>
-<button class="group relative flex w-full justify-center rounded-none border border-transparent bg-primary px-4 py-3 text-sm font-semibold text-black hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark" type="submit">
-                        비밀번호 재설정 링크 발송
-                    </button>
+<h2 class="text-xl font-semibold text-gray-300 mb-4 border-b border-lime-400 pb-2">2024년 4월 10일</h2>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+<div @click="showModal = true; modalImage = 'https://lh3.googleusercontent.com/aida-public/AB6AXuC-pHAJh1YIDBCP_mAvWPZ-_lKV-TQCKUwdIxPpvVzPh_lACdD1_YXTym3TEQ2WaDZxkLC-8DAfMWB9O2-cjDYMQakMGxGdHGq31Km1XxixLjBt4cyUp1UKkc6n7xRV2nQRkRCFZpYhhKIITtAGVnJ8zixE2bStefJU-W2ams2_Ds1_O_XFadCuWDQF-LTc1-egWFb9Wktuq36BPcX20fxv2kLGijOObSddqZ1laQGvl8LzPCNxA82OSB0a060qZjw1RX4bVCv37IId'" class="cursor-pointer">
+<img alt="인바디 이미지 4" class="rounded-lg object-cover w-full h-auto aspect-[3/4] transition-transform duration-300 hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-pHAJh1YIDBCP_mAvWPZ-_lKV-TQCKUwdIxPpvVzPh_lACdD1_YXTym3TEQ2WaDZxkLC-8DAfMWB9O2-cjDYMQakMGxGdHGq31Km1XxixLjBt4cyUp1UKkc6n7xRV2nQRkRCFZpYhhKIITtAGVnJ8zixE2bStefJU-W2ams2_Ds1_O_XFadCuWDQF-LTc1-egWFb9Wktuq36BPcX20fxv2kLGijOObSddqZ1laQGvl8LzPCNxA82OSB0a060qZjw1RX4bVCv37IId"/>
 </div>
-</form>
-<div class="text-center text-sm">
-<a class="font-medium text-primary hover:text-primary/90" href="#">
-                        로그인으로 돌아가기
-                    </a>
+<div @click="showModal = true; modalImage = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAf91iV5VThofm1FnsxpvNhi-J-eKGSaJW6WYIn9rxQrwhuG5s1myCHp3E3AKo6McFYwfhtDg3B2Znk_AwCz-3pY13C23SSzMovqu7jEARIYMBw8BkFohyZnrTszaxJsT47_DJ2nuc4N18b8pD3aeb1RCUo-jxDcoKIErhrvEIC_wNeBohPCcDQitRcEg176x9tKyGNLe7dIuQmsLMmTPSdrPiPVfEkv5UUywzCNjX1EiUa5TyOBfw4b6wxb6PdA7z-bE5REDGK2z3v'" class="cursor-pointer">
+<img alt="인바디 이미지 5" class="rounded-lg object-cover w-full h-auto aspect-[3/4] transition-transform duration-300 hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAf91iV5VThofm1FnsxpvNhi-J-eKGSaJW6WYIn9rxQrwhuG5s1myCHp3E3AKo6McFYwfhtDg3B2Znk_AwCz-3pY13C23SSzMovqu7jEARIYMBw8BkFohyZnrTszaxJsT47_DJ2nuc4N18b8pD3aeb1RCUo-jxDcoKIErhrvEIC_wNeBohPCcDQitRcEg176x9tKyGNLe7dIuQmsLMmTPSdrPiPVfEkv5UUywzCNjX1EiUa5TyOBfw4b6wxb6PdA7z-bE5REDGK2z3v"/>
+</div>
+<div @click="showModal = true; modalImage = 'https://lh3.googleusercontent.com/aida-public/AB6AXuC-pHAJh1YIDBCP_mAvWPZ-_lKV-TQCKUwdIxPpvVzPh_lACdD1_YXTym3TEQ2WaDZxkLC-8DAfMWB9O2-cjDYMQakMGxGdHGq31Km1XxixLjBt4cyUp1UKkc6n7xRV2nQRkRCFZpYhhKIITtAGVnJ8zixE2bStefJU-W2ams2_Ds1_O_XFadCuWDQF-LTc1-egWFb9Wktuq36BPcX20fxv2kLGijOObSddqZ1laQGvl8LzPCNxA82OSB0a060qZjw1RX4bVCv37IId'" class="cursor-pointer">
+<img alt="인바디 이미지 6" class="rounded-lg object-cover w-full h-auto aspect-[3/4] transition-transform duration-300 hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-pHAJh1YIDBCP_mAvWPZ-_lKV-TQCKUwdIxPpvVzPh_lACdD1_YXTym3TEQ2WaDZxkLC-8DAfMWB9O2-cjDYMQakMGxGdHGq31Km1XxixLjBt4cyUp1UKkc6n7xRV2nQRkRCFZpYhhKIITtAGVnJ8zixE2bStefJU-W2ams2_Ds1_O_XFadCuWDQF-LTc1-egWFb9Wktuq36BPcX20fxv2kLGijOObSddqZ1laQGvl8LzPCNxA82OSB0a060qZjw1RX4bVCv37IId"/>
+</div>
+</div>
+</div>
 </div>
 </div>
 </main>
+<div @keydown.escape.window="showModal = false" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75" x-cloak="" x-show="showModal" x-transition:enter="ease-out duration-300" x-transition:enter-end="opacity-100" x-transition:enter-start="opacity-0" x-transition:leave="ease-in duration-200" x-transition:leave-end="opacity-0" x-transition:leave-start="opacity-100">
+<div @click.away="showModal = false" class="relative max-w-4xl max-h-[90vh] p-4">
+<img :src="modalImage" alt="확대된 인바디 이미지" class="rounded-lg object-contain w-full h-full"/>
+<button @click="showModal = false" class="absolute top-0 right-0 -mt-4 -mr-4 text-white bg-gray-800 rounded-full p-2 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+<span class="material-symbols-outlined">close</span>
+</button>
 </div>
-
+</div>
+</div>
 </body></html>

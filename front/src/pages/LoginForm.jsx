@@ -1,17 +1,19 @@
-// src/components/LoginForm.jsx
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import pfLogo from '../assets/pflogo.svg'
+import { useAuthStore } from '../stores/authStore'
 
 export default function LoginForm({
-  onLogin,                  // (email, password) => Promise<void>  (선호)
-  loginEndpoint = '/api/auth/login',  // onLogin 미전달 시 fetch로 사용
+  onLogin,
+  loginEndpoint = '/api/auth/login',
 }) {
+  const { loginFromResponse } = useAuthStore()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // ✅ 일반 로그인
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
@@ -29,14 +31,37 @@ export default function LoginForm({
           const err = await res.json().catch(() => ({}))
           throw new Error(err.message || '로그인에 실패했습니다.')
         }
-        // 성공 응답(JSON)을 상위에서 처리하려면 onLogin을 넘겨주세요.
-        // 여기서는 단순 성공 처리만.
+        const data = await res.json()
+        loginFromResponse(data) // ✅ JWT 상태 저장
+        window.location.href = '/' // 홈으로 이동
       }
     } catch (e) {
       setError(e.message || '로그인에 실패했습니다.')
     } finally {
       setLoading(false)
     }
+  }
+
+  // ✅ 소셜 로그인 (팝업 방식)
+  const handleSocialLogin = (provider) => {
+    console.log(`🌐 ${provider} 로그인 팝업 열림`)
+    const popup = window.open(
+      `http://localhost:8080/oauth2/authorization/${provider}?r=${Date.now()}`,
+      `${provider}-login`,
+      'width=500,height=600,noopener=no'
+    )
+
+    const listener = (event) => {
+      if (event.origin !== 'http://localhost:8080') return
+      const data = event.data
+      if (data && data.access_token) {
+        loginFromResponse(data)
+        console.log(`✅ ${provider} 로그인 성공`)
+        window.removeEventListener('message', listener)
+        window.location.reload()
+      }
+    }
+    window.addEventListener('message', listener)
   }
 
   return (
@@ -50,13 +75,12 @@ export default function LoginForm({
           <div>
             <div className="flex items-center justify-center gap-4 text-gray-800 dark:text-white mb-6">
               <div className="size-8 text-primary">
-              <Link to="/" className="flex items-center gap-1 text-text-light dark:text-text-dark">
-                    {/* ✅ SVG 로고로 교체 */}
-                    <img
-                        src={pfLogo}
-                        alt="Protein Friends Logo"
-                        className="w-10 h-10 object-contain text-primary"
-                    />
+                <Link to="/" className="flex items-center gap-1 text-text-light dark:text-text-dark">
+                  <img
+                    src={pfLogo}
+                    alt="Protein Friends Logo"
+                    className="w-10 h-10 object-contain text-primary"
+                  />
                 </Link>
               </div>
               <h2 className="text-3xl font-bold">Protein Friends</h2>
@@ -80,7 +104,7 @@ export default function LoginForm({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="form-input relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark px-3 py-4 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200"
+                  className="form-input relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200"
                 />
               </div>
               <div>
@@ -94,7 +118,7 @@ export default function LoginForm({
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="form-input relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark px-3 py-4 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200"
+                  className="form-input relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200"
                 />
               </div>
             </div>
@@ -127,14 +151,14 @@ export default function LoginForm({
                 className="w-full rounded-lg font-bold py-3 disabled:opacity-60 transition-all duration-200 hover:shadow-lg hover:shadow-primary/25 active:scale-[0.95]"
                 style={{
                   backgroundColor: 'var(--color-primary)',
-                  color: 'white'
+                  color: 'black'
                 }}>
                 {loading ? '처리중…' : '로그인'}
               </button>
             </div>
           </form>
 
-          {/* 소셜 로그인 */}
+          {/* 구분선 */}
           <div className="relative mt-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300 dark:border-gray-700" />
@@ -146,41 +170,44 @@ export default function LoginForm({
             </div>
           </div>
 
+          {/* ✅ 소셜 로그인 버튼 (팝업 연동) */}
           <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            {/* Spring Security 기본 OAuth2 엔드포인트 예시 */}
-            <a
+            {/* 카카오 */}
+            <button
+              type="button"
+              onClick={() => handleSocialLogin('kakao')}
               className="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 bg-background-light dark:bg-black px-4 py-3 text-sm font-medium hover:bg-yellow-300 hover:border-yellow-300 hover:text-black transition-all duration-200"
-              href="/oauth2/authorization/kakao"
             >
               카카오
-            </a>
-            <a
-              className="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 bg-background-light dark:bg-black px-4 py-3 text-sm font-medium transition-all duration-200"
-              style={{
-                '--hover-bg': 'var(--color-primary)',
-                '--hover-border': 'var(--color-primary)',
-                '--hover-text': 'white'
-              }}
+            </button>
+
+            {/* 네이버 */}
+            <button
+              type="button"
+              onClick={() => handleSocialLogin('naver')}
               onMouseEnter={(e) => {
-                e.target.style.backgroundColor = 'var(--color-primary)';
-                e.target.style.borderColor = 'var(--color-primary)';
-                e.target.style.color = 'white';
+                e.target.style.backgroundColor = 'var(--color-primary)'
+                e.target.style.borderColor = 'var(--color-primary)'
+                e.target.style.color = 'black'
               }}
               onMouseLeave={(e) => {
-                e.target.style.backgroundColor = '';
-                e.target.style.borderColor = '';
-                e.target.style.color = '';
+                e.target.style.backgroundColor = ''
+                e.target.style.borderColor = ''
+                e.target.style.color = ''
               }}
-              href="/oauth2/authorization/naver"
+              className="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 bg-background-light dark:bg-black px-4 py-3 text-sm font-medium transition-all duration-200"
             >
               네이버
-            </a>
-            <a
+            </button>
+
+            {/* 구글 */}
+            <button
+              type="button"
+              onClick={() => handleSocialLogin('google')}
               className="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 bg-background-light dark:bg-black px-4 py-3 text-sm font-medium hover:bg-blue-600 hover:border-blue-600 hover:text-white transition-all duration-200"
-              href="/oauth2/authorization/google"
             >
               구글
-            </a>
+            </button>
           </div>
         </div>
       </main>

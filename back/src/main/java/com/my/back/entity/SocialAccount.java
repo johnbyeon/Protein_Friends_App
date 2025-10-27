@@ -10,8 +10,14 @@ import java.time.LocalDateTime;
  * - 토큰, 만료시점, 연결시점 등 관리
  */
 @Entity
-@Table(name = "social_account")
-@Getter @Setter
+@Table(
+        name = "social_account",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_provider_user", columnNames = {"provider", "provider_user_id"})
+        }
+)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -22,33 +28,42 @@ public class SocialAccount {
     @Column(name = "social_id")
     private Long id;
 
-    /** 어떤 회원의 소셜 계정인지 (FK → user.u_id) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", nullable = false)
     private Users users;
 
-    /** 소셜 제공자 (google, kakao, naver) */
     @Column(length = 20, nullable = false)
     private String provider;
 
-    /** 소셜 제공자 내 고유 사용자 ID (sub, id 등) */
     @Column(name = "provider_user_id", length = 191, nullable = false)
     private String providerUserId;
 
-    /** access token / refresh token (선택) */
-    @Column(length = 2048)
+    @Column(name = "social_code", length = 64, unique = true)
+    private String socialCode;
+
+    @Column(length = 1024)
     private String accessToken;
 
-    @Column(length = 2048)
+    @Column(length = 1024)
     private String refreshToken;
 
     private LocalDateTime tokenExpiresAt;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean active = true;
+
     private LocalDateTime connectedAt;
     private LocalDateTime disconnectedAt;
 
-    // (unique provider + provider_user_id)
     @PrePersist
     void onCreate() {
         if (connectedAt == null) connectedAt = LocalDateTime.now();
+        if (socialCode == null) socialCode = provider + "_" + providerUserId;
+    }
+
+    public void disconnect() {
+        this.active = false;
+        this.disconnectedAt = LocalDateTime.now();
     }
 }

@@ -1,6 +1,5 @@
-package com.my.back.Service;
+package com.my.back.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;

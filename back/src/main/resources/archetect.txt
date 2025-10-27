@@ -1,0 +1,27 @@
+📁 com.my.back
+├── entity
+│   ├── Users.java
+│   └── SocialAccount.java
+│
+├── oauth2
+│   ├── OAuth2UserInfo.java
+│   ├── GoogleOAuth2UserInfo.java
+│   ├── NaverOAuth2UserInfo.java
+│   ├── KakaoOAuth2UserInfo.java
+│   ├── OAuth2UserInfoFactory.java
+│   ├── OAuth2SuccessHandler.java  ✅ (JWT 발급 & React로 redirect)
+│
+├── service
+│   ├── CustomUserDetailsService.java
+│   ├── CustomOAuth2UserService.java ✅ (User & SocialAccount 매핑만)
+│   ├── JoinService.java
+│   ├── JwtTokenService.java ✅ (JWT 생성/검증 공통화)
+│
+├── repository
+│   ├── UserRepository.java
+│   └── SocialAccountRepository.java ✅
+│
+├── myjwt
+│   ├── JWTUtil.java ❌ (삭제 → JwtTokenService로 통합)
+│   ├── LoginFilter.java
+│   └── SessionTime.java

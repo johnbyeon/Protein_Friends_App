@@ -4,7 +4,7 @@ import { persist } from 'zustand/middleware'
 function applyRoleTheme(role) {
   const el = document.documentElement
   if (role && role.includes('ADMIN')) el.setAttribute('data-role', 'admin')
-  else el.setAttribute('data-role', 'user')  // ← 기본을 유저로 강제
+  else el.setAttribute('data-role', 'user')
 }
 
 let expiryTimer = null
@@ -57,7 +57,6 @@ export const useAuthStore = create(
   )
 )
 
-// 앱 시작시(새로고침) 저장된 만료시각으로 타이머 복원
 export function initAuthTimers() {
   const { expiresAt, logout, refreshToken } = useAuthStore.getState()
   scheduleExpiry(expiresAt, async () => {
@@ -69,7 +68,6 @@ export function initAuthTimers() {
   })
 }
 
-// 리프레시 토큰 플로우(백엔드 경로만 맞춰줘)
 async function refreshTokens() {
   const { refreshToken, loginFromResponse } = useAuthStore.getState()
   if (!refreshToken) return false
@@ -80,6 +78,6 @@ async function refreshTokens() {
   })
   if (!res.ok) return false
   const data = await res.json()
-  loginFromResponse(data) // access/exp/user 갱신
+  loginFromResponse(data)
   return true
 }
