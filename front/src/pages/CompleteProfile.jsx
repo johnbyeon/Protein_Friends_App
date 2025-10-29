@@ -8,7 +8,7 @@ export default function CompleteProfile() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
-  const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080'
+  const API_BASE = import.meta.env.VITE_API_BASE ?? window.location.origin;
   const token = localStorage.getItem('jwt')
 
   const handleSubmit = async (e) => {

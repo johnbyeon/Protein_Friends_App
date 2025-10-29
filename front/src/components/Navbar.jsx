@@ -11,8 +11,8 @@ const Navbar = () => {
   const role = user?.role || ''
   const isLoggedIn = !!token && !!user
 
-  console.log('[Navbar] user:', user)
-  console.log('[Navbar] role:', role)
+  // console.log('[Navbar] user:', user)
+  // console.log('[Navbar] role:', role)
   // user가 null이면 아직 정보 로딩 중으로 간주
   const isLoadingUser = isLoggedIn && !user?.role
 
