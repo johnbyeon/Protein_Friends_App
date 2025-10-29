@@ -52,7 +52,7 @@ export default function LoginForm({
             } catch {
               if (txt) message = txt
             }
-          } catch {}
+          } catch { }
           console.error('[Login] server error', res.status, message)
           throw new Error(message)
         }
@@ -109,11 +109,15 @@ export default function LoginForm({
   // ✅ 소셜 로그인 (팝업 방식)
   const handleSocialLogin = (provider) => {
     console.log(`🌐 ${provider} 로그인 팝업 열림`)
+    const backendOrigin =
+      import.meta.env.VITE_BACKEND_ORIGIN ?? window.location.origin;
+
+    const popupUrl = `${backendOrigin}/oauth2/authorization/${provider}?r=${Date.now()}`;
     const popup = window.open(
-      `http://localhost:8080/oauth2/authorization/${provider}?r=${Date.now()}`,
+      popupUrl,
       `${provider}-login`,
       'width=500,height=600,noopener=no'
-    )
+    );
 
     const listener = async (event) => {
       const allowedOrigins = new Set([

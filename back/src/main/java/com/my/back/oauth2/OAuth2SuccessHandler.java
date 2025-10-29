@@ -70,26 +70,27 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler, Sessi
 
             response.setContentType("text/html;charset=UTF-8");
             response.getWriter().write("""
-                <html><body>
-                <script>
-                  try {
-                    const data = {
-                      access_token: "%s",
-                      expires_in: %d,
-                      need_profile: "%s",
-                      user: %s
-                    };
-                    if (window.opener) {
-                      window.opener.postMessage(data, "*");
-                      console.log('[OAuth2SuccessHandler] postMessage sent with *', data);
-                    }
-                  } catch (e) {
-                    console.error('[OAuth2SuccessHandler] error', e);
-                  }
-                  setTimeout(() => { try { window.close(); } catch(e){} }, 500);
-                </script>
-                </body></html>
-                """.formatted(
+<html><body>
+<script>
+  try {
+    const data = {
+      access_token: "%s",
+      expires_in: %d,
+      need_profile: "%s",
+      user: %s
+    };
+    if (window.opener) {
+      // ✅ 오리진 일치하도록 지정
+      window.opener.postMessage(data, window.opener.origin);
+      console.log('[OAuth2SuccessHandler] postMessage sent to', window.opener.origin, data);
+    }
+  } catch (e) {
+    console.error('[OAuth2SuccessHandler] error', e);
+  }
+  setTimeout(() => { try { window.close(); } catch(e){} }, 500);
+</script>
+</body></html>
+""".formatted(
                     token,
                     (int)(HOUR/SECOND),
                     needProfile ? "true" : "false",
