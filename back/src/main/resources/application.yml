@@ -41,21 +41,17 @@ spring:
   security:
     oauth2:
       client:
-        spring:
-  security:
-    oauth2:
-      client:
         registration:
           google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_SECRET_ID}
-            redirect-uri: ""http://localhost:8080/login/oauth2/code/google"
+            redirect-uri: "http://localhost:8080/login/oauth2/code/google"
             scope: [profile, email]
 
           naver:
             client-id: ${NAVER_CLIENT_ID}
             client-secret: ${NAVER_SECRET_ID}
-            redirect-uri: ""http://localhost:8080/login/oauth2/code/naver"
+            redirect-uri: "http://localhost:8080/login/oauth2/code/naver"
             authorization-grant-type: authorization_code
             client-name: Naver
             scope: [name, email]
@@ -68,7 +64,6 @@ spring:
             client-authentication-method: client_secret_post
             scope: [profile_nickname, account_email]
 
-        # ✅ provider는 registration과 같은 계층이어야 함
         provider:
           naver:
             authorization-uri: https://nid.naver.com/oauth2.0/authorize
@@ -116,10 +111,6 @@ spring:
   security:
     oauth2:
       client:
-        spring:
-  security:
-    oauth2:
-      client:
         registration:
           google:
             client-id: ${GOOGLE_CLIENT_ID}
@@ -143,7 +134,6 @@ spring:
             client-authentication-method: client_secret_post
             scope: [profile_nickname, account_email]
 
-        # ✅ provider는 registration과 같은 계층이어야 함
         provider:
           naver:
             authorization-uri: https://nid.naver.com/oauth2.0/authorize
