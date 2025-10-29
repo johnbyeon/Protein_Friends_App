@@ -11,7 +11,7 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    timeout-minutes: 30   # ⬅️ 장기 빌드 중단 방지
+    timeout-minutes: 30
     strategy:
       matrix:
         include:
@@ -45,7 +45,7 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.imagename }}:${{ github.sha }}
           build-args: |
             BUILDKIT_PROGRESS=plain
-            VITE_SERVER_ORIGIN=https://www.proteinfriends.shop   # ✅ 여기에 추가
+            VITE_SERVER_ORIGIN=https://www.proteinfriends.shop
           outputs: type=image
           provenance: false
           no-cache: true
