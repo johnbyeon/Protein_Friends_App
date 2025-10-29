@@ -11,6 +11,7 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    timeout-minutes: 30   # ⬅️ 장기 빌드 중단 방지
     strategy:
       matrix:
         include:
@@ -19,7 +20,7 @@ jobs:
             imagename: protein-friends-back
           - name: frontend
             context: front
-            imagename: protein-friends-front     # ← 앞의 네임스페이스는 빼고
+            imagename: protein-friends-front
 
     steps:
       - name: Checkout
@@ -42,19 +43,32 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.imagename }}:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.imagename }}:${{ github.sha }}
+          # 👇 빌드 로그 실시간 출력 + buildx idle 방지
+          build-args: |
+            BUILDKIT_PROGRESS=plain
+          outputs: type=image
+          provenance: false
 
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+
     steps:
       - name: Deploy on EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-            host: ${{ secrets.EC2_HOST }}
-            username: ${{ secrets.EC2_USER }}
-            key: ${{ secrets.EC2_SSH_KEY }}
-            script: |
-              set -e
-              cd ~/app/infra || { mkdir -p ~/app/infra; cd ~/app/infra; }
-              docker compose --env-file .env.prod -f docker-compose.prod.yml pull
-              docker compose --env-file .env.prod -f docker-compose.prod.yml up -d
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            echo "🚀 Starting deployment on EC2..."
+            cd ~/app/infra || { mkdir -p ~/app/infra; cd ~/app/infra; }
+
+            echo "📦 Pulling latest images..."
+            docker compose --env-file .env.prod -f docker-compose.prod.yml pull
+
+            echo "🔁 Restarting containers..."
+            docker compose --env-file .env.prod -f docker-compose.prod.yml up -d
+
+            echo "✅ Deployment completed successfully!"
