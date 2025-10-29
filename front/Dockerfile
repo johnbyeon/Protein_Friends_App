@@ -1,10 +1,17 @@
 # ===== Build assets =====
 FROM node:20-alpine AS build
 WORKDIR /app
-COPY package.json package-lock.json* yarn.lock* pnpm-lock.yaml* ./
-RUN npm ci || yarn install || pnpm i
+
+COPY package*.json ./
+
+# ✅ 반드시 devDependencies 포함해서 설치
+ENV NODE_ENV=development
+RUN npm ci
+
 COPY . .
-RUN npm run build || yarn build || pnpm build
+
+# ✅ 실패 시 바로 중단 (|| 제거)
+RUN npm run build
 
 # ===== Nginx serve =====
 FROM nginx:1.27-alpine
