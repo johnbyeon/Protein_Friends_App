@@ -69,10 +69,12 @@ public class MembershipLog {
 
     /** 할인 받은 금액 (default 0, not null, number) */
     @Column(name = "sale_price", nullable = false)
+    @Builder.Default
     private Integer salePrice = 0;
 
     /** 정지 가능횟수 (default 0, not null, number) */
     @Column(name = "stop_count", nullable = false)
+    @Builder.Default
     private Integer stopCount = 0;
 
 }

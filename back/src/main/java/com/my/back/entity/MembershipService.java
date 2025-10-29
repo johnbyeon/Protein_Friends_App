@@ -42,10 +42,12 @@ public class MembershipService {
 
     /** 회원권 할인금액 (default 0, not null, number) */
     @Column(name = "membership_sale_price", nullable = false)
+    @Builder.Default
     private Integer membershipSalePrice = 0;
 
     /** 판매중 여부 (default true, not null, boolean) */
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
 
     /** 회원권 만든 날짜 (not null, date time) */

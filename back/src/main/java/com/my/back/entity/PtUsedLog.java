@@ -52,6 +52,7 @@ public class PtUsedLog {
 
     /** 활성화 상태 (default true, not null, boolean) */
     @Column(name = "status", nullable = false)
+    @Builder.Default
     private Boolean status = true;
 
     /** PT 클래스 번호 (pt_class_info 테이블 FK, not null, number) */

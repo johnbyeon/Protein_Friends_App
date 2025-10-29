@@ -42,6 +42,7 @@ public class Products {
 
     /** 재고수량 (기본값 0) */
     @Column(name = "stock_qty", nullable = false)
+    @Builder.Default
     private Integer stockQty = 0;
 
     /** 상품상태 (active / inactive) */

@@ -48,5 +48,6 @@ public class TrainerUserMapping {
 
     /** 현재 트레이너가 유효한지 (default true, not null, boolean) */
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
 }

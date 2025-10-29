@@ -40,12 +40,14 @@ public class PtInfo {
      * 트레이너 아이디 (default 0)
      */
     @Column(name = "t_id")
+    @Builder.Default
     private Long tId = 0L;
 
     /**
      * PT 컬 (default 0)
      */
     @Column(name = "pt_col")
+    @Builder.Default
     private Long ptCol = 0L;
 
     /**
@@ -70,12 +72,14 @@ public class PtInfo {
      * PT 총 횟수 (default 0, not null)
      */
     @Column(name = "pt_total_count", nullable = false)
+    @Builder.Default
     private Integer ptTotalCount = 0;
 
     /**
      * 상태 (default true)
      */
     @Column(name = "status")
+    @Builder.Default
     private Boolean status = true;
 
     /**
@@ -88,6 +92,7 @@ public class PtInfo {
      * 할인가격 (default 0, not null)
      */
     @Column(name = "sale_price", nullable = false)
+    @Builder.Default
     private BigDecimal salePrice = BigDecimal.ZERO;
 
     /**

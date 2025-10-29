@@ -34,10 +34,12 @@ public class DiscountService {
 
     /** 할인해줄 가격 (default 0, not null, number) */
     @Column(name = "dis_price", nullable = false)
+    @Builder.Default
     private Integer disPrice = 0;
 
     /** 할인 퍼센트 (default 0, not null, number) */
     @Column(name = "dis_percent", nullable = false)
+    @Builder.Default
     private Integer disPercent = 0;
 
     /** 할인권 시작기간 (date time) */
@@ -55,6 +57,7 @@ public class DiscountService {
 
     /** 적용금액 (얼마부터 적용할지, default 0, not null, number) */
     @Column(name = "dis_threshold_amount", nullable = false)
+    @Builder.Default
     private Integer disThresholdAmount = 0;
 
     /** 할인권 배포여부 (default true, boolean) */

@@ -29,6 +29,7 @@ public class Consultation {
 
     /** 회원이면 true(미등록회원은 false) (default false, boolean) */
     @Column(name = "is_member", nullable = false)
+    @Builder.Default
     private Boolean isMember = false;
 
     /** 유저아이디 (user 테이블 FK, number) */

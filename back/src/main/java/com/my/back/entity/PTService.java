@@ -42,14 +42,17 @@ public class PTService {
 
     /** 이용권 가격 (default 0, not null, number) */
     @Column(name = "pt_price", nullable = false)
+    @Builder.Default
     private Integer ptPrice = 0;
 
     /** 이용권 할인금액 (default 0, not null, number) */
     @Column(name = "pt_sale_price", nullable = false)
+    @Builder.Default
     private Integer ptSalePrice = 0;
 
     /** 이용권 판매중 여부 (default true, not null, boolean) */
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
 
     /** 이용권 생성날짜 (not null, date time) */

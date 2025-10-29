@@ -84,5 +84,6 @@ public class Users {
     /** 소셜 연결 상세 정보 (1:N, 단방향) */
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
+    @Builder.Default
     private List<SocialAccount> socialAccounts = new ArrayList<>();
 }

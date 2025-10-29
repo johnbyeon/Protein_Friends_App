@@ -42,6 +42,7 @@ public class Question {
 
     /** 비밀글 설정 (default false, boolean) */
     @Column(name = "q_is_secret", nullable = false)
+    @Builder.Default
     private Boolean qIsSecret = false;
 
     /** 작성일 (not null, date time) */

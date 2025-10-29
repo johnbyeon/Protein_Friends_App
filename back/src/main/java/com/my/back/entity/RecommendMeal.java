@@ -35,5 +35,6 @@ public class RecommendMeal {
 
     /** 추천 식단 상세 목록 (1:N 관계 매핑) */
     @OneToMany(mappedBy = "recommendMeal", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<RecommendMealLog> mealLogs = new ArrayList<>();
 }

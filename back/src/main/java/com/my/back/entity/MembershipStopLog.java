@@ -54,5 +54,6 @@ public class MembershipStopLog {
 
     /** 정지사유 (default 0, not null, number) */
     @Column(name = "reason_note", nullable = false)
+    @Builder.Default
     private Integer reasonNote = 0;
 }
