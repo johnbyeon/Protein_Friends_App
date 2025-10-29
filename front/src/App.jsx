@@ -6,6 +6,7 @@ import AppRoutes from './routes/AppRoutes'
 
 
 export default function App() {
+  console.log('🔥 VITE_SERVER_ORIGIN:', import.meta.env.VITE_SERVER_ORIGIN)
   useEffect(() => {
     initAuthTimers()
   }, [])

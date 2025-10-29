@@ -8,22 +8,17 @@ import { useAuthStore } from '../stores/authStore'
 export function openSocialPopup(provider, redirectPath = '/') {
   console.log(`🌐 ${provider} 로그인 팝업 열림`)
 
-  const API_BASE = import.meta.env.VITE_API_BASE ?? window.location.origin
+  const SERVER_ORIGIN = import.meta.env.VITE_SERVER_ORIGIN ?? ''
   const popup = window.open(
-    `${API_BASE}/oauth2/authorization/${provider}?r=${Date.now()}`,
+    `${SERVER_ORIGIN}/oauth2/authorization/${provider}?r=${Date.now()}`,
     `${provider}-login`,
     'width=500,height=600,noopener=no'
   )
 
   const listener = async (event) => {
-    const allowedOrigins = [
-      'http://localhost:8080',
-      'http://localhost:3000',
-      'https://proteinfriends.shop',
-      'https://www.proteinfriends.shop',
-    ]
+    const allowedOrigins = [SERVER_ORIGIN]
     if (!allowedOrigins.includes(event.origin)) return
-
+    
     const data = event.data
     console.log('[OAuth Message Received]', event.origin, data)
 

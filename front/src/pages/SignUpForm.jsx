@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import pfLogo from '../assets/pflogo.svg'
 import { useAuthStore } from '../stores/authStore'
 import { openSocialPopup } from '../utils/openSocialPopup'
-  
+
+// ✅ 소셜 로그인 버튼 클릭
 const handleSocialLogin = (provider) => {
   try {
     localStorage.setItem('oauth_mode', 'login')
@@ -11,6 +12,7 @@ const handleSocialLogin = (provider) => {
   } catch {}
   openSocialPopup(provider, '/auth/register')
 }
+
 export default function SignUpForm({
   onSignUp,
   signUpEndpoint = '/api/auth/join',
@@ -27,12 +29,12 @@ export default function SignUpForm({
   const isLoggedIn = useAuthStore(s => !!s.token)
   const navigate = useNavigate();
 
+  // ✅ 환경 기반 서버 주소 통일
+  const SERVER_ORIGIN = import.meta.env.VITE_SERVER_ORIGIN || window.location.origin
+
   useEffect(() => {
-    // 이미 로그인된 경우 홈으로 이동
-    if (isLoggedIn) {
-      navigate('/');
-    }
-  }, [isLoggedIn, navigate]);
+    if (isLoggedIn) navigate('/')
+  }, [isLoggedIn, navigate])
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -49,7 +51,7 @@ export default function SignUpForm({
       if (onSignUp) {
         await onSignUp(email, password, confirmPassword, name, phone)
       } else {
-        const res = await fetch(signUpEndpoint, {
+        const res = await fetch(`${SERVER_ORIGIN}${signUpEndpoint}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password, name, phone }),
@@ -58,8 +60,8 @@ export default function SignUpForm({
           const err = await res.json().catch(() => ({}))
           throw new Error(err.message || '회원가입에 실패했습니다.')
         }
-        // 회원가입 완료 → 로그인 페이지로 이동
-        window.location.href = '/login'
+        // ✅ 회원가입 완료 → 로그인 페이지로 이동
+        window.location.href = `${window.location.origin}/login`
       }
     } catch (e) {
       setError(e.message || '회원가입에 실패했습니다.')
@@ -72,6 +74,7 @@ export default function SignUpForm({
     <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
       <main className="flex flex-1 items-center justify-center py-12 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8 rounded-xl bg-background-light/5 dark:bg-background-dark/50 p-8 shadow-2xl border border-primary/30 ring-1 ring-primary/20">
+          
           {/* 헤더 */}
           <div className="flex items-center justify-center gap-1 text-gray-800 dark:text-white mb-6">
             <img src={pfLogo} alt="Protein Friends Logo" className="w-10 h-10 object-contain" />
@@ -81,34 +84,34 @@ export default function SignUpForm({
           {/* 폼 */}
           <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
             <div className="space-y-4 rounded-md">
-              <input id="email-address" name="email" type="email" autoComplete="email"
-                     placeholder="이메일 ID" required value={email}
-                     onChange={(e) => setEmail(e.target.value)}
-                    className="form-input relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200" />
-              <input id="password" name="password" type="password" autoComplete="new-password"
-                     placeholder="비밀번호" required value={password}
-                     onChange={(e) => setPassword(e.target.value)}
-                     className="form-input relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200" />
-              <input id="confirm-password" name="confirm-password" type="password" autoComplete="new-password"
-                     placeholder="비밀번호 확인" required value={confirmPassword}
-                     onChange={(e) => setConfirmPassword(e.target.value)}
-                     className="form-input relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200" />
-              <input id="name" name="name" type="text" autoComplete="name"
-                     placeholder="이름" required value={name}
-                     onChange={(e) => setName(e.target.value)}
-                     className="form-input relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200" />
-              <input id="phone-number" name="phone-number" type="tel" autoComplete="tel"
-                     placeholder="휴대폰 번호" required value={phone}
-                     onChange={(e) => setPhone(e.target.value)}
-                     className="form-input relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200" />
+              <input id="email-address" type="email" placeholder="이메일 ID" required
+                value={email} onChange={(e) => setEmail(e.target.value)}
+                className="form-input block w-full rounded-lg border px-3 py-4"
+              />
+              <input id="password" type="password" placeholder="비밀번호" required
+                value={password} onChange={(e) => setPassword(e.target.value)}
+                className="form-input block w-full rounded-lg border px-3 py-4"
+              />
+              <input id="confirm-password" type="password" placeholder="비밀번호 확인" required
+                value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
+                className="form-input block w-full rounded-lg border px-3 py-4"
+              />
+              <input id="name" type="text" placeholder="이름" required
+                value={name} onChange={(e) => setName(e.target.value)}
+                className="form-input block w-full rounded-lg border px-3 py-4"
+              />
+              <input id="phone-number" type="tel" placeholder="휴대폰 번호" required
+                value={phone} onChange={(e) => setPhone(e.target.value)}
+                className="form-input block w-full rounded-lg border px-3 py-4"
+              />
             </div>
 
             {error && <p className="text-sm text-red-400">{error}</p>}
 
             <div>
               <button type="submit" disabled={loading}
-                      className="w-full rounded-lg font-bold py-3 disabled:opacity-60"
-                      style={{ backgroundColor: 'var(--color-primary)', color: 'black' }}>
+                className="w-full rounded-lg font-bold py-3 disabled:opacity-60"
+                style={{ backgroundColor: 'var(--color-primary)', color: 'black' }}>
                 {loading ? '처리중…' : '회원가입'}
               </button>
             </div>
@@ -116,13 +119,9 @@ export default function SignUpForm({
 
           {/* 구분선 */}
           <div className="relative mt-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t" />
-            </div>
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t" /></div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-background-dark px-2 text-gray-500 dark:text-gray-400">
-                또는 다음으로 가입
-              </span>
+              <span className="bg-background-dark px-2 text-gray-500 dark:text-gray-400">또는 다음으로 가입</span>
             </div>
           </div>
 

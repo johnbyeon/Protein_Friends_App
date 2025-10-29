@@ -8,7 +8,7 @@ export default function CompleteProfile() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
-  const API_BASE = import.meta.env.VITE_API_BASE ?? window.location.origin;
+  const SERVER_ORIGIN = import.meta.env.VITE_SERVER_ORIGIN ?? '';
   const token = localStorage.getItem('jwt')
 
   const handleSubmit = async (e) => {
@@ -18,7 +18,7 @@ export default function CompleteProfile() {
 
     try {
       // 1️⃣ 프로필 저장
-      const res = await fetch(`${API_BASE}/api/users/profile`, {
+      const res = await fetch(`${SERVER_ORIGIN}/api/users/profile`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -32,7 +32,7 @@ export default function CompleteProfile() {
       setUser(updated) // 스토어 user 갱신
 
       // 2️⃣ 저장 후 서버에 다시 상태 확인
-      const chk = await fetch(`${API_BASE}/api/users/profile-status`, {
+      const chk = await fetch(`${SERVER_ORIGIN}/api/users/profile-status`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const st = await chk.json()

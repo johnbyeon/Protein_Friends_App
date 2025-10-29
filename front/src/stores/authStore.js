@@ -84,7 +84,7 @@ export const useAuthStore = create(
           // If server didn't include full user info, try to fetch /api/users/me (항상 role까지 보장)
           if (!u || !u.role) {
             try {
-              const base = import.meta.env.VITE_API_BASE ?? window.location.origin;
+              const base = import.meta.env.VITE_API_BASE ?? '';
               const res = await fetch(`${base}/api/users/me`, {
                 headers: { Authorization: `Bearer ${token}` },
               })
@@ -145,7 +145,7 @@ export function initAuthTimers() {
 async function refreshTokens() {
   const { refreshToken, loginFromResponse, logout } = useAuthStore.getState()
   if (!refreshToken) return false
-  const base = import.meta.env.VITE_API_BASE ?? window.location.origin;
+  const base = import.meta.env.VITE_API_BASE ?? ''
   const res = await fetch(`${base}/api/auth/refresh`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

@@ -23,9 +23,8 @@ export default function LoginForm({
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-
-  const API_BASE = import.meta.env.VITE_API_BASE ?? window.location.origin
-  const LOGIN_URL = `${API_BASE}${loginEndpoint}`
+  const SERVER_ORIGIN = import.meta.env.VITE_SERVER_ORIGIN || ''
+  const LOGIN_URL = `${SERVER_ORIGIN}${loginEndpoint}`
 
   // ✅ 일반 로그인
   async function handleSubmit(e) {
@@ -109,10 +108,10 @@ export default function LoginForm({
   // ✅ 소셜 로그인 (팝업 방식)
   const handleSocialLogin = (provider) => {
     console.log(`🌐 ${provider} 로그인 팝업 열림`)
-    const backendOrigin =
-      import.meta.env.VITE_BACKEND_ORIGIN ?? window.location.origin;
+    const serverOrigin =
+      import.meta.env.VITE_SERVER_ORIGIN ?? ''
 
-    const popupUrl = `${backendOrigin}/oauth2/authorization/${provider}?r=${Date.now()}`;
+    const popupUrl = `${serverOrigin}/oauth2/authorization/${provider}?r=${Date.now()}`;
     const popup = window.open(
       popupUrl,
       `${provider}-login`,
@@ -121,14 +120,11 @@ export default function LoginForm({
 
     const listener = async (event) => {
       const allowedOrigins = new Set([
-        import.meta.env.VITE_BACKEND_ORIGIN ?? window.location.origin,
-        window.location.origin,
-        'https://proteinfriends.shop',
-        'https://www.proteinfriends.shop',
+        import.meta.env.VITE_BACKEND_ORIGIN ?? ''
       ])
 
       if (!allowedOrigins.has(event.origin)) return
-
+      console.log(`[OAuth Message Received] ${event.origin}`, event.data)
       const data = event.data
       if (data && data.access_token) {
         try {
