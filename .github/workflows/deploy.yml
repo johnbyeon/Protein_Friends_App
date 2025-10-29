@@ -35,7 +35,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push ${{ matrix.name }}
+            - name: Build and push ${{ matrix.name }}
         uses: docker/build-push-action@v6
         with:
           context: ${{ matrix.context }}
@@ -43,11 +43,11 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.imagename }}:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.imagename }}:${{ github.sha }}
-          # 👇 빌드 로그 실시간 출력 + buildx idle 방지
           build-args: |
             BUILDKIT_PROGRESS=plain
           outputs: type=image
           provenance: false
+          no-cache: true
 
   deploy:
     needs: build-and-push
