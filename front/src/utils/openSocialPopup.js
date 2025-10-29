@@ -8,7 +8,7 @@ import { useAuthStore } from '../stores/authStore'
 export function openSocialPopup(provider, redirectPath = '/') {
   console.log(`🌐 ${provider} 로그인 팝업 열림`)
 
-  const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080'
+  const API_BASE = import.meta.env.VITE_API_BASE ?? window.location.origin
   const popup = window.open(
     `${API_BASE}/oauth2/authorization/${provider}?r=${Date.now()}`,
     `${provider}-login`,

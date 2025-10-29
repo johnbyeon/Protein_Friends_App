@@ -4,7 +4,7 @@ export async function checkProfileAfterLogin(afterLoginPath = '/') {
   const { token, setProfileRequired } = useAuthStore.getState()
   if (!token) return
 
-  const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080'
+  const API_BASE = import.meta.env.VITE_API_BASE ?? window.location.origin;
   const res = await fetch(`${API_BASE}/api/users/profile-status`, {
     headers: { Authorization: `Bearer ${token}` }
   })

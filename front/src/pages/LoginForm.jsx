@@ -21,7 +21,7 @@ export default function LoginForm({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080'
+  const API_BASE = import.meta.env.VITE_API_BASE ?? window.location.origin;
   const LOGIN_URL = `${API_BASE}${loginEndpoint}`
 
   // ✅ 일반 로그인
@@ -109,17 +109,20 @@ export default function LoginForm({
     }
   }
 
-  // ✅ 소셜 로그인 (팝업 방식)
-  const handleSocialLogin = (provider) => {
-    console.log(`🌐 ${provider} 로그인 팝업 열림`)
-    const popup = window.open(
-      `http://localhost:8080/oauth2/authorization/${provider}?r=${Date.now()}`,
-      `${provider}-login`,
-      'width=500,height=600,noopener=no'
-    )
 
-    const listener = async (event) => {
-      if (event.origin !== 'http://localhost:8080') return
+const listener = async (event) => {
+  const allowedOrigins = new Set([
+    // 백엔드 OAuth 콜백이 실행되는 오리진
+    import.meta.env.VITE_BACKEND_ORIGIN ?? window.location.origin,
+    // 프론트 자신의 오리진(리디렉트 페이지 등에서 메시지 보낼 수 있음)
+    window.location.origin,
+    // 필요 시 도메인 하드코드(운영)
+    'https://proteinfriends.shop',
+    'https://www.proteinfriends.shop',
+  ])
+
+  if (!allowedOrigins.has(event.origin)) return
+
       const data = event.data
       if (data && data.access_token) {
         try {
