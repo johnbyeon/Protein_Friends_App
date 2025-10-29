@@ -48,6 +48,7 @@ public class Products {
     /** 상품상태 (active / inactive) */
     @Enumerated(EnumType.STRING)
     @Column(name = "prod_status", nullable = false)
+    @Builder.Default
     private ProductStatus status = ProductStatus.ACTIVE;
 
     /** 상품등록일 (자동 기록) */

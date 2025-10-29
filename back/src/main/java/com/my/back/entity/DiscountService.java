@@ -62,6 +62,7 @@ public class DiscountService {
 
     /** 할인권 배포여부 (default true, boolean) */
     @Column(name = "is_active")
+    @Builder.Default
     private Boolean isActive = true;
 
     /** 할인권 생성일 (not null, date time) */

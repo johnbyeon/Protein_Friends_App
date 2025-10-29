@@ -36,7 +36,6 @@ public class DiscountLog {
     /** 할인 쿠폰 id (discount_service 테이블 FK, not null, number) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dis_id", nullable = false)
-    @Builder.Default
     private DiscountService discountService;
 
     /** 사용여부 (not null, boolean) */
