@@ -1,18 +1,27 @@
 # ===== Build stage =====
 FROM amazoncorretto:17.0.12 AS build
 WORKDIR /app
+
+# 소스 복사
 COPY . .
-# Gradle은 보통 빌드 속도를 높이려고 백그라운드 데몬 프로세스를 띄움.
-# 데몬 안띄우게 하는 것임. -> 속도 빨라짐
+
+# Gradle 데몬 비활성화 + StackTrace 활성화
+# ⬇️ 빌드 중 로그가 끊기지 않게 --stacktrace 추가
 RUN chmod +x ./gradlew
-RUN ./gradlew clean bootJar --no-daemon
+RUN ./gradlew clean bootJar --no-daemon --stacktrace
 
 # ===== Run stage =====
 FROM amazoncorretto:17.0.12
 WORKDIR /app
+
+# build stage 결과 JAR 복사
 COPY --from=build /app/build/libs/*.jar /app/server.jar
+
+# 포트 노출
 EXPOSE 8080
-# 컨테이너 안의 환경 변수를 정의하는 구문
-# 컨테이너가 실행될 때 리눅스 환경 변수로 들어감.
+
+# 환경변수 (prod, local 등 주입 가능)
 ENV SPRING_PROFILES_ACTIVE=local
+
+# 실행 커맨드
 CMD ["java", "-jar", "/app/server.jar"]
