@@ -1,0 +1,107 @@
+import { useState } from 'react'
+import { useAuthStore } from '../stores/authStore'
+
+export default function CompleteProfile() {
+  const { user, setUser, setProfileRequired } = useAuthStore()
+  const [name, setName] = useState(user?.name || '')
+  const [phone, setPhone] = useState(user?.phone || '')
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
+
+  const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080'
+  const token = localStorage.getItem('jwt')
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setMessage('')
+
+    try {
+      // 1️⃣ 프로필 저장
+      const res = await fetch(`${API_BASE}/api/users/profile`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name, phone }),
+      })
+      if (!res.ok) throw new Error('프로필 저장 실패')
+
+      const updated = await res.json()
+      setUser(updated) // 스토어 user 갱신
+
+      // 2️⃣ 저장 후 서버에 다시 상태 확인
+      const chk = await fetch(`${API_BASE}/api/users/profile-status`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const st = await chk.json()
+
+      // 3️⃣ 상태에 따라 처리
+      setProfileRequired(!!st.profileRequired)
+
+      if (!st.profileRequired) {
+        setMessage('✅ 프로필이 완료되었습니다! 홈으로 이동합니다.')
+        setTimeout(() => (window.location.href = '/'), 1000)
+      } else {
+        setMessage('⚠️ 입력 정보가 부족합니다. 다시 확인해주세요.')
+      }
+    } catch (err) {
+      console.error(err)
+      setMessage('❌ 오류가 발생했습니다. 다시 시도해주세요.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="flex flex-1 items-center justify-center py-12 sm:px-6 lg:px-8 min-h-screen flex-col bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md space-y-8 rounded-xl bg-background-light/5 dark:bg-background-dark/50 p-8 shadow-2xl border border-primary/30 ring-1 ring-primary/20"
+        style={{
+          boxShadow: '0 25px 50px -12px rgba(57, 255, 20, 0.25), 0 0 0 1px rgba(57, 255, 20, 0.1)',
+        }}
+      >
+        <h1 className="text-2xl font-bold mb-4">추가 정보 입력</h1>
+        <p className="text-sm text-gray-400 mb-6">
+          소셜 로그인으로 가입된 경우
+          <br />
+          이름과 전화번호를 입력해야 이용이 가능합니다.
+        </p>
+
+        <input
+          type="text"
+          placeholder="이름"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          className="form-input relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200"
+        />
+
+        <input
+          type="tel"
+          placeholder="전화번호"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          required
+          className="mt-3 form-input relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200"
+        />
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="mt-5 w-full rounded-lg font-bold py-3 disabled:opacity-60 transition-all duration-200 hover:shadow-lg hover:shadow-primary/25 active:scale-[0.95]"
+          style={{
+            backgroundColor: 'var(--color-primary)',
+            color: 'black',
+          }}
+        >
+          {loading ? '처리중…' : '저장하기'}
+        </button>
+
+        {message && <p className="mt-3 text-center text-sm">{message}</p>}
+      </form>
+    </div>
+  )
+}

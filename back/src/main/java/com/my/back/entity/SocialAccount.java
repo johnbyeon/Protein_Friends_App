@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -30,6 +31,7 @@ public class SocialAccount {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", nullable = false)
+    @JsonIgnore
     private Users users;
 
     @Column(length = 20, nullable = false)

@@ -2,41 +2,108 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import pfLogo from '../assets/pflogo.svg'
 import { useAuthStore } from '../stores/authStore'
+import { openSocialPopup } from '../utils/openSocialPopup'
+
+function tryDecodeJwt(token) {
+  try {
+    const [, payload] = token.split('.')
+    return JSON.parse(atob(payload.replace(/-/g,'+').replace(/_/g,'/')))
+  } catch { return null }
+}
 
 export default function LoginForm({
   onLogin,
   loginEndpoint = '/api/auth/login',
 }) {
-  const { loginFromResponse } = useAuthStore()
+  const { loginFromResponse, authError, clearAuthError, setAuthError } = useAuthStore()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080'
+  const LOGIN_URL = `${API_BASE}${loginEndpoint}`
+
   // ✅ 일반 로그인
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
+    if (typeof clearAuthError === 'function') clearAuthError();
     setLoading(true)
     try {
       if (onLogin) {
         await onLogin(email, password)
       } else {
-        const res = await fetch(loginEndpoint, {
+        const res = await fetch(LOGIN_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),
         })
         if (!res.ok) {
-          const err = await res.json().catch(() => ({}))
-          throw new Error(err.message || '로그인에 실패했습니다.')
+          let message = `로그인에 실패했습니다. [${res.status}]`
+          try {
+            const txt = await res.text()
+            try {
+              const j = JSON.parse(txt)
+              message = j.message || j.error || message
+            } catch {
+              if (txt) message = txt
+            }
+          } catch {}
+          console.error('[Login] server error', res.status, message)
+          throw new Error(message)
         }
-        const data = await res.json()
-        loginFromResponse(data) // ✅ JWT 상태 저장
-        window.location.href = '/' // 홈으로 이동
+        // ✅ 응답 처리 — 1순위: JSON 바디, 2순위: Authorization 헤더
+        let data = null;
+
+        // 먼저 JSON 바디를 시도 (need_profile 포함 수신)
+        try {
+          data = await res.clone().json();
+        } catch {
+          data = null;
+        }
+
+        // 바디에 토큰이 없으면 헤더에서 보완
+        if (!data || !data.access_token) {
+          const auth = res.headers.get('Authorization');
+          if (auth && auth.startsWith('Bearer ')) {
+            const token = auth.substring(7);
+            const decoded = tryDecodeJwt(token) || {};
+            const nowSec = Math.floor(Date.now() / 1000);
+            const ttl = decoded.exp ? Math.max(10, decoded.exp - nowSec) : 3600;
+
+            // 헤더만 온 경우에도 최소한의 데이터 구성
+            data = {
+              access_token: token,
+              expires_in: ttl,
+              user: {
+                email: decoded.email ?? email,
+                role: decoded.role ?? 'ROLE_USER',
+              },
+              // 헤더 경로에서는 need_profile 정보를 알 수 없으므로 기본 false
+              need_profile: false,
+            };
+          } else {
+            throw new Error('토큰 응답이 없습니다.');
+          }
+        }
+
+        // 디버깅 로그
+        console.log('[LoginResponse] payload =', data);
+        console.log('[LoginResponse] need_profile =', data?.need_profile);
+
+        // 상태 반영
+        await loginFromResponse(data);
+
+        // ✅ 프로필 필요 여부 따라 이동 (명시적 비교)
+        const redirectTo =
+          data?.need_profile === true ? '/auth/complete-profile' : '/';
+        console.log('[LoginRedirect] ->', redirectTo);
+        window.location.assign(redirectTo);
       }
     } catch (e) {
       setError(e.message || '로그인에 실패했습니다.')
+      if (typeof setAuthError === 'function') setAuthError(e.message || '로그인에 실패했습니다.')
     } finally {
       setLoading(false)
     }
@@ -51,14 +118,22 @@ export default function LoginForm({
       'width=500,height=600,noopener=no'
     )
 
-    const listener = (event) => {
+    const listener = async (event) => {
       if (event.origin !== 'http://localhost:8080') return
       const data = event.data
       if (data && data.access_token) {
-        loginFromResponse(data)
-        console.log(`✅ ${provider} 로그인 성공`)
+        try {
+          await loginFromResponse(data)
+          console.log(`✅ ${provider} 로그인 성공:`, data)
+        } catch (e) {
+          console.warn('[SocialLogin] loginFromResponse 에러', e)
+        }
         window.removeEventListener('message', listener)
-        window.location.reload()
+
+        // 프로필 필요 여부에 따라 리다이렉트
+        const redirectTo = data.need_profile === true ? '/auth/complete-profile' : '/'
+        console.log('[SocialLoginRedirect] ->', redirectTo)
+        window.location.assign(redirectTo)
       }
     }
     window.addEventListener('message', listener)
@@ -123,9 +198,20 @@ export default function LoginForm({
               </div>
             </div>
 
-            {/* 에러 메시지 */}
-            {error && (
-              <p className="text-sm text-red-400">{error}</p>
+            {/* 에러 메시지 (로컬 오류 + 스토어 오류 모두 표시) */}
+            {(error || authError) && (
+              <div className="text-sm text-red-400">
+                {error || authError}
+                {authError && (
+                  <button
+                    type="button"
+                    className="ml-2 underline"
+                    onClick={typeof clearAuthError === 'function' ? clearAuthError : undefined}
+                  >
+                    닫기
+                  </button>
+                )}
+              </div>
             )}
 
             <div className="flex items-center justify-between text-sm">
@@ -172,42 +258,11 @@ export default function LoginForm({
 
           {/* ✅ 소셜 로그인 버튼 (팝업 연동) */}
           <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            {/* 카카오 */}
-            <button
-              type="button"
-              onClick={() => handleSocialLogin('kakao')}
-              className="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 bg-background-light dark:bg-black px-4 py-3 text-sm font-medium hover:bg-yellow-300 hover:border-yellow-300 hover:text-black transition-all duration-200"
-            >
-              카카오
-            </button>
-
-            {/* 네이버 */}
-            <button
-              type="button"
-              onClick={() => handleSocialLogin('naver')}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = 'var(--color-primary)'
-                e.target.style.borderColor = 'var(--color-primary)'
-                e.target.style.color = 'black'
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = ''
-                e.target.style.borderColor = ''
-                e.target.style.color = ''
-              }}
-              className="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 bg-background-light dark:bg-black px-4 py-3 text-sm font-medium transition-all duration-200"
-            >
-              네이버
-            </button>
-
-            {/* 구글 */}
-            <button
-              type="button"
-              onClick={() => handleSocialLogin('google')}
-              className="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 bg-background-light dark:bg-black px-4 py-3 text-sm font-medium hover:bg-blue-600 hover:border-blue-600 hover:text-white transition-all duration-200"
-            >
-              구글
-            </button>
+            <button type="button" onClick={() => {console.log('🖱️ 구글 로그인 버튼 클릭됨')
+            openSocialPopup('google', '/')}}>구글</button>
+            <button type="button" onClick={() => {console.log('🖱️ 구글 로그인 버튼 클릭됨')
+              openSocialPopup('naver', '/')}}>네이버</button>
+            <button type="button" onClick={() => openSocialPopup('kakao', '/')}>카카오</button>
           </div>
         </div>
       </main>

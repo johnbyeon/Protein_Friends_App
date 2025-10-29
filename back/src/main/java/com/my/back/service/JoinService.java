@@ -7,7 +7,6 @@ import com.my.back.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +31,7 @@ public class JoinService {
         data.setEmail(joinDTO.getEmail());
         data.setName(joinDTO.getUsername());
         data.setPassword(bCryptPasswordEncoder.encode(joinDTO.getPassword()));
-        data.setUserRole(UserRole.USER);
+        data.setRole(UserRole.USER);
 
         userRepository.save(data);
     }

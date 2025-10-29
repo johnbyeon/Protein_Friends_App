@@ -6,9 +6,9 @@ import App from './App.jsx'
 
 document.documentElement.setAttribute('data-role', 'user')
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  //<StrictMode>
     <BrowserRouter>
       <App />
     </BrowserRouter>
-  </StrictMode>,
+  //</StrictMode>
 )

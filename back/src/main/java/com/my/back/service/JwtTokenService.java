@@ -46,4 +46,5 @@ public class JwtTokenService implements SessionTime {
         return Jwts.parser().verifyWith(getKey()).build()
                 .parseSignedClaims(token).getPayload().get("role", String.class);
     }
+
 }

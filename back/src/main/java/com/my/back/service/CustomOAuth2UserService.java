@@ -13,11 +13,11 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +27,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final SocialAccountRepository socialAccountRepository;
 
     @Override
+    @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
@@ -42,7 +43,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user = userRepository.save(Users.builder()
                     .email(email)
                     .password("SOCIAL_" + registrationId.toUpperCase())
-                    .userRole(UserRole.USER)
+                    .role(UserRole.USER)
                     .build());
         }
 
@@ -84,7 +85,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         return new CustomOAuth2User(
                 user.getEmail(),
-                user.getUserRole().getLabel(),
+                user.getRole().getLabel(),
                 oAuth2User.getAttributes(),
                 oAuth2User.getAuthorities()
         );

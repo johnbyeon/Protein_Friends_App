@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -47,8 +48,8 @@ public class Users {
 
     /** 회원 역할 (not null, enum) */
     @Enumerated(EnumType.STRING)
-    @Column(name = "user_role", nullable = false)
-    private UserRole userRole;
+    @Column(name = "role", nullable = false)
+    private UserRole role;
 
     /** 가입일시 (not null, 자동 생성) */
     @CreatedDate
@@ -82,5 +83,6 @@ public class Users {
 
     /** 소셜 연결 상세 정보 (1:N, 단방향) */
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<SocialAccount> socialAccounts = new ArrayList<>();
 }

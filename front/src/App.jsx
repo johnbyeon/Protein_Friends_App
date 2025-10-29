@@ -1,24 +1,21 @@
 import { useEffect } from 'react'
-import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
-import LoginForm from './pages/LoginForm'
-import SignUpForm from './pages/SignUpForm'
-import OAuthLogin from './pages/OAuthLogin'
+import OAuthMessageBridge from './components/OAuthMessageBridge'
 import { initAuthTimers } from './stores/authStore'
+import AppRoutes from './routes/AppRoutes'
+
 
 export default function App() {
-  useEffect(() => { initAuthTimers() }, [])
+  useEffect(() => {
+    initAuthTimers()
+  }, [])
 
   return (
     <>
+      {/* 전역 OAuth 메시지 브리지: 팝업에서 postMessage 수신 */}
+      <OAuthMessageBridge />
       <Navbar />
-      <main className="text-white p-6">
-        <Routes>
-          <Route path="/" element={<OAuthLogin />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route path="/auth/register" element={<SignUpForm />} />
-        </Routes>
-      </main>
+      <AppRoutes />
     </>
   )
 }

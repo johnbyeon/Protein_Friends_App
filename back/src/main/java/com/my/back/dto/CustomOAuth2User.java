@@ -9,7 +9,7 @@ import java.util.Map;
 public class CustomOAuth2User implements OAuth2User {
 
     private final String email;
-    private final String role;
+    private final String userRole;
     private final Map<String, Object> attributes;
     private final Collection<? extends GrantedAuthority> authorities;
 
@@ -18,7 +18,7 @@ public class CustomOAuth2User implements OAuth2User {
                             Map<String, Object> attributes,
                             Collection<? extends GrantedAuthority> authorities) {
         this.email = email;
-        this.role = role;
+        this.userRole = role;
         this.attributes = attributes;
         this.authorities = authorities;
     }
@@ -28,7 +28,7 @@ public class CustomOAuth2User implements OAuth2User {
     }
 
     public String getRole() {
-        return role;
+        return "ROLE_" + userRole;
     }
 
     @Override
