@@ -45,6 +45,7 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.imagename }}:${{ github.sha }}
           build-args: |
             BUILDKIT_PROGRESS=plain
+            VITE_SERVER_ORIGIN=https://www.proteinfriends.shop   # ✅ 여기에 추가
           outputs: type=image
           provenance: false
           no-cache: true
