@@ -35,19 +35,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-            - name: Build and push ${{ matrix.name }}
-              uses: docker/build-push-action@v6
-              with:
-                context: ${{ matrix.context }}
-                push: true
-                tags: |
-                  ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.imagename }}:latest
-                  ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.imagename }}:${{ github.sha }}
-                build-args: |
-                  BUILDKIT_PROGRESS=plain
-                outputs: type=image
-                provenance: false
-                no-cache: true
+      - name: Build and push ${{ matrix.name }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.imagename }}:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.imagename }}:${{ github.sha }}
+          build-args: |
+            BUILDKIT_PROGRESS=plain
+          outputs: type=image
+          provenance: false
+          no-cache: true
 
   deploy:
     needs: build-and-push
