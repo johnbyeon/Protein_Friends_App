@@ -16,24 +16,31 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class MealLogList {
-    /** 등록 번호 */
-    @Id
-    @Column(name = "record_id", nullable = false)
-    private Long recordId;
 
-    /** 식사정보(아침,점심,저녁,간식,브런치,야식,기타) */
+    /** PK: 개별 음식 항목 */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;   // ✅ 새 PK
+
+    /** FK: 어느 meal_log 에 속하는지 */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "record_id", nullable = false)
+    private MealLog mealLog;  // ✅ FK로 변경
+
+    /** 식사 타입 */
     @Column(name = "meal_type", nullable = false)
     private String mealType;
 
-    /** 섭취 음식과 섭취량 기록용 */
+    /** 음식 이름 + 양 */
     @Column(name = "food_note")
     private String foodNote;
 
-    /** 트레이너의 코멘트 */
+    /** 트레이너 코멘트 */
     @Column(name = "t_comment")
     private String trainerComment;
 
-    /** 식단 사진 URL */
+    /** 사진 URL */
     @Column(name = "t_pic_url")
     private String pictureUrl;
 }
