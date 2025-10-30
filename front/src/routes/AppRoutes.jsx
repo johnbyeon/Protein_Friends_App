@@ -1,42 +1,39 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 import ProtectedRoute from './ProtectedRoute'
-import { PublicRoutes } from './PublicRoutes'
 import { AuthRoutes } from './AuthRoutes'
 import { AdminRoutes } from './AdminRoutes'
-import MyInfo from '../pages/MyInfo'
+import { UserRoutes } from './UserRoutes'
 import Home from '../pages/Home'
 
 export default function AppRoutes() {
-  const { user } = useAuthStore()
-  const role = user?.role || ''
-
-  const isAuthenticated = !!user
+  const { token, user, profileRequired } = useAuthStore()
+  const isAuthenticated = !!(token && user)
 
   return (
     <Routes>
-      {/* 기본 홈 경로 */}
+      {/* 루트: 로그인 안됨 → /login, 로그인됨 → 홈/프로필완성 유도 */}
       <Route
         path="/"
         element={
-          isAuthenticated ? (
-            role === 'ROLE_ADMIN' ? (
-              <Navigate to="/admin/dashboard" replace />
-            ) : (
-              <ProtectedRoute element={<Home />} />
-            )
-          ) : (
-            <Navigate to="/login" replace />
-          )
+          isAuthenticated
+            ? (profileRequired
+                ? <Navigate to="/auth/complete-profile" replace />
+                : <ProtectedRoute element={<Home />} />)
+            : <Navigate to="/login" replace />
         }
       />
 
-      {/* 공용, 인증, 관리자 페이지 */}
-      {PublicRoutes}
+      {/* 로그인/회원가입/프로필완성 */}
       {AuthRoutes}
+
+      {/* 유저 전용 */}
+      {UserRoutes}
+
+      {/* 트레이너/관리자 전용 */}
       {AdminRoutes}
 
-      {/* 잘못된 경로 */}
+      {/* 존재하지 않는 URL → 루트로 */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

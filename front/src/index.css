@@ -1,21 +1,46 @@
-/* src/index.css */
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
 
-/* 기본값 = 유저(초록) */
+/* === 기본 테마 (유저: 네온 그린) === */
 @theme {
-  --color-primary: #39ff14;
-  --color-background-light: #000000;
+  --color-primary: #39FF14;
+  --color-primary-light: #6AFF47;
+  --color-primary-dark: #1DBF0A;
+
+  --color-background-light: #0D0D0D;
   --color-background-dark: #000000;
   --color-surface-light: #1F2937;
-  --color-surface-dark: #1F2937;
+  --color-surface-dark: #111827;
+
   --color-text-light: #FFFFFF;
-  --color-text-dark: #FFFFFF;
+  --color-text-dark: #E5E7EB;
+
   --color-border-light: #374151;
-  --color-border-dark: #374151;
+  --color-border-dark: #4B5563;
+
+  --color-accent: #00FFFF;
+  --color-warning: #FFD60A;
+  --color-error: #FF4D4D;
+
+    /* ✅ 소셜 브랜드 컬러 추가 */
+  --color-blue: #4285F4;   /* Google */
+  --color-green: #03C75A;  /* Naver */
+  --color-yellow: #FEE500; /* Kakao */
 }
 
-/* 관리자일 때만 빨강으로 오버라이드 */
-:root[data-role="admin"] { --color-primary: #DC2626; }
-/* 유저 명시(선택) */
-:root[data-role="user"]  { --color-primary: #39ff14; }
+/* === 유저 (USER: 네온그린 계열) === */
+:root[data-role="user"] {
+  --color-primary: #39FF14;        /* 기본 네온그린 */
+  --color-primary-light: #6AFF47;  /* 밝은 네온그린 */
+  --color-primary-dark: #1DBF0A;   /* 짙은 네온그린 */
+  --color-accent: #00FFFF;         /* 보조 포인트 - 청록 */
+}
+
+/* === 관리자 / 트레이너 (ADMIN + TRAINER: 레드 계열) === */
+:root[data-role="admin"],
+:root[data-role="trainer"] {
+  --color-primary: #DC2626;        /* 진한 레드 */
+  --color-primary-light: #EF4444;  /* 약간 밝은 빨강 */
+  --color-primary-dark: #991B1B;   /* 어두운 빨강 */
+  --color-accent: #FFB700;         /* 포인트 노랑 */
+}
