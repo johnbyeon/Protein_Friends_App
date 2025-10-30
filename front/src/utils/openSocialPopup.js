@@ -9,6 +9,7 @@ export function openSocialPopup(provider, redirectPath = '/') {
   console.log(`🌐 ${provider} 로그인 팝업 열림`)
 
   const SERVER_ORIGIN = import.meta.env.VITE_SERVER_ORIGIN ?? ''
+
   const popup = window.open(
     `${SERVER_ORIGIN}/oauth2/authorization/${provider}?r=${Date.now()}`,
     `${provider}-login`,
@@ -16,9 +17,11 @@ export function openSocialPopup(provider, redirectPath = '/') {
   )
 
   const listener = async (event) => {
-    const allowedOrigins = [SERVER_ORIGIN]
-    if (!allowedOrigins.includes(event.origin)) return
-    
+    const withWww = SERVER_ORIGIN.replace('://', '://www.')
+    const noWww = SERVER_ORIGIN.replace('://www.', '://')
+    const allowedOrigins = new Set([SERVER_ORIGIN, withWww, noWww])
+    if (!allowedOrigins.has(event.origin)) return
+
     const data = event.data
     console.log('[OAuth Message Received]', event.origin, data)
 
@@ -36,7 +39,7 @@ export function openSocialPopup(provider, redirectPath = '/') {
         refresh_token: data.refresh_token ?? null,
         expires_in: data.expires_in ?? null,
         user: data.user ?? null,
-        need_profile: data.need_profile ?? data.profileRequired ?? null,
+        need_profile: needProfile ?? false,
       })
       console.log(`✅ ${provider} 로그인 성공, server need_profile=${data.need_profile}`)
     } catch (err) {
