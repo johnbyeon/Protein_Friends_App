@@ -20,10 +20,11 @@ export function openSocialPopup(provider, redirectPath = '/') {
     const withWww = SERVER_ORIGIN.replace('://', '://www.')
     const noWww = SERVER_ORIGIN.replace('://www.', '://')
     const allowedOrigins = new Set([SERVER_ORIGIN, withWww, noWww])
+    console.log('[OAuth Message Received]', event.origin, data)
     if (!allowedOrigins.has(event.origin)) return
 
     const data = event.data
-    console.log('[OAuth Message Received]', event.origin, data)
+
 
     if (!data || !data.access_token) return
 
