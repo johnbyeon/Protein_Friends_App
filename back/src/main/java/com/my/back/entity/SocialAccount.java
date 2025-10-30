@@ -3,6 +3,8 @@ package com.my.back.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+
 import java.time.LocalDateTime;
 
 /**

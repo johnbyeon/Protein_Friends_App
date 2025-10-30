@@ -2,6 +2,10 @@ package com.my.back.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import java.time.LocalDateTime;
 
 /**
@@ -66,10 +70,12 @@ public class DiscountService {
     private Boolean isActive = true;
 
     /** 할인권 생성일 (not null, date time) */
+    @CreatedDate
     @Column(name = "dis_create_at", nullable = false)
     private LocalDateTime disCreateAt;
 
     /** 할인권 수정일 (not null, date time) */
+    @LastModifiedDate
     @Column(name = "dis_update_at", nullable = false)
     private LocalDateTime disUpdateAt;
 }

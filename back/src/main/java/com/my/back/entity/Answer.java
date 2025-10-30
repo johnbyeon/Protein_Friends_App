@@ -2,6 +2,9 @@ package com.my.back.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import java.time.LocalDateTime;
 
 /**
@@ -43,10 +46,12 @@ public class Answer {
     private String answer;
 
     /** 답변 작성일 (not null, date time) */
+    @CreatedDate
     @Column(name = "create_date", nullable = false)
     private LocalDateTime createDate;
 
     /** 답변 수정일 (not null, date time) */
+    @LastModifiedDate
     @Column(name = "update_date", nullable = false)
     private LocalDateTime updateDate;
 

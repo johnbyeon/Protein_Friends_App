@@ -2,6 +2,8 @@ package com.my.back.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+
 import java.time.LocalDateTime;
 
 /**
@@ -37,6 +39,7 @@ public class MealLog {
     private String mealType;
 
     /** 등록일 */
+    @CreatedDate
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
 

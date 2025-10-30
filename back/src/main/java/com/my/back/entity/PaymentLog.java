@@ -2,6 +2,8 @@ package com.my.back.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -41,6 +43,7 @@ public class PaymentLog {
     private String customerName;
 
     /** 결제 완료 시점 (not null) */
+    @CreatedDate
     @Column(name = "payment_time", nullable = false)
     private LocalDateTime paymentTime;
 

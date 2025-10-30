@@ -2,6 +2,8 @@ package com.my.back.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+
 import java.time.LocalDateTime;
 
 /**
@@ -39,6 +41,7 @@ public class TrainerUserMapping {
     private TrainerInfo trainer;
 
     /** 등록일 (not null, date time) */
+    @CreatedDate
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
 

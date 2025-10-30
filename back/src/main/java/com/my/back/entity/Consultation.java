@@ -2,6 +2,8 @@ package com.my.back.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+
 import java.time.LocalDateTime;
 
 /**
@@ -51,6 +53,7 @@ public class Consultation {
     private String note;
 
     /** 상담노트 등록시간 (not null, date time) */
+    @CreatedDate
     @Column(name = "c_date", nullable = false)
     private LocalDateTime cDate;
 

@@ -2,6 +2,9 @@ package com.my.back.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import java.time.LocalDateTime;
 
 /**
@@ -56,10 +59,12 @@ public class PTService {
     private Boolean isActive = true;
 
     /** 이용권 생성날짜 (not null, date time) */
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     /** 이용권 수정날짜 (not null, date time) */
+    @LastModifiedDate
     @Column(name = "update_at", nullable = false)
     private LocalDateTime updateAt;
 }

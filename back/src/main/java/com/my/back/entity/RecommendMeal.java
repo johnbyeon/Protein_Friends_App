@@ -29,7 +29,7 @@ public class RecommendMeal {
     @Column(name = "u_id", nullable = false)
     private Long userId;
 
-    /** 해당 날짜 */
+    /** 식단등록 해당 날짜 */
     @Column(name = "date", nullable = false)
     private LocalDate date;
 

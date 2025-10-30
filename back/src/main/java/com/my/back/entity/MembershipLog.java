@@ -2,6 +2,8 @@ package com.my.back.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -60,6 +62,7 @@ public class MembershipLog {
     private MembershipStatus status;
 
     /** 판매일(구매일) (not null, date time) */
+    @CreatedDate
     @Column(name = "create_date", nullable = false)
     private LocalDateTime createDate;
 

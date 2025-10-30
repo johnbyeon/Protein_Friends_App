@@ -2,6 +2,9 @@ package com.my.back.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import java.time.LocalDateTime;
 
 /**
@@ -51,10 +54,12 @@ public class MembershipService {
     private Boolean isActive = true;
 
     /** 회원권 만든 날짜 (not null, date time) */
+    @CreatedDate
     @Column(name = "create_at", nullable = false)
     private LocalDateTime createAt;
 
     /** 회원권 수정 날짜 (not null, date time) */
+    @LastModifiedDate
     @Column(name = "update_at", nullable = false)
     private LocalDateTime updateAt;
 }
