@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 public class MealLog {
     /** 등록 번호 */
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "record_id", nullable = false)
     private Long recordId;
 
