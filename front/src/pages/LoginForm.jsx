@@ -150,8 +150,8 @@ export default function LoginForm({
     <div className="flex min-h-screen flex-col bg-background-dark font-display text-text-light">
       <main className="flex flex-1 items-center justify-center py-12 sm:px-6 lg:px-8">
         <div
-          className="w-full max-w-md space-y-8 rounded-2xl border outline-none transition-all 
-          bg-background-dark p-10 transition-all duration-300"
+          className="w-full max-w-md space-y-8 rounded-xl dark:bg-background-dark/50 
+           shadow-2xl border border-primary/20 ring-1 ring-primary/30 p-10 transition-all duration-300"
         >
           {/* 헤더 */}
           <div className="text-center mb-8">
@@ -173,7 +173,7 @@ export default function LoginForm({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="block w-full rounded-lg border border-border-dark 
+              className="block w-full rounded-lg border border-primary/20  
               bg-background-dark px-4 py-3 text-gray-200 placeholder-gray-500 
               focus:border-primary focus:ring-2 focus:ring-primary/40 focus:outline-none 
               transition-all duration-200"
@@ -186,7 +186,7 @@ export default function LoginForm({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="block w-full rounded-lg border border-border-dark 
+              className="block w-full rounded-lg border border-primary/20  
               bg-background-dark px-4 py-3 text-gray-200 placeholder-gray-500 
               focus:border-primary focus:ring-2 focus:ring-primary/40 focus:outline-none 
               transition-all duration-200"
@@ -221,7 +221,7 @@ export default function LoginForm({
           {/* 구분선 */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border-light" />
+              <div className="w-full border-t border-primary/20" />
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="bg-background-dark px-2 text-gray-400">
@@ -233,19 +233,23 @@ export default function LoginForm({
           {/* 소셜 로그인 버튼 */}
 
           <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <button type="button" className="rounded-lg border border-border-dark py-2 
-                text-sm font-medium hover:bg-[var(--color-blue)] 
-                hover:text-white transition-all duration-200" onClick={() => handleSocialLogin('google')}>
+            <button type="button" className="rounded-lg border border-primary/20 py-2 
+                text-sm text-gray-400 font-medium 
+                hover:bg-[var(--color-blue)] hover:text-white
+                hover:border-[var(--color-blue)] transition-all 
+                duration-200" onClick={() => handleSocialLogin('google')}>
                   GOOGLE
                   </button>
-            <button type="button" className="rounded-lg border border-border-dark py-2 
-                text-sm font-medium hover:bg-[var(--color-green)] 
-                hover:text-white transition-all duration-200"onClick={() => handleSocialLogin('naver')}>
+            <button type="button" className="rounded-lg border border-primary/20 py-2 
+                text-sm text-gray-400 font-medium hover:bg-[var(--color-green)] 
+                hover:text-white transition-all 
+                hover:border-[var(--color-green)] duration-200"onClick={() => handleSocialLogin('naver')}>
                   NAVER
                 </button>
-            <button type="button" className="rounded-lg border border-border-dark py-2 
-                text-sm font-medium hover:bg-[var(--color-yellow)] 
-                hover:text-black transition-all duration-200" onClick={() => handleSocialLogin('kakao')}>
+            <button type="button" className="rounded-lg border border-primary/20 py-2 
+                text-sm text-gray-400 font-medium hover:bg-[var(--color-yellow)] 
+                hover:text-black transition-all 
+                hover:border-[var(--color-yellow)] duration-200" onClick={() => handleSocialLogin('kakao')}>
                   KAKAO
                   </button>
           </div>

@@ -107,7 +107,7 @@ export default function Home() {
               <a
                 key={i}
                 href="#"
-                className="flex-1 w-full text-center bg-black text-neon-green py-3 px-4 border border-neon-green hover:bg-neon-green hover:text-black transition-colors duration-300 flex items-center justify-center gap-2"
+                className="flex-1 w-full text-center bg-black text-primary/30 py-3 px-4 border border-primary/30 hover:bg-neon-green hover:text-primary hover:ring-1 transition-colors duration-300 flex items-center justify-center gap-2"
               >
                 <span className="material-symbols-outlined">{item.icon}</span>
                 {item.text}
@@ -117,7 +117,7 @@ export default function Home() {
 
           <div className="text-center text-gray-400 text-sm space-y-1">
             <p>
-              <span className="text-white font-semibold">주식회사 스티치</span> | 대표:
+              <span className="text-gray-400 font-semibold">주식회사 스티치</span> | 대표:
               홍길동 | 사업자등록번호: 123-45-67890 | 통신판매업신고번호:
               제2024-서울강남-00000호
             </p>
@@ -125,7 +125,7 @@ export default function Home() {
               주소: 서울특별시 강남구 테헤란로 123, 4층 | TEL: 02-1234-5678 | E-MAIL:
               contact@stitchdesign.com
             </p>
-            <p className="pt-4 text-gray-500">
+            <p className="pt-4 text-gray-400">
               COPYRIGHT © STITCH DESIGN ALL RIGHTS RESERVED.
             </p>
           </div>

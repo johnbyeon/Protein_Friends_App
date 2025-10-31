@@ -31,11 +31,11 @@ const Navbar = () => {
   }
 
   return (
-    <header className="flex items-center justify-between px-6 py-3 bg-background-light dark:bg-background-dark border-b border-gray-700 sticky top-0 z-20">
+    <header className="flex items-center justify-between px-6 py-3 dark:bg-background-dark border border-primary/20 sticky top-0 z-20">
       <div className="flex items-center gap-3">
         <Link to="/" className="flex items-center gap-2">
           <img src={pfLogo} alt="Protein Friends" className="w-5 h-5" />
-          <h1 className="font-bold text-lg text-white">Protein Friends</h1>
+          <h1 className="font-bold text-lg text-gray-400">Protein Friends</h1>
         </Link>
       </div>
       {/* ===== Center: Main Navigation ===== */}
@@ -59,15 +59,16 @@ const Navbar = () => {
       <nav className="flex items-center gap-6 text-sm text-gray-200">
         <div class="relative group">
           <button class="flex items-center gap-2 focus:outline-none">
-            <img src={userprofile} class="w-9 h-9 rounded-full border border-border-dark" alt="User" />
+            <img src={userprofile} class="w-9 h-9 rounded-full border border-border-primary/20" alt="User" />
           </button>
-          <div class="absolute right-0 mt-2 w-48 border border-border-dark rounded-md shadow-lg
+
+          <div class="absolute right-0 mt-2 w-48 border border-border-primary/20 rounded-md shadow-lg
             bg-black text-white
             opacity-0 translate-y-1 group-hover:opacity-80 group-hover:translate-y-0 transition-all duration-200">
             {!isLoggedIn ? (
               <>
                 <a href="/login" class="block px-4 py-2 text-sm hover:bg-primary/20">로그인</a>
-                <a href="/auth/register" class="block px-4 py-2 text-sm hover:bg-primary/20">회원가입</a>
+                <a href="/register" class="block px-4 py-2 text-sm hover:bg-primary/20">회원가입</a>
               </>
             ) : isLoadingUser ? (
               <span>정보 불러오는 중...</span>

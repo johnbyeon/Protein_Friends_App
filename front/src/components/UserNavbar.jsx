@@ -2,7 +2,7 @@ const UserNavbar = () => {
     return (
         <>
             <div className="relative group">
-                <button className="flex items-center gap-1 text-sm font-medium text-text-light">
+                <button className="flex items-center gap-1 text-sm font-medium text-gray-400">
                     <a href="/access" className="hover:underline mr-3">출입체크</a>
                 </button>
                 <div
@@ -12,9 +12,9 @@ const UserNavbar = () => {
                 </div>
             </div>
             <div className="relative group">
-                <button className="flex items-center gap-1 text-sm font-medium text-text-light">
+                <button className="flex items-center gap-1 text-sm font-medium text-gray-400">
                     <span className="hover:underline">게시판</span>
-                    <span className="material-symbols-outlined text-base transition-transform group-hover:rotate-180">expand_more</span>
+                    <span className="material-symbols-outlined text-base transition-transform group-hover:rotate-180 group-hover:text-text-light">expand_more</span>
                 </button>
                 <div
                     className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-black border border-border-dark 
@@ -30,9 +30,9 @@ const UserNavbar = () => {
 
 
             <div className="relative group">
-                <button className="flex items-center gap-1 text-sm font-medium text-text-light">
-                    <span className="hover:underline">SHOP</span>
-                    <span class="material-symbols-outlined text-base transition-transform group-hover:rotate-180">expand_more</span>
+                <button className="flex items-center gap-1 text-sm font-medium text-gray-400">
+                    <span className="hover:underline hover:text-text-light duration-200 mr-3">SHOP</span>
+                    <span class="material-symbols-outlined text-base transition-transform group-hover:rotate-180 group-hover:text-text-light">expand_more</span>
                 </button>
                 <div
                     className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-black border border-border-dark 
@@ -48,8 +48,8 @@ const UserNavbar = () => {
             </div>
 
              <div className="relative group">
-                <button className="flex items-center gap-1 text-sm font-medium text-text-light">
-                    <a href="/trainers" className="hover:underline mr-3">트레이너</a>
+                <button className="flex items-center gap-1 text-sm font-medium text-gray-400">
+                    <a href="/trainers"  className="hover:underline hover:text-text-light mr-3">트레이너</a>
                 </button>
                 <div
                     className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-black border border-border-dark 
@@ -58,8 +58,8 @@ const UserNavbar = () => {
                 </div>
             </div>
              <div className="relative group">
-                <button className="flex items-center gap-1 text-sm font-medium text-text-light">
-                    <a href="/branches" className="hover:underline mr-3">지점 정보</a>
+                <button className="flex items-center gap-1 text-sm font-medium text-gray-400">
+                    <a href="/branches" className="hover:underline hover:text-text-light mr-3">지점 정보</a>
                 </button>
                 <div
                     className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-black border border-border-dark 
@@ -69,9 +69,9 @@ const UserNavbar = () => {
             </div>
 
             <div className="relative group">
-                <button className="flex items-center gap-1 text-sm font-medium text-text-light">
-                    <span className="hover:underline">식단관리</span>
-                    <span class="material-symbols-outlined text-base transition-transform group-hover:rotate-180">expand_more</span>
+                <button className="flex items-center gap-1 text-sm font-medium text-gray-400">
+                    <span  className="hover:underline hover:text-text-light mr-3">식단관리</span>
+                    <span class="material-symbols-outlined text-base transition-transform group-hover:rotate-180 group-hover:text-text-light">expand_more</span>
                 </button>
                 <div
                     className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-black border border-border-dark 
@@ -84,8 +84,8 @@ const UserNavbar = () => {
             </div>
 
             <div className="relative group">
-                <button className="flex items-center gap-1 text-sm font-medium text-text-light">
-                    <span className="hover:underline">PT 클래스</span>
+                <button className="flex items-center gap-1 text-sm font-medium text-gray-400">
+                    <span className="hover:underline hover:text-text-light mr-3">PT 클래스</span>
                     <span class="material-symbols-outlined text-base transition-transform group-hover:rotate-180">expand_more</span>
                 </button>
                 <div
@@ -99,8 +99,8 @@ const UserNavbar = () => {
             </div>
             
             <div className="relative group">
-                <button className="flex items-center gap-1 text-sm font-medium text-text-light">
-                    <span className="hover:underline">내 정보관리</span>
+                <button className="flex items-center gap-1 text-sm font-medium text-gray-400">
+                    <span className="hover:underline hover:text-text-light mr-3">내 정보관리</span>
                     <span class="material-symbols-outlined text-base transition-transform group-hover:rotate-180">expand_more</span>
                 </button>
                 <div
@@ -117,8 +117,8 @@ const UserNavbar = () => {
             </div>
 
             <div className="relative group">
-                <button className="flex items-center gap-1 text-sm font-medium text-text-light">
-                    <span className="hover:underline">고객센터</span>
+                <button className="flex items-center gap-1 text-sm font-medium text-gray-400">
+                    <span className="hover:underline hover:text-text-light mr-3">고객센터</span>
                     <span className="material-symbols-outlined text-base transition-transform group-hover:rotate-180">expand_more</span>
                 </button>
                 <div

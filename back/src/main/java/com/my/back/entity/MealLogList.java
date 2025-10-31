@@ -32,15 +32,15 @@ public class MealLogList {
     @Column(name = "meal_type", nullable = false)
     private String mealType;
 
-    /** 음식 이름 + 양 */
+    /** 섭취 음식과 섭취량 기록용 */
     @Column(name = "food_note")
     private String foodNote;
 
-    /** 트레이너 코멘트 */
+    /** 트레이너의 코멘트 */
     @Column(name = "t_comment")
     private String trainerComment;
 
-    /** 사진 URL */
+    /** 식단 사진 URL */
     @Column(name = "t_pic_url")
     private String pictureUrl;
 }
