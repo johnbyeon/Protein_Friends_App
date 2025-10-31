@@ -7,18 +7,6 @@ import Backgroundimage4 from '../images/KakaoTalk_20251031_162309082.png';
 
 const SHELL_W = 1440
 
-/** 안전한 절대경로 */
-function resolveImage(src) {
-  if (!src) return ""
-  const s = String(src)
-  if (/^https?:\/\//i.test(s)) return s
-  if (s.startsWith("/")) return s
-  try {
-    return new URL(s, import.meta.url).href
-  } catch {
-    return s.replace(/^\.\.\//, "/")
-  }
-}
 
 /* =========================
    ULTRA SOFT Feather Masks
@@ -44,6 +32,7 @@ function maskBottomUltra(px = 160) {
   }
 }
 
+
 /* =========================
    Background Section
    ========================= */
@@ -65,7 +54,7 @@ function BackgroundSection({
       }}
     >
       <img
-        src={url}
+        src={src}
         alt={alt}
         className="block w-full h-auto select-none pointer-events-none"
         loading="eager"
@@ -185,7 +174,7 @@ export default function Home() {
       <main className="w-full">
         {/* HERO 1 */}
         <BackgroundSection
-          imageUrl={Backgroundimage1}
+          src={Backgroundimage1}
           alt="Hero 1"
           feather={180}
           overlapNext={84}
@@ -213,7 +202,7 @@ export default function Home() {
 
         {/* 이후 시퀀스 */}
         <BackgroundSection
-          imageUrl={Backgroundimage2}
+          src={Backgroundimage2}
           alt="Hero 2"
           feather={170}
           overlapNext={78}
@@ -227,7 +216,7 @@ export default function Home() {
         />
 
         <BackgroundSection
-          imageUrl={Backgroundimage3}
+          src={Backgroundimage3}
           alt="Hero 3"
           feather={160}
           overlapNext={72}
@@ -241,7 +230,7 @@ export default function Home() {
         />
 
         <BackgroundSection
-          imageUrl={Backgroundimage4}
+          src={Backgroundimage4}
           alt="Hero 4"
           feather={160}
           overlapNext={64}
