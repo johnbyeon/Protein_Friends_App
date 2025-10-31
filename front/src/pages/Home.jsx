@@ -1,6 +1,9 @@
-// src/pages/Home.jsx
 import React from "react"
 import ProgramsSection from "./ProgramsSection"
+import Backgroundimage1 from '../images/KakaoTalk_20251022_151104432.png';
+import Backgroundimage2 from '../images/fe549cd3-de2e-42fb-8f4d-dec3eb213353.png';
+import Backgroundimage3 from '../images/image_720 (1).png';
+import Backgroundimage4 from '../images/KakaoTalk_20251031_162309082.png';
 
 const SHELL_W = 1440
 
@@ -41,33 +44,7 @@ function maskBottomUltra(px = 160) {
   }
 }
 
-function maskTopUltra(px = 90) {
-  const p1 = Math.round(px * 0.28)
-  const p2 = Math.round(px * 0.55)
-  const p3 = Math.round(px * 0.82)
-  const g = `linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(0,0,0,0.18) ${p1}px,
-    rgba(0,0,0,0.42) ${p2}px,
-    rgba(0,0,0,0.75) ${p3}px,
-    #000 ${px}px,
-    #000 100%
-  )`
-  return {
-    WebkitMaskImage: g,
-    maskImage: g,
-    WebkitMaskRepeat: "no-repeat",
-    maskRepeat: "no-repeat",
-    WebkitMaskSize: "100% 100%",
-    maskSize: "100% 100%",
-  }
-}
-
-/* =========================
-   Feather Bridge
-   ========================= */
-function FeatherBridge({ height = 200, opacity = 0.32, blur = 7 }) {
+export default function Home() {
   return (
     <div
       aria-hidden="true"
@@ -229,7 +206,7 @@ export default function Home() {
       <main className="w-full">
         {/* HERO 1 */}
         <BackgroundSection
-          imageUrl="/images/KakaoTalk_20251022_151104432.png"
+          imageUrl={Backgroundimage1}
           alt="Hero 1"
           feather={180}
           overlapNext={84}
@@ -257,7 +234,7 @@ export default function Home() {
 
         {/* 이후 시퀀스 */}
         <BackgroundSection
-          imageUrl="/images/fe549cd3-de2e-42fb-8f4d-dec3eb213353.png"
+          imageUrl={Backgroundimage2}
           alt="Hero 2"
           feather={170}
           overlapNext={78}
@@ -271,7 +248,7 @@ export default function Home() {
         />
 
         <BackgroundSection
-          imageUrl="/images/image_720 (1).png"
+          imageUrl={Backgroundimage3}
           alt="Hero 3"
           feather={160}
           overlapNext={72}
@@ -285,7 +262,7 @@ export default function Home() {
         />
 
         <BackgroundSection
-          imageUrl="/images/KakaoTalk_20251031_162309082.png"
+          imageUrl={Backgroundimage4}
           alt="Hero 4"
           feather={160}
           overlapNext={64}
