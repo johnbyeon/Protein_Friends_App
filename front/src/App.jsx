@@ -6,7 +6,22 @@ import AppRoutes from './routes/AppRoutes'
 
 
 export default function App() {
+    const { user } = useAuthStore()
   
+    useEffect(() => {
+      if (user?.role) {
+        // role은 이미 ROLE_이 빠진 상태 (ex. "USER", "TRAINER", "ADMIN")
+        let role = user.role.toLowerCase()
+  
+        // 트레이너를 관리자 계열로 통합
+        if (role === 'trainer') role = 'admin'
+  
+        document.documentElement.setAttribute('data-role', role)
+      } else {
+        // 로그아웃 시 초기화
+        document.documentElement.removeAttribute('data-role')
+      }
+    }, [user])
   console.log('🔥 VITE_SERVER_ORIGIN:', import.meta.env.VITE_SERVER_ORIGIN)
   useEffect(() => {
     initAuthTimers()
