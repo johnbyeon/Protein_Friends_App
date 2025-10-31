@@ -44,27 +44,6 @@ function maskBottomUltra(px = 160) {
   }
 }
 
-export default function Home() {
-  return (
-    <div
-      aria-hidden="true"
-      style={{
-        position: "absolute",
-        left: 0,
-        right: 0,
-        bottom: -1,
-        height,
-        pointerEvents: "none",
-        background:
-          "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,.28) 60%, rgba(0,0,0,.6) 100%)",
-        mixBlendMode: "multiply",
-        opacity,
-        filter: `blur(${blur}px)`,
-      }}
-    />
-  )
-}
-
 /* =========================
    Background Section
    ========================= */
