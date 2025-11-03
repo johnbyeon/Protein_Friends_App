@@ -3,7 +3,7 @@
 
 /* === 기본 테마 (유저: 네온 그린) === */
 @theme {
-  --color-primary: #39FF14;
+  --color-primary: #3DFA2F;
   --color-primary-light: #6AFF47;
   --color-primary-dark: #1DBF0A;
 
@@ -30,7 +30,7 @@
 
 /* === 유저 (USER: 네온그린 계열) === */
 :root[data-role="user"] {
-  --color-primary: #39FF14;        /* 기본 네온그린 */
+  --color-primary: #3DFA2F;        /* 기본 네온그린 */
   --color-primary-light: #6AFF47;  /* 밝은 네온그린 */
   --color-primary-dark: #1DBF0A;   /* 짙은 네온그린 */
   --color-accent: #00FFFF;         /* 보조 포인트 - 청록 */

@@ -24,6 +24,11 @@ public class S3PresignService {
 
     // ✅ 다운로드(GET) 프리사인 URL 생성
     public String getDownloadUrl(String bucket, String key) {
+        return getDownloadUrl(bucket, key, Duration.ofMinutes(5));
+    }
+
+    // ✅ 다운로드(GET) 프리사인 URL 생성 (커스텀 만료 시간)
+    public String getDownloadUrl(String bucket, String key, Duration expiration) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
@@ -31,7 +36,7 @@ public class S3PresignService {
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
                 .getObjectRequest(getObjectRequest)
-                .signatureDuration(Duration.ofMinutes(5))
+                .signatureDuration(expiration)
                 .build();
 
         return presigner.presignGetObject(presignRequest)

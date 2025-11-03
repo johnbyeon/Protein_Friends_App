@@ -1,102 +1,222 @@
-import React from "react"
+// src/pages/Home.jsx
+import React from "react";
+import ProgramsSection from "./ProgramsSection";
 
+// ⬇️ 이미지 파일을 모듈로 import (Vite/CRA 모두 URL 문자열로 번들됨)
+import Bg1 from "../images/KakaoTalk_20251022_151104432.png";
+import Bg2 from "../images/fe549cd3-de2e-42fb-8f4d-dec3eb213353.png";
+import Bg3 from "../images/image_720 (1).png";
+import Bg4 from "../images/KakaoTalk_20251031_162309082.png";
+
+const SHELL_W = 1440;
+
+/* =========================
+   ULTRA SOFT Feather Masks
+   ========================= */
+function maskBottomUltra(px = 160) {
+  const p1 = Math.round(px * 0.35);
+  const p2 = Math.round(px * 0.62);
+  const g = `linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 calc(100% - ${px}px),
+    rgba(0,0,0,0.55) calc(100% - ${p2}px),
+    rgba(0,0,0,0.28) calc(100% - ${p1}px),
+    transparent 100%
+  )`;
+  return {
+    WebkitMaskImage: g, maskImage: g,
+    WebkitMaskRepeat: "no-repeat", maskRepeat: "no-repeat",
+    WebkitMaskSize: "100% 100%", maskSize: "100% 100%",
+  };
+}
+
+function maskTopUltra(px = 90) {
+  const p1 = Math.round(px * 0.28);
+  const p2 = Math.round(px * 0.55);
+  const p3 = Math.round(px * 0.82);
+  const g = `linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0,0,0,0.18) ${p1}px,
+    rgba(0,0,0,0.42) ${p2}px,
+    rgba(0,0,0,0.75) ${p3}px,
+    #000 ${px}px,
+    #000 100%
+  )`;
+  return {
+    WebkitMaskImage: g, maskImage: g,
+    WebkitMaskRepeat: "no-repeat", maskRepeat: "no-repeat",
+    WebkitMaskSize: "100% 100%", maskSize: "100% 100%",
+  };
+}
+
+/* =========================
+   Neutral Veil (아주 옅은 중성 베일)
+   ========================= */
+function FeatherBridge({ height = 200, opacity = 0.32, blur = 7 }) {
+  return (
+    <div
+      aria-hidden
+      style={{
+        position: "absolute",
+        left: 0, right: 0, bottom: -1,
+        height,
+        pointerEvents: "none",
+        background:
+          "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,.28) 60%, rgba(0,0,0,.6) 100%)",
+        mixBlendMode: "multiply",
+        opacity,
+        filter: `blur(${blur}px)`,
+      }}
+    />
+  );
+}
+
+/* =========================
+   Background Section (import된 src 사용)
+   ========================= */
+function BackgroundSection({ src, alt = "", feather = 170, overlapNext = 76, bridge = true }) {
+  return (
+    <section className="w-full" style={{ position: "relative", zIndex: 3, marginBottom: -overlapNext }}>
+      <img
+        src={src}
+        alt={alt}
+        className="block w-full h-auto select-none pointer-events-none"
+        loading="eager"
+        decoding="async"
+        style={{
+          objectFit: "contain",
+          objectPosition: "center",
+          ...maskBottomUltra(feather),
+          willChange: "transform",
+          transform: "translateZ(0)",
+        }}
+      />
+      {bridge && <FeatherBridge height={feather + 30} opacity={0.30} blur={8} />}
+    </section>
+  );
+}
+
+/* =========================
+   Copy Band
+   ========================= */
+function CopyBand({
+  title, titleLines, subtitle,
+  align = "center", maxContentWidth = 1040,
+  lineGap = 6, nowrap = true,
+  featherTop = 90, pullUp = 52,
+}) {
+  const isCenter = align === "center";
+  const lines = Array.isArray(titleLines) && titleLines.length ? titleLines : (title ? [title] : []);
+  return (
+    <section className="w-full" style={{ position: "relative", zIndex: 2, marginTop: -pullUp }}>
+      <div className="mx-auto" style={{ width: SHELL_W, minWidth: SHELL_W }}>
+        <div
+          style={{
+            margin: "56px 0",
+            padding: "56px 56px",
+            borderRadius: 34,
+            background: "rgba(0,0,0,.76)",
+            boxShadow: "0 14px 48px rgba(0,0,0,.42)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: isCenter ? "center" : "flex-start",
+            textAlign: isCenter ? "center" : "left",
+            ...maskTopUltra(featherTop),
+          }}
+        >
+          <div style={{ width: "100%", maxWidth: maxContentWidth }}>
+            {!!lines.length && (
+              <h2
+                className="font-headline"
+                style={{
+                  margin: 0, fontWeight: 800, fontSize: 97, lineHeight: 1.3, letterSpacing: "-0.02em",
+                }}
+              >
+                {lines.map((ln, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      display: "block",
+                      marginTop: i ? lineGap : 0,
+                      whiteSpace: nowrap ? "nowrap" : undefined,
+                      wordBreak: "keep-all",
+                    }}
+                  >
+                    {ln}
+                  </span>
+                ))}
+              </h2>
+            )}
+            {subtitle && (
+              <p
+                className="font-subtext"
+                style={{ marginTop: 16, fontSize: 29, lineHeight: 1.6, color: "rgba(255,255,255,.86)" }}
+              >
+                {subtitle}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================
+   Main
+   ========================= */
 export default function Home() {
   return (
-    <div className="bg-black text-white font-display overflow-x-hidden">
+    <div className="bg-black text-white font-display min-h-screen overflow-x-auto">
       <main className="w-full">
-        {/* 섹션 1 */}
-        <section className="h-screen w-full">
-          <div
-            className="h-full w-full bg-cover bg-center"
-            style={{
-              backgroundImage:
-                'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCfcdFy_ve1VkkcRHnd8VsV-gXNYWDds94bYKTndBKDN4ElaBKkXywPR6pn0QVsfNCXgkN24U3pMr5SDzfRlLlLOhon1Kmr34F4AXwm8LW6dx876ayr1SU4z5jR42GhF8dEzgiDZCQ5vtJdo75jH9hxkUOyHd82RJK2-fs8JjFH1Ub7TG8IB5a2lM5Ufa9Iu_w0Iubimn8XpeLD-XC_eSpV9daUWkjUQEFThWX7G42gIvUiF5ibjOzA_xHoSqNH-fg1mbyDVuqlGJg")',
-            }}
-          ></div>
-        </section>
+        {/* HERO 1 → CopyBand */}
+        <BackgroundSection src={Bg1} alt="Hero 1" feather={180} overlapNext={84} bridge />
+        <CopyBand
+          titleLines={["운동의 시작,", "변화의 '첫 걸음'"]}
+          subtitle="당신의 결심 하나가 건강한 평생을 만듭니다."
+          featherTop={96}
+          pullUp={60}
+        />
 
-        <section className="h-[33vh] w-full flex flex-col justify-center items-start text-left px-4 sm:px-12">
-          <div>
-            <h1 className="font-headline font-bold text-5xl sm:text-7xl">
-              운동의 시작, 변화의 첫 걸음
-            </h1>
-            <p className="font-subtext text-base sm:text-xl mt-4 max-w-2xl font-light">
-              당신의 결심 하나가 건강한 내일을 만듭니다
-            </p>
+        {/* 프로그램(카드) */}
+        <section className="w-full" style={{ position: "relative", zIndex: 1, marginTop: -16 }}>
+          <div className="mx-auto" style={{ width: SHELL_W, minWidth: SHELL_W }}>
+            <ProgramsSection />
           </div>
         </section>
 
-        {/* 섹션 2 */}
-        <section className="h-screen w-full">
-          <div
-            className="h-full w-full bg-cover bg-center"
-            style={{
-              backgroundImage:
-                'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDgAmQkY0HIYALYxC_D1-pN0cbin9jrXtm1Vn5zQnZVD8jZwyg2pAZGzeNkR2sJ3F7dxozxUURTEPqL9GpoYZ4_S5-BcUiwxAh_4F8kPWvfiAP941bX8m4zDAg9aIWH5cTY6dqzx8v8MgWQnuLNia_YRBLOBaf9RLLQ6OgPvR_65e4XCvvvlJb7rXbkPECJfqSXY7pp6cNuOQ8ALHmMyhvXily7Nouw6yXQR5fJsnLWcgVeYJkADC1FE9hMNUY0TOQmKlHbRdtBgMU")',
-            }}
-          ></div>
-        </section>
+        {/* 이후 시퀀스 */}
+        <BackgroundSection src={Bg2} alt="Hero 2" feather={170} overlapNext={78} bridge />
+        <CopyBand
+          titleLines={["두려움은,", "자연스러운 시작입니다"]}
+          subtitle="시작은 작아도 비로소 지속이 거름이 될 때, 내일은 성장합니다."
+          featherTop={90}
+          pullUp={54}
+        />
 
-        <section className="h-[33vh] w-full flex flex-col justify-center items-start text-left px-4 sm:px-12">
-          <div>
-            <h1 className="font-headline font-bold text-5xl sm:text-7xl">
-              모든 변화에는 좋은 환경이 필요합니다
-            </h1>
-            <p className="font-subtext text-base sm:text-xl mt-4 max-w-2xl font-light">
-              프리미엄 시설과 전문 코칭으로, 목표를 현실로 만드는 여정을 함께합니다
-            </p>
-          </div>
-        </section>
+        <BackgroundSection src={Bg3} alt="Hero 3" feather={160} overlapNext={72} bridge />
+        <CopyBand
+          titleLines={["움직이면,", "달라집니다"]}
+          subtitle="지속이 거름이 될 때, 비로소 내일은 자랍니다."
+          featherTop={86}
+          pullUp={50}
+        />
 
-        {/* 섹션 3 */}
-        <section className="h-screen w-full">
-          <div
-            className="h-full w-full bg-cover bg-center"
-            style={{
-              backgroundImage:
-                'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDgAmQkY0HIYALYxC_D1-pN0cbin9jrXtm1Vn5zQnZVD8jZwyg2pAZGzeNkR2sJ3F7dxozxUURTEPqL9GpoYZ4_S5-BcUiwxAh_4F8kPWvfiAP941bX8m4zDAg9aIWH5cTY6dqzx8v8MgWQnuLNia_YRBLOBaf9RLLQ6OgPvR_65e4XCvvvlJb7rXbkPECJfqSXY7pp6cNuOQ8ALHmMyhvXily7Nouw6yXQR5fJsnLWcgVeYJkADC1FE9hMNUY0TOQmKlHbRdtBgMU")',
-            }}
-          ></div>
-        </section>
-
-        <section className="h-[33vh] w-full flex flex-col justify-center items-start text-left px-4 sm:px-12">
-          <div>
-            <h1 className="font-headline font-bold text-5xl sm:text-7xl">
-              매일의 루틴이 나를 바꾼다
-            </h1>
-            <p className="font-subtext text-base sm:text-xl mt-4 max-w-2xl font-light">
-              작은 시작이 큰 변화를 만듭니다. 지금, 당신의 건강한 일상이 완성됩니다
-            </p>
-          </div>
-        </section>
-
-        {/* 섹션 4 */}
-        <section className="h-screen w-full">
-          <div
-            className="h-full w-full bg-cover bg-center"
-            style={{
-              backgroundImage:
-                'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAhYG32DC9RQGeq0diVlt8R9JoEIlnJQdASHkP0RYsv0q57Zfr_ZJoPiYsnhQ-MJgbEDrCrQQSq9Udv3s8zop1U6hFff8ONC-cV_Wiw4ZXqNb4oa7Dwk2Rn7tOXpo3rE1rsqR-MAfvwA8-7zuqTW2gfvvQz848EApmgbP5fL9mxk5hWyoi2IcZoq-l0OYb6qIhAPQydMuVXq7A-Q00Wyi76R4GQtki6xo8rsV0SkMBG3xJ3us9exzVSRi-7XFYcjNSGhnshMtIBdNw")',
-            }}
-          ></div>
-        </section>
-
-        <section className="h-[33vh] w-full flex flex-col justify-center items-start text-left px-4 sm:px-12">
-          <div>
-            <h1 className="font-headline font-bold text-5xl sm:text-7xl">
-              새로운 당신을 만나보세요
-            </h1>
-            <p className="font-subtext text-base sm:text-xl mt-4 max-w-2xl font-light">
-              도전을 통해 성장하는 당신을 응원합니다
-            </p>
-          </div>
-        </section>
+        <BackgroundSection src={Bg4} alt="Hero 4" feather={160} overlapNext={64} bridge />
       </main>
 
-      {/* 푸터 */}
-      <footer className="bg-black py-12 px-4 sm:px-12">
-        <div className="container mx-auto flex flex-col items-center">
-          <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+      {/* 푸터(현행 유지) */}
+      <footer
+        className="border-t border-[#2A2A2A] bg-black"
+        style={{ width: SHELL_W, padding: "48px 48px 64px", margin: "0 auto" }}
+      >
+        <div style={{ width: SHELL_W - 96, margin: "0 auto" }}>
+          <div
+            className="flex items-center gap-4"
+            style={{ width: "100%", justifyContent: "space-between", marginBottom: 32 }}
+          >
             {[
               { icon: "corporate_fare", text: "회사소개" },
               { icon: "description", text: "이용약관" },
@@ -107,7 +227,22 @@ export default function Home() {
               <a
                 key={i}
                 href="#"
-                className="flex-1 w-full text-center bg-black text-neon-green py-3 px-4 border border-neon-green hover:bg-neon-green hover:text-black transition-colors duration-300 flex items-center justify-center gap-2"
+                className="flex items-center justify-center transition-colors duration-300"
+                style={{
+                  width: 248, height: 52,
+                  border: "1px solid #D6A84F",
+                  color: "#D6A84F",
+                  background: "black",
+                  gap: 8, textAlign: "center",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#D6A84F";
+                  e.currentTarget.style.color = "#000";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "black";
+                  e.currentTarget.style.color = "#D6A84F";
+                }}
               >
                 <span className="material-symbols-outlined">{item.icon}</span>
                 {item.text}
@@ -115,22 +250,15 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="text-center text-gray-400 text-sm space-y-1">
+          <div style={{ textAlign: "center", color: "#9ca3af", fontSize: 14, lineHeight: "22px" }}>
             <p>
-              <span className="text-white font-semibold">주식회사 스티치</span> | 대표:
-              홍길동 | 사업자등록번호: 123-45-67890 | 통신판매업신고번호:
-              제2024-서울강남-00000호
+              <span style={{ color: "#fff", fontWeight: 600 }}>주식회사 스티치</span> | 대표: 홍길동 | 사업자등록번호: 123-45-67890 | 통신판매업신고번호: 제2024-서울강남-00000호
             </p>
-            <p>
-              주소: 서울특별시 강남구 테헤란로 123, 4층 | TEL: 02-1234-5678 | E-MAIL:
-              contact@stitchdesign.com
-            </p>
-            <p className="pt-4 text-gray-500">
-              COPYRIGHT © STITCH DESIGN ALL RIGHTS RESERVED.
-            </p>
+            <p>주소: 서울특별시 강남구 테헤란로 123, 4층 | TEL: 02-1234-5678 | E-MAIL: contact@stitchdesign.com</p>
+            <p style={{ paddingTop: 16, color: "#6b7280" }}>COPYRIGHT © STITCH DESIGN ALL RIGHTS RESERVED.</p>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }

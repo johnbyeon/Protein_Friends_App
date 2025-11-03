@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import Navbar from './components/Navbar'
 import OAuthMessageBridge from './components/OAuthMessageBridge'
 import { initAuthTimers, useAuthStore } from './stores/authStore'
-import AppRoutes from './routes/AppRoutes'
+import AppRoutes from './routes'
 
 
 export default function App() {
