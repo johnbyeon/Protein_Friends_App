@@ -59,9 +59,6 @@ export default function CompleteProfile() {
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md space-y-8 rounded-xl bg-background-light/5 dark:bg-background-dark/50 p-8 shadow-2xl border border-primary/30 ring-1 ring-primary/20"
-        style={{
-          boxShadow: '0 25px 50px -12px rgba(57, 255, 20, 0.25), 0 0 0 1px rgba(57, 255, 20, 0.1)',
-        }}
       >
         <h1 className="text-2xl font-bold mb-4">추가 정보 입력</h1>
         <p className="text-sm text-gray-400 mb-6">
@@ -76,7 +73,8 @@ export default function CompleteProfile() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="form-input relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200"
+          className="form-input relative block w-full appearance-none rounded-lg border border-border-dark 
+              bg-background-dark px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200"
         />
 
         <input
@@ -85,7 +83,8 @@ export default function CompleteProfile() {
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           required
-          className="mt-3 form-input relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200"
+          className="mt-3 form-input relative block w-full appearance-none rounded-lg 
+          border border-border-dark dark:border-gray-700 bg-background-dark px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200"
         />
 
         <button

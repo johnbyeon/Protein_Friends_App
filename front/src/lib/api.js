@@ -133,3 +133,74 @@ export const put = (url, body, init) => {
     headers
   })
 }
+
+// ===== S3 업로드 관련 API =====
+
+/**
+ * S3 Presigned Upload URL 발급 (인증 필수, DB 자동 저장)
+ * @param {Object} params - { filename, contentType, contentLength, description, imageType }
+ * @returns {Promise<{ key: string, putUrl: string, imageId: number }>}
+ */
+export async function presignUpload({ filename, contentType, contentLength, description = '', imageType = 'MEAL' }) {
+  const res = await post('/api/s3/upload', {
+    filename,
+    contentType,
+    contentLength,
+    description,
+    imageType
+  })
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || 'Presign upload 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * S3에서 파일 조회 URL 발급 (인증 필수, 본인 이미지만)
+ * @param {string} key - S3 객체 키
+ * @returns {Promise<string>} - Presigned GET URL
+ */
+export async function getViewUrl(key) {
+  const res = await get(`/api/s3/download?key=${encodeURIComponent(key)}`)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || 'View URL 발급 실패')
+  }
+
+  return res.text()
+}
+
+/**
+ * 내 이미지 목록 조회 (인증 필수)
+ * @returns {Promise<Array>} - 이미지 목록
+ */
+export async function getMyImages() {
+  const res = await get('/api/s3/my-images')
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || '이미지 목록 조회 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * 이미지 삭제 (인증 필수, 본인 이미지만)
+ * @param {number} imageId - 이미지 ID
+ * @returns {Promise<string>} - 성공 메시지
+ */
+export async function deleteImage(imageId) {
+  const res = await del(`/api/s3/images/${imageId}`)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || '이미지 삭제 실패')
+  }
+
+  return res.text()
+}

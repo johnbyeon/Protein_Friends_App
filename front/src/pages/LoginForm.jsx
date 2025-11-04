@@ -147,154 +147,122 @@ export default function LoginForm({
 
   // ✅ JSX 렌더링
   return (
-    <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+    <div className="flex min-h-screen flex-col bg-background-dark font-display text-text-light">
       <main className="flex flex-1 items-center justify-center py-12 sm:px-6 lg:px-8">
         <div
-          className="w-full max-w-md space-y-8 rounded-xl bg-background-light/5 dark:bg-background-dark/50 p-8 shadow-2xl border border-primary/30 ring-1 ring-primary/20"
-          style={{
-            boxShadow:
-              '0 25px 50px -12px rgba(57, 255, 20, 0.25), 0 0 0 1px rgba(57, 255, 20, 0.1)',
-          }}
+          className="w-full max-w-md space-y-8 rounded-xl dark:bg-background-dark/50 
+           shadow-2xl border border-primary/20 ring-1 ring-primary/30 p-10 transition-all duration-300"
         >
           {/* 헤더 */}
-          <div>
-            <div className="flex items-center justify-center gap-4 text-gray-800 dark:text-white mb-6">
-              <div className="size-8 text-primary">
-                <Link
-                  to="/"
-                  className="flex items-center gap-1 text-text-light dark:text-text-dark"
-                >
-                  <img
-                    src={pfLogo}
-                    alt="Protein Friends Logo"
-                    className="w-10 h-10 object-contain text-primary"
-                  />
-                </Link>
-              </div>
-              <h2 className="text-3xl font-bold">Protein Friends</h2>
-            </div>
-            <h2 className="text-center text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-              로그인
-            </h2>
+          <div className="text-center mb-8">
+            <Link to="/" className="flex justify-center mb-4">
+              <img src={pfLogo} alt="Protein Friends" className="w-16 h-16" />
+            </Link>
+            <h1 className="text-3xl font-bold tracking-tight text-primary">
+              Protein Friends
+            </h1>
+            <p className="text-gray-400 text-sm mt-2">함께 성장하는 피트니스 커뮤니티</p>
           </div>
 
           {/* 폼 */}
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
-            <div className="space-y-4 rounded-md">
-              <div>
-                <label className="sr-only" htmlFor="email-address">
-                  이메일 주소
-                </label>
-                <input
-                  id="email-address"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="이메일 ID"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="form-input relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200"
-                />
-              </div>
-              <div>
-                <label className="sr-only" htmlFor="password">
-                  비밀번호
-                </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  placeholder="비밀번호"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="form-input relative block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200"
-                />
-              </div>
-            </div>
+          <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+            <input
+              id="email-address"
+              type="email"
+              placeholder="이메일 주소"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="block w-full rounded-lg border border-primary/20  
+              bg-background-dark px-4 py-3 text-gray-200 placeholder-gray-500 
+              focus:border-primary focus:ring-2 focus:ring-primary/40 focus:outline-none 
+              transition-all duration-200"
+            />
+
+            <input
+              id="password"
+              type="password"
+              placeholder="비밀번호"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="block w-full rounded-lg border border-primary/20  
+              bg-background-dark px-4 py-3 text-gray-200 placeholder-gray-500 
+              focus:border-primary focus:ring-2 focus:ring-primary/40 focus:outline-none 
+              transition-all duration-200"
+            />
 
             {(error || authError) && (
-              <div className="text-sm text-red-400">
+              <p className="text-sm text-red-400 mt-2">
                 {error || authError}
                 {authError && (
                   <button
                     type="button"
+                    onClick={clearAuthError}
                     className="ml-2 underline"
-                    onClick={
-                      typeof clearAuthError === 'function' ? clearAuthError : undefined
-                    }
                   >
                     닫기
                   </button>
                 )}
-              </div>
+              </p>
             )}
 
-            <div className="flex items-center justify-between text-sm">
-              <div>
-                <Link
-                  className="font-medium text-primary hover:text-primary/90"
-                  to="/auth/register"
-                >
-                  회원가입
-                </Link>
-              </div>
-              <div>
-                <Link
-                  className="font-medium text-primary hover:text-primary/90 mr-4"
-                  to="/auth/find-id"
-                >
-                  아이디찾기
-                </Link>
-                <Link
-                  className="font-medium text-primary hover:text-primary/90"
-                  to="/auth/reset-password"
-                >
-                  비밀번호 찾기
-                </Link>
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-lg font-bold py-3 disabled:opacity-60 transition-all duration-200 hover:shadow-lg hover:shadow-primary/25 active:scale-[0.95]"
-                style={{
-                  backgroundColor: 'var(--color-primary)',
-                  color: 'black',
-                }}
-              >
-                {loading ? '처리중…' : '로그인'}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full mt-4 rounded-lg py-3 font-semibold 
+              text-black bg-[var(--color-primary)] hover:opacity-90 
+              active:scale-[0.97] transition-all duration-150"
+            >
+              {loading ? '처리중…' : '로그인'}
+            </button>
           </form>
 
           {/* 구분선 */}
-          <div className="relative mt-6">
+          <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300 dark:border-gray-700" />
+              <div className="w-full border-t border-primary/20" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-background-dark px-2 text-gray-500 dark:text-gray-400">
-                또는 다음으로 로그인
+              <span className="bg-background-dark px-2 text-gray-400">
+                또는 소셜 로그인
               </span>
             </div>
           </div>
 
-          {/* ✅ 소셜 로그인 버튼 (팝업 연동) */}
+          {/* 소셜 로그인 버튼 */}
+
           <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <button type="button" onClick={() => handleSocialLogin('google')}>
-              구글
-            </button>
-            <button type="button" onClick={() => handleSocialLogin('naver')}>
-              네이버
-            </button>
-            <button type="button" onClick={() => handleSocialLogin('kakao')}>
-              카카오
-            </button>
+            <button type="button" className="rounded-lg border border-primary/20 py-2 
+                text-sm text-gray-400 font-medium 
+                hover:bg-[var(--color-blue)] hover:text-white
+                hover:border-[var(--color-blue)] transition-all 
+                duration-200" onClick={() => handleSocialLogin('google')}>
+                  GOOGLE
+                  </button>
+            <button type="button" className="rounded-lg border border-primary/20 py-2 
+                text-sm text-gray-400 font-medium hover:bg-[var(--color-green)] 
+                hover:text-white transition-all 
+                hover:border-[var(--color-green)] duration-200"onClick={() => handleSocialLogin('naver')}>
+                  NAVER
+                </button>
+            <button type="button" className="rounded-lg border border-primary/20 py-2 
+                text-sm text-gray-400 font-medium hover:bg-[var(--color-yellow)] 
+                hover:text-black transition-all 
+                hover:border-[var(--color-yellow)] duration-200" onClick={() => handleSocialLogin('kakao')}>
+                  KAKAO
+                  </button>
+          </div>
+
+
+
+          {/* 링크 영역 */}
+          <div className="flex justify-between text-sm text-gray-400 mt-6">
+            <Link to="/auth/register" className="hover:text-primary">회원가입</Link>
+            <div className="space-x-3">
+              <Link to="/auth/find-id" className="hover:text-primary">아이디 찾기</Link>
+              <Link to="/auth/reset-password" className="hover:text-primary">비밀번호 찾기</Link>
+            </div>
           </div>
         </div>
       </main>
