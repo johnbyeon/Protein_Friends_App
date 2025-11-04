@@ -57,32 +57,32 @@ const Navbar = () => {
       </nav>
 
       <nav className="flex items-center gap-6 text-sm text-gray-200">
-        <div class="relative group">
-          <button class="flex items-center gap-2 focus:outline-none">
-            <img src={userprofile} class="w-9 h-9 rounded-full border border-border-primary/20" alt="User" />
+        <div className="relative group">
+          <button className="flex items-center gap-2 focus:outline-none">
+            <img src={userprofile} className="w-9 h-9 rounded-full border border-border-primary/20" alt="User" />
           </button>
 
-          <div class="absolute right-0 mt-2 w-48 border border-border-primary/20 rounded-md shadow-lg
+          <div className="absolute right-0 mt-2 w-48 border border-border-primary/20 rounded-md shadow-lg
             bg-black text-white
             opacity-0 translate-y-1 group-hover:opacity-80 group-hover:translate-y-0 transition-all duration-200">
             {!isLoggedIn ? (
               <>
-                <a href="/login" class="block px-4 py-2 text-sm hover:bg-primary/20">로그인</a>
-                <a href="/register" class="block px-4 py-2 text-sm hover:bg-primary/20">회원가입</a>
+                <a href="/login" className="block px-4 py-2 text-sm hover:bg-primary/20">로그인</a>
+                <a href="/register" className="block px-4 py-2 text-sm hover:bg-primary/20">회원가입</a>
               </>
             ) : isLoadingUser ? (
               <span>정보 불러오는 중...</span>
             ) : profileRequired ? (
               <>
-                <a href="/auth/complete-profile" class="block px-4 py-2 text-sm hover:bg-primary/20">정보 입력</a>
-                <button onClick={handleLogout} class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-primary/20">로그아웃</button>
+                <a href="/auth/complete-profile" className="block px-4 py-2 text-sm hover:bg-primary/20">정보 입력</a>
+                <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-primary/20">로그아웃</button>
               </>
             ) : (
               <>
-                {hasUserAccess && <a href="/user/me" class="block px-4 py-2 text-sm hover:bg-primary/20">내 정보</a>}
-                <button onClick={handleLogout} class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-primary/20">로그아웃</button>
-                {hasAdminAccess && <a href="/user/me" class="block px-4 py-2 text-sm hover:bg-primary/20">관리자용</a>}
-                {hasTrainerAccess && <a href="/user/me" class="block px-4 py-2 text-sm hover:bg-primary/20">트레이너용</a>}
+                {hasUserAccess && <a href="/user/me" className="block px-4 py-2 text-sm hover:bg-primary/20">내 정보</a>}
+                <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-primary/20">로그아웃</button>
+                {hasAdminAccess && <a href="/user/me" className="block px-4 py-2 text-sm hover:bg-primary/20">관리자용</a>}
+                {hasTrainerAccess && <a href="/user/me" className="block px-4 py-2 text-sm hover:bg-primary/20">트레이너용</a>}
               </>
             )}
           </div>

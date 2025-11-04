@@ -32,7 +32,7 @@ const UserNavbar = () => {
             <div className="relative group">
                 <button className="flex items-center gap-1 text-sm font-medium text-gray-400">
                     <span className="hover:underline hover:text-text-light duration-200 mr-3">SHOP</span>
-                    <span class="material-symbols-outlined text-base transition-transform group-hover:rotate-180 group-hover:text-text-light">expand_more</span>
+                    <span className="material-symbols-outlined text-base transition-transform group-hover:rotate-180 group-hover:text-text-light">expand_more</span>
                 </button>
                 <div
                     className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-black border border-border-dark 
@@ -71,7 +71,7 @@ const UserNavbar = () => {
             <div className="relative group">
                 <button className="flex items-center gap-1 text-sm font-medium text-gray-400">
                     <span  className="hover:underline hover:text-text-light mr-3">식단관리</span>
-                    <span class="material-symbols-outlined text-base transition-transform group-hover:rotate-180 group-hover:text-text-light">expand_more</span>
+                    <span className="material-symbols-outlined text-base transition-transform group-hover:rotate-180 group-hover:text-text-light">expand_more</span>
                 </button>
                 <div
                     className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-black border border-border-dark 
@@ -86,7 +86,7 @@ const UserNavbar = () => {
             <div className="relative group">
                 <button className="flex items-center gap-1 text-sm font-medium text-gray-400">
                     <span className="hover:underline hover:text-text-light mr-3">PT 클래스</span>
-                    <span class="material-symbols-outlined text-base transition-transform group-hover:rotate-180">expand_more</span>
+                    <span className="material-symbols-outlined text-base transition-transform group-hover:rotate-180">expand_more</span>
                 </button>
                 <div
                     className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-black border border-border-dark 
@@ -101,7 +101,7 @@ const UserNavbar = () => {
             <div className="relative group">
                 <button className="flex items-center gap-1 text-sm font-medium text-gray-400">
                     <span className="hover:underline hover:text-text-light mr-3">내 정보관리</span>
-                    <span class="material-symbols-outlined text-base transition-transform group-hover:rotate-180">expand_more</span>
+                    <span className="material-symbols-outlined text-base transition-transform group-hover:rotate-180">expand_more</span>
                 </button>
                 <div
                     className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-black border border-border-dark 
