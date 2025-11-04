@@ -26,6 +26,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import jakarta.servlet.http.HttpServletResponse; // ✅ (내 코드 추가)
 import java.util.List;
 
 @Slf4j
@@ -67,6 +68,19 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // ===== 🔽 여기부터가 '내 코드' 추가분 🔽 =====
+                .formLogin(fl -> fl.disable())          // ✅ 브라우저 폼 로그인 비활성
+                .httpBasic(hb -> hb.disable())          // ✅ HTTP Basic 비활성
+                .exceptionHandling(eh -> eh             // ✅ 401 JSON으로 고정 (302 방지)
+                        .authenticationEntryPoint((req, res, ex) -> {
+                            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            res.setContentType("application/json;charset=UTF-8");
+                            res.getWriter().write("{\"error\":\"unauthorized\"}");
+                        })
+                )
+                // ===== 🔼 여기까지 '내 코드' 추가분 🔼 =====
+
                 .authorizeHttpRequests(auth -> auth
                         // 비인증 허용
                         .requestMatchers(HttpMethod.POST, "/api/auth/oauth2/login", "/api/auth/login", "/api/auth/join").permitAll()
