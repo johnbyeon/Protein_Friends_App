@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener; // ✅ 추가
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "user_info")  // DB 테이블명 명시 (필수)
+@EntityListeners(AuditingEntityListener.class) // ✅ 추가: @CreatedDate/@LastModifiedDate 동작
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -66,4 +68,17 @@ public class UserInfo {
     @LastModifiedDate
     @Column(name = "update_at", nullable = false)
     private LocalDateTime updateAt;
+
+    // ✅ 추가: 감사 미동작/트랜잭션 타이밍 이슈에도 NOT NULL 보장
+    @PrePersist
+    void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        if (createAt == null) createAt = now;
+        if (updateAt == null) updateAt = now;
+    }
+
+    @PreUpdate
+    void onUpdate() {
+        updateAt = LocalDateTime.now();
+    }
 }
