@@ -13,12 +13,14 @@ import org.springframework.data.repository.query.Param;
  */
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 트레이너 정보 Repository
  */
 public interface TrainerInfoRepository extends JpaRepository<TrainerInfo, Long>,JpaSpecificationExecutor<TrainerInfo> {
     boolean existsByuId(Long uId); // ✅ 소문자 u
+    Optional<TrainerInfo> findByuId(Long uId); // 트레이너 본인 조회용
     /**
      * 특정 지점의 재직 중인 트레이너 목록 조회
      *

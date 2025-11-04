@@ -6,7 +6,7 @@ import AppRoutes from './routes'
 
 
 export default function App() {
-    const { user } = useAuthStore()
+    const { user, token, setUser } = useAuthStore()
   
     useEffect(() => {
       if (user?.role) {
@@ -22,6 +22,29 @@ export default function App() {
         document.documentElement.removeAttribute('data-role')
       }
     }, [user])
+
+    // 앱 로드 시 최신 사용자 정보 가져오기 (profilePicture 포함)
+    useEffect(() => {
+      const refreshUserInfo = async () => {
+        if (!token) return
+
+        try {
+          const base = import.meta.env.VITE_API_BASE ?? ''
+          const res = await fetch(`${base}/api/users/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          if (res.ok) {
+            const me = await res.json()
+            setUser(me)
+            console.log('✅ 앱 로드 시 사용자 정보 새로고침 (profilePicture 포함)', me)
+          }
+        } catch (e) {
+          console.error('❌ 사용자 정보 새로고침 실패', e)
+        }
+      }
+
+      refreshUserInfo()
+    }, [token, setUser])
   console.log('🔥 VITE_SERVER_ORIGIN:', import.meta.env.VITE_SERVER_ORIGIN)
   useEffect(() => {
     initAuthTimers()

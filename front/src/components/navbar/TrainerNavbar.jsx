@@ -19,7 +19,18 @@ const TrainerNavbar = () => {
 
     return (
         <>
-            <Link to="/trainer/schedule">트레이너 일정</Link>
+            <div className="relative group">
+                <button className="flex items-center gap-1 text-lg font-medium text-gray-400">
+                    <Link to="/trainer/dashboard" className="group-hover:underline group-hover:text-text-light mr-3">트레이너 대시보드</Link>
+                </button>
+            </div>
+
+            <div className="relative group">
+                <button className="flex items-center gap-1 text-lg font-medium text-gray-400">
+                    <Link to="/trainer/trainers" className="group-hover:underline group-hover:text-text-light mr-3">트레이너 목록</Link>
+                </button>
+            </div>
+
             <div className="relative group">
                 <button className="flex items-center gap-1 text-lg font-medium text-gray-400">
                     <span className="group-hover:underline group-hover:text-text-light mr-3">게시판</span>
@@ -31,6 +42,12 @@ const TrainerNavbar = () => {
                               group-hover:opacity-80 group-hover:scale-100 group-hover:block transform transition-all duration-200 ease-out origin-top
                               before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2 before:block"
                 >
+                    <Link 
+                        to="/trainer/board-types" 
+                        className="block px-4 py-2 text-lg hover:bg-primary/20 border-b border-border-dark"
+                    >
+                        게시판타입설정
+                    </Link>
                     {loading ? (
                         <div className="px-4 py-2 text-lg text-gray-400">
                             게시판 로딩 중...
@@ -39,7 +56,7 @@ const TrainerNavbar = () => {
                         boardTypes.map((type) => (
                             <Link
                                 key={type.ptypeid}
-                                to={`/admin/boards/${type.ptypeaddressName}`}
+                                to={`/trainer/boards/${type.ptypeaddressName}`}
                                 className="block px-4 py-2 text-lg hover:bg-primary/20"
                             >
                                 {type.ptypename}

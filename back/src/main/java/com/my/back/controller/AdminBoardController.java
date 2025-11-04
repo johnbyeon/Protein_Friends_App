@@ -4,7 +4,10 @@ import com.my.back.dto.BoardCreateRequest;
 import com.my.back.dto.BoardListResponse;
 import com.my.back.dto.BoardResponse;
 import com.my.back.dto.BoardUpdateRequest;
+import com.my.back.dto.CustomUserDetails;
+import com.my.back.entity.TrainerInfo;
 import com.my.back.entity.Users;
+import com.my.back.repository.TrainerInfoRepository;
 import com.my.back.repository.UserRepository;
 import com.my.back.service.AdminBoardService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,7 @@ public class AdminBoardController {
 
     private final AdminBoardService adminBoardService;
     private final UserRepository userRepository;
+    private final TrainerInfoRepository trainerInfoRepository;
 
     /**
      * 게시글 타입별 목록 조회 (관리자용 - 모든 게시글 포함)
@@ -50,18 +54,21 @@ public class AdminBoardController {
     /**
      * 게시글 생성
      * @param request 게시글 생성 요청
-     * @param email 로그인한 사용자 이메일 (JWT에서 추출)
+     * @param userDetails 로그인한 사용자 정보 (JWT에서 추출)
      * @return 생성된 게시글 정보
      */
     @PostMapping
     public ResponseEntity<?> createBoard(
             @RequestBody BoardCreateRequest request,
-            @AuthenticationPrincipal String email
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         log.info("➕ [ADMIN POST] /api/admin/boards - 게시글 생성");
 
         try {
-            // 이메일로 유저 조회 (트레이너 ID 필요)
+            String email = userDetails.getUsername();
+            log.info("👤 로그인 사용자: {}", email);
+            
+            // 이메일로 유저 조회
             Users user = userRepository.findByEmail(email);
             if (user == null) {
                 log.error("❌ 사용자를 찾을 수 없습니다: {}", email);
@@ -69,10 +76,18 @@ public class AdminBoardController {
                         .body(new ErrorResponse("사용자를 찾을 수 없습니다."));
             }
 
-            // 트레이너 ID 확인 (user_info에서 trainer_info의 t_id 가져오기)
-            // TODO: UserInfo -> TrainerInfo 매핑 구현 필요
-            // 임시로 user.getUId()를 tId로 사용 (실제로는 TrainerInfo에서 가져와야 함)
-            Long trainerId = user.getUId(); // 임시 처리
+            // u_id로 TrainerInfo에서 t_id 가져오기
+            TrainerInfo trainerInfo = trainerInfoRepository.findByuId(user.getUId())
+                    .orElse(null);
+            
+            if (trainerInfo == null) {
+                log.error("❌ 트레이너 정보를 찾을 수 없습니다. u_id: {}", user.getUId());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(new ErrorResponse("트레이너로 등록되지 않은 사용자입니다."));
+            }
+
+            Long trainerId = trainerInfo.getTId();
+            log.info("✅ 트레이너 ID: {}, 이름: {}", trainerId, trainerInfo.getTName());
 
             BoardResponse board = adminBoardService.createBoard(request, trainerId);
             return ResponseEntity.status(HttpStatus.CREATED).body(board);

@@ -73,8 +73,10 @@ export default function CompleteProfile() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="form-input relative block w-full appearance-none rounded-lg border border-border-dark 
-              bg-background-dark px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200"
+          className="block w-full rounded-lg border border-primary/20
+              bg-background-dark px-4 py-3 text-gray-200 placeholder-gray-500
+              focus:border-primary focus:ring-2 focus:ring-primary/40 focus:outline-none
+              transition-all duration-200"
         />
 
         <input
@@ -83,8 +85,10 @@ export default function CompleteProfile() {
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           required
-          className="mt-3 form-input relative block w-full appearance-none rounded-lg 
-          border border-border-dark dark:border-gray-700 bg-background-dark px-3 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:z-10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark sm:text-sm transition-all duration-200"
+          className="block w-full rounded-lg border border-primary/20
+              bg-background-dark px-4 py-3 text-gray-200 placeholder-gray-500
+              focus:border-primary focus:ring-2 focus:ring-primary/40 focus:outline-none
+              transition-all duration-200"
         />
 
         <button

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useBoardTypeStore } from '../../stores/boardTypeStore'
+import { useAuthStore } from '../../stores/authStore'
 import { presignUpload, getViewUrl } from '../../lib/api'
 
 // S3 업로드 헬퍼 함수
@@ -30,10 +31,18 @@ export default function BoardForm() {
   const { typeAddressName, pId } = useParams()
   const navigate = useNavigate()
   const { boardTypes, fetchBoardTypes } = useBoardTypeStore()
+  const { user } = useAuthStore()
 
   const isEditMode = !!pId
   const [loading, setLoading] = useState(false)
   const [currentType, setCurrentType] = useState(null)
+
+  // 사용자 role에 따른 기본 경로 설정
+  const getBasePath = () => {
+    if (user?.role === 'ROLE_ADMIN') return '/admin'
+    if (user?.role === 'ROLE_TRAINER') return '/trainer'
+    return '/admin' // 기본값
+  }
 
   // 이미지 업로드 상태
   const [imageFile, setImageFile] = useState(null)
@@ -99,22 +108,24 @@ export default function BoardForm() {
         }
 
         const data = await response.json()
+        console.log('📝 수정 모드 - 불러온 데이터:', data)
+        
         setFormData({
-          pTitle: data.pTitle || '',
-          pContent: data.pContent || '',
-          pImageUrl: data.pImageUrl || '',
-          pLink: data.pLink || '',
-          pIsPopup: data.pIsPopup || false,
+          pTitle: data.ptitle || '',
+          pContent: data.pcontent || '',
+          pImageUrl: data.pimageUrl || '',
+          pLink: data.plink || '',
+          pIsPopup: data.pisPopup || false,
           isAlwaysPopup: data.isAlwaysPopup || false,
-          pPopupStartDate: data.pPopupStartDate || '',
-          pPopupEndDate: data.pPopupEndDate || '',
+          pPopupStartDate: data.ppopupStartDate || '',
+          pPopupEndDate: data.ppopupEndDate || '',
           isUnlimited: data.isUnlimited || false,
-          pSetVisible: data.pSetVisible !== undefined ? data.pSetVisible : true
+          pSetVisible: data.psetVisible !== undefined ? data.psetVisible : true
         })
 
         // 기존 이미지가 있으면 미리보기 설정
-        if (data.pImageUrl) {
-          setImagePreview(data.pImageUrl)
+        if (data.pimageUrl) {
+          setImagePreview(data.pimageUrl)
         }
       } catch (err) {
         console.error('게시글 로드 에러:', err)
@@ -135,8 +146,8 @@ export default function BoardForm() {
     }))
   }
 
-  // 이미지 파일 선택 핸들러
-  const handleImageChange = (e) => {
+  // 이미지 파일 선택 핸들러 (자동 업로드)
+  const handleImageChange = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -157,31 +168,24 @@ export default function BoardForm() {
     setImagePreview(URL.createObjectURL(file))
     setUploadStatus('')
     setUploadProgress(0)
-  }
 
-  // 이미지 업로드 (S3)
-  const handleImageUpload = async () => {
-    if (!imageFile) {
-      alert('업로드할 이미지를 선택해주세요.')
-      return
-    }
-
+    // 자동으로 S3 업로드 시작
     try {
       setUploadStatus('이미지 업로드 중...')
       setLoading(true)
 
       // 1. Presigned URL 발급
       const { key, putUrl } = await presignUpload({
-        filename: imageFile.name,
-        contentType: imageFile.type,
-        contentLength: imageFile.size,
+        filename: file.name,
+        contentType: file.type,
+        contentLength: file.size,
         description: `게시판 이미지: ${formData.pTitle || '제목 없음'}`,
-        imageType: 'BOARD' // 게시판 이미지 타입
+        imageType: 'BOARD'
       })
 
       // 2. S3에 직접 업로드
       setUploadStatus('S3에 업로드 중...')
-      await putWithProgress(putUrl, imageFile, imageFile.type, setUploadProgress)
+      await putWithProgress(putUrl, file, file.type, setUploadProgress)
 
       // 3. View URL 발급
       setUploadStatus('이미지 URL 발급 중...')
@@ -190,8 +194,6 @@ export default function BoardForm() {
       // 4. 폼 데이터에 URL 저장
       setFormData(prev => ({ ...prev, pImageUrl: url }))
       setUploadStatus('이미지 업로드 완료 ✓')
-
-      alert('이미지가 업로드되었습니다!')
     } catch (err) {
       console.error('이미지 업로드 에러:', err)
       setUploadStatus('이미지 업로드 실패')
@@ -214,6 +216,12 @@ export default function BoardForm() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    console.log('📤 [게시글 제출 시작]')
+    console.log('  - currentType:', currentType)
+    console.log('  - typeAddressName:', typeAddressName)
+    console.log('  - formData.pTitle:', formData.pTitle)
+    console.log('  - formData.pContent:', formData.pContent)
+
     if (!formData.pTitle.trim()) {
       alert('제목을 입력해주세요.')
       return
@@ -229,11 +237,23 @@ export default function BoardForm() {
       return
     }
 
+    console.log('  - currentType.ptypeid:', currentType.ptypeid)
+
     setLoading(true)
 
     try {
       const SERVER_ORIGIN = import.meta.env.VITE_SERVER_ORIGIN || ''
-      const token = localStorage.getItem('jwt')
+      // authStore에서 토큰 가져오기
+      const token = useAuthStore.getState().token || localStorage.getItem('jwt')
+      
+      if (!token) {
+        alert('로그인이 필요합니다.')
+        navigate('/login')
+        return
+      }
+      
+      console.log('🔑 토큰 확인:', token ? '토큰 있음' : '토큰 없음')
+      console.log('👤 사용자 정보:', user)
 
       const requestBody = {
         pTypeId: currentType.ptypeid,
@@ -249,6 +269,7 @@ export default function BoardForm() {
         pSetVisible: formData.pSetVisible
       }
 
+      // 역할에 따라 API 경로 결정 (모두 /api/admin/boards 사용)
       const url = isEditMode
         ? `${SERVER_ORIGIN}/api/admin/boards/${pId}`
         : `${SERVER_ORIGIN}/api/admin/boards`
@@ -274,8 +295,22 @@ export default function BoardForm() {
         throw new Error(errorText || '게시글 저장에 실패했습니다.')
       }
 
+      // 응답 데이터에서 게시글 ID 추출 (소문자 pid)
+      const savedBoard = await response.json()
+      console.log('✅ 저장된 게시글:', savedBoard)
+      
       alert(isEditMode ? '게시글이 수정되었습니다.' : '게시글이 작성되었습니다.')
-      navigate(`/admin/boards/${typeAddressName}`)
+      
+      // role에 따라 동적 경로 이동
+      const basePath = getBasePath()
+      
+      // 생성/수정된 게시글의 상세 페이지로 이동 (pid는 소문자)
+      if (savedBoard && savedBoard.pid) {
+        navigate(`${basePath}/boards/${typeAddressName}/${savedBoard.pid}`)
+      } else {
+        // ID가 없으면 목록으로 이동
+        navigate(`${basePath}/boards/${typeAddressName}`)
+      }
     } catch (err) {
       console.error('게시글 저장 에러:', err)
       alert(err.message)
@@ -360,50 +395,53 @@ export default function BoardForm() {
                 이미지 업로드
               </label>
 
-              {/* 이미지 미리보기 또는 기존 이미지 */}
-              {(imagePreview || formData.pImageUrl) && (
-                <div className="mb-4 relative">
-                  <img
-                    src={imagePreview || formData.pImageUrl}
-                    alt="미리보기"
-                    className="w-full max-h-96 object-contain rounded-lg border border-border-light"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleImageRemove}
-                    className="absolute top-2 right-2 bg-error text-white rounded-full p-2
-                      hover:bg-red-600 transition-colors"
-                    disabled={loading}
-                  >
-                    <span className="material-symbols-outlined text-sm">close</span>
-                  </button>
-                </div>
-              )}
-
-              {/* 파일 선택 */}
-              <div className="flex items-center gap-2">
+              {/* 이미지 미리보기 또는 기존 이미지 (클릭하여 변경) */}
+              <div className="relative group mb-4">
+                <label htmlFor="imageInput" className="cursor-pointer block">
+                  {(imagePreview || formData.pImageUrl) ? (
+                    <div className="relative">
+                      <img
+                        src={imagePreview || formData.pImageUrl}
+                        alt="미리보기"
+                        className="w-full max-h-96 object-contain rounded-lg border border-border-light"
+                      />
+                      {/* 호버 오버레이 */}
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                        <div className="text-center text-white">
+                          <span className="material-symbols-outlined text-5xl mb-2">photo_camera</span>
+                          <p className="text-sm">클릭하여 이미지 변경</p>
+                        </div>
+                      </div>
+                      {/* 삭제 버튼 */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          handleImageRemove()
+                        }}
+                        className="absolute top-2 right-2 bg-error text-white rounded-full p-2
+                          hover:bg-red-600 transition-colors z-10"
+                        disabled={loading}
+                      >
+                        <span className="material-symbols-outlined text-sm">close</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-border-light rounded-lg p-12 text-center hover:border-primary transition-colors">
+                      <span className="material-symbols-outlined text-6xl text-gray-500 mb-4 block">add_photo_alternate</span>
+                      <p className="text-gray-400 mb-2">이미지를 클릭하여 업로드</p>
+                      <p className="text-xs text-gray-500">PNG, JPEG, WEBP (최대 10MB)</p>
+                    </div>
+                  )}
+                </label>
                 <input
+                  id="imageInput"
                   type="file"
                   accept="image/png,image/jpeg,image/webp"
                   onChange={handleImageChange}
-                  className="flex-1 bg-background-dark border border-border-light rounded-lg px-4 py-2
-                    text-text-light focus:outline-none focus:ring-2 focus:ring-primary
-                    file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0
-                    file:bg-primary file:text-white file:cursor-pointer
-                    hover:file:opacity-90"
+                  className="hidden"
                   disabled={loading}
                 />
-                {imageFile && !formData.pImageUrl && (
-                  <button
-                    type="button"
-                    onClick={handleImageUpload}
-                    disabled={loading}
-                    className="px-4 py-2 bg-primary text-white rounded-lg font-semibold
-                      hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap"
-                  >
-                    업로드
-                  </button>
-                )}
               </div>
 
               {/* 업로드 진행 상태 */}
@@ -420,10 +458,6 @@ export default function BoardForm() {
                   )}
                 </div>
               )}
-
-              <p className="mt-2 text-xs text-gray-500">
-                PNG, JPEG, WEBP 형식, 최대 10MB
-              </p>
             </div>
 
             {/* 링크 URL */}

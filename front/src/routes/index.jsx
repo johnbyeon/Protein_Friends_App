@@ -30,6 +30,8 @@ import BoardTypeManagement from '../pages/admin/BoardTypeManagement'
 // Admin/Trainer Pages
 import AdminDashboard from '../pages/AdminDashboard'
 import UploadTest from '../pages/UploadTest'
+import TrainerCreate from '../pages/admin/trainers/TrainerCreate'
+import TrainerProfile from '../pages/trainer/TrainerProfile'
 
 // Access & Branch Pages
 import AccessCheck from '../pages/access/AccessCheck'
@@ -56,6 +58,7 @@ export default function AppRoutes() {
 
         {/* 공통 페이지 (모든 로그인 유저) */}
         <Route path="home" element={<Home />} />
+        <Route path="me" element={<MyInfo />} />
 
         {/* ==================== 게시판 (공통) ==================== */}
         <Route path="boards/:typeAddressName" element={<BoardList />} />
@@ -78,14 +81,6 @@ export default function AppRoutes() {
             }
           />
 
-          <Route
-            path="me"
-            element={
-              <RoleGuard allowedRoles={['USER']}>
-                <MyInfo />
-              </RoleGuard>
-            }
-          />
           <Route
             path="coupons"
             element={
@@ -122,6 +117,73 @@ export default function AppRoutes() {
 
         {/* ==================== TRAINER 전용 ==================== */}
         <Route path="trainer">
+          {/* 트레이너 대시보드 */}
+          <Route
+            path="dashboard"
+            element={
+              <RoleGuard allowedRoles={['TRAINER']}>
+                <AdminDashboard />
+              </RoleGuard>
+            }
+          />
+
+          {/* 트레이너 게시판 */}
+          <Route
+            path="boards/:typeAddressName"
+            element={
+              <RoleGuard allowedRoles={['TRAINER']}>
+                <AdminBoardList />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="boards/:typeAddressName/new"
+            element={
+              <RoleGuard allowedRoles={['TRAINER']}>
+                <BoardForm />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="boards/:typeAddressName/:pId/edit"
+            element={
+              <RoleGuard allowedRoles={['TRAINER']}>
+                <BoardForm />
+              </RoleGuard>
+            }
+          />
+
+          {/* 게시판 타입 관리 */}
+          <Route
+            path="board-types"
+            element={
+              <RoleGuard allowedRoles={['TRAINER']}>
+                <BoardTypeManagement />
+              </RoleGuard>
+            }
+          />
+
+          {/* 트레이너 관리 - 목록 조회만 가능 (등록은 ADMIN 전용) */}
+          <Route
+            path="trainers"
+            element={
+              <RoleGuard allowedRoles={['TRAINER']}>
+                <div>트레이너 목록 페이지 (개발 예정)</div>
+              </RoleGuard>
+            }
+          />
+
+          {/* 트레이너 본인 프로필 수정 */}
+          <Route
+            path="profile"
+            element={
+              <RoleGuard allowedRoles={['TRAINER']}>
+                <TrainerProfile />
+              </RoleGuard>
+            }
+          />
+
+          {/* 기타 트레이너 기능 */}
           <Route
             path="schedule"
             element={
@@ -138,7 +200,6 @@ export default function AppRoutes() {
               </RoleGuard>
             }
           />
-          {/* 트레이너 전용 페이지 추가 시 여기에 */}
         </Route>
 
         {/* ==================== ADMIN 전용 ==================== */}
@@ -185,6 +246,24 @@ export default function AppRoutes() {
             element={
               <RoleGuard allowedRoles={['ADMIN']}>
                 <BoardTypeManagement />
+              </RoleGuard>
+            }
+          />
+
+          {/* 트레이너 관리 */}
+          <Route
+            path="trainers"
+            element={
+              <RoleGuard allowedRoles={['ADMIN']}>
+                <div>트레이너 목록 페이지 (개발 예정)</div>
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="trainers/new"
+            element={
+              <RoleGuard allowedRoles={['ADMIN']}>
+                <TrainerCreate />
               </RoleGuard>
             }
           />

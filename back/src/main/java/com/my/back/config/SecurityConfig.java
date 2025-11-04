@@ -85,12 +85,19 @@ public class SecurityConfig {
                         // 비인증 허용
                         .requestMatchers(HttpMethod.POST, "/api/auth/oauth2/login", "/api/auth/login", "/api/auth/join").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/board-types", "/api/board-types/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/branches", "/api/branches/*", "/api/branches/*/trainers").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/search").permitAll()
                         .requestMatchers(
                                 "/oauth2/**",
                                 "/login/oauth2/**",           // 콜백
                                 "/actuator/health",
                                 "/error"
                         ).permitAll()
+                        // 관리자/트레이너 전용 (게시판 관리)
+                        .requestMatchers("/api/admin/boards/**").hasAnyRole("ADMIN", "TRAINER")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // 트레이너 전용
+                        .requestMatchers("/api/trainer/**").hasRole("TRAINER")
                         // 그 외는 인증 필요
                         .anyRequest().authenticated()
                 )

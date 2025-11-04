@@ -4,6 +4,7 @@ import com.my.back.entity.Board;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -49,9 +50,39 @@ public class BoardListResponse {
     private Boolean pIsPopup;
 
     /**
+     * 상시 팝업 여부
+     */
+    private Boolean isAlwaysPopup;
+
+    /**
+     * 팝업 시작 날짜
+     */
+    private LocalDate pPopupStartDate;
+
+    /**
+     * 팝업 종료 날짜
+     */
+    private LocalDate pPopupEndDate;
+
+    /**
+     * 기간 제한 없음 여부
+     */
+    private Boolean isUnlimited;
+
+    /**
+     * 게시글 노출 여부
+     */
+    private Boolean pSetVisible;
+
+    /**
      * 게시글 작성일시
      */
     private LocalDateTime pCreateDate;
+
+    /**
+     * 게시글 수정일시
+     */
+    private LocalDateTime pUpdateDate;
 
     /**
      * 조회수
@@ -70,7 +101,13 @@ public class BoardListResponse {
                 .pTitle(entity.getPTitle())
                 .pImageUrl(entity.getPImageUrl())
                 .pIsPopup(entity.getPIsPopup())
+                .isAlwaysPopup(entity.getIsAlwaysPopup())
+                .pPopupStartDate(entity.getPPopupStartDate())
+                .pPopupEndDate(entity.getPPopupEndDate())
+                .isUnlimited(entity.getIsUnlimited())
+                .pSetVisible(entity.getPSetVisible())
                 .pCreateDate(entity.getPCreateDate())
+                .pUpdateDate(entity.getPUpdateDate())
                 .viewCount(viewCount != null ? viewCount : 0L)
                 .build();
     }

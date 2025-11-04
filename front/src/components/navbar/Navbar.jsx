@@ -20,6 +20,7 @@ const Navbar = () => {
 
   console.log('[Navbar] user:', user)
   console.log('[Navbar] role:', role)
+  console.log('[Navbar] profilePicture:', user?.profilePicture)
   // user가 null이면 아직 정보 로딩 중으로 간주
   const isLoadingUser = isLoggedIn && !user?.role
 
@@ -64,9 +65,25 @@ const Navbar = () => {
       <nav className="flex items-center gap-6 text-lg text-gray-200">
         <div className="relative group">
           <button className="flex items-center gap-2 focus:outline-none">
-          {!isLoggedIn && <img src={userprofile} className="w-9 h-9 rounded-full border border-border-primary/20" alt="User" />}
-           {hasUserAccess && <img src={userprofile} className="w-9 h-9 rounded-full border border-border-primary/20" alt="User" />}
-           {(hasAdminAccess || hasTrainerAccess) && <img src={admin_user} className="w-9 h-9 rounded-full border border-border-primary/20" alt="User" />}
+            {!isLoggedIn && (
+              <img src={userprofile} className="w-9 h-9 rounded-full border border-border-primary/20 object-cover" alt="User" />
+            )}
+            {isLoggedIn && user?.profilePicture ? (
+              <img 
+                src={user.profilePicture} 
+                className="w-9 h-9 rounded-full border border-border-primary/20 object-cover" 
+                alt="Profile" 
+                onError={(e) => {
+                  // 이미지 로드 실패 시 기본 이미지로 대체
+                  e.target.src = (hasAdminAccess || hasTrainerAccess) ? admin_user : userprofile
+                }}
+              />
+            ) : isLoggedIn && hasUserAccess && (
+              <img src={userprofile} className="w-9 h-9 rounded-full border border-border-primary/20 object-cover" alt="User" />
+            )}
+            {isLoggedIn && !user?.profilePicture && (hasAdminAccess || hasTrainerAccess) && (
+              <img src={admin_user} className="w-9 h-9 rounded-full border border-border-primary/20 object-cover" alt="Admin" />
+            )}
           </button>
 
           <div className="absolute right-0 mt-2 w-48 border border-border-primary/20 rounded-md shadow-lg
@@ -88,10 +105,10 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                {hasUserAccess && <a href="/my/info" className="block px-4 py-2 text-lg hover:bg-primary/20">내 정보</a>}
-                <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-lg text-red-400 hover:bg-primary/20">로그아웃</button>
+                {(hasUserAccess || hasTrainerAccess || hasAdminAccess) && <a href="/me" className="block px-4 py-2 text-lg hover:bg-primary/20">내 정보</a>}
+                {hasTrainerAccess && <a href="/trainer/profile" className="block px-4 py-2 text-lg hover:bg-primary/20">트레이너 프로필 수정</a>}
                 {hasAdminAccess && <a href="/admin/dashboard" className="block px-4 py-2 text-lg hover:bg-primary/20">관리자용</a>}
-                {hasTrainerAccess && <a href="/trainer/schedule" className="block px-4 py-2 text-lg hover:bg-primary/20">트레이너용</a>}
+                <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-lg text-red-400 hover:bg-primary/20">로그아웃</button>
               </>
             )}
           </div>

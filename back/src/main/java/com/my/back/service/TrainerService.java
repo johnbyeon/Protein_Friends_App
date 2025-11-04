@@ -1,5 +1,7 @@
 package com.my.back.service;
 
+import com.my.back.dto.TrainerProfileResponse;
+import com.my.back.dto.TrainerProfileUpdateRequest;
 import com.my.back.dto.trainer.TrainerDtos.CreateReq;
 import com.my.back.dto.trainer.TrainerDtos.UpdateReq;
 import com.my.back.dto.trainer.TrainerDtos.Res;
@@ -56,6 +58,11 @@ public class TrainerService {
                 .build();
 
         TrainerInfo saved = trainerRepo.save(entity);
+
+        // ✅ 트레이너 등록 시 User의 role을 TRAINER로 변경
+        user.setRole(com.my.back.entity.UserRole.TRAINER);
+        usersRepo.save(user);
+
         return toRes(saved, gym.getGName(), user.getEmail());
     }
 
@@ -115,9 +122,16 @@ public class TrainerService {
 
     /** 트레이너 삭제 */
     public void delete(Long tId) {
-        if (!trainerRepo.existsById(tId)) {
-            throw new IllegalArgumentException("Trainer not found: " + tId);
+        TrainerInfo trainer = trainerRepo.findById(tId)
+                .orElseThrow(() -> new IllegalArgumentException("Trainer not found: " + tId));
+
+        // ✅ 트레이너 삭제 시 User의 role을 USER로 복원
+        Users user = usersRepo.findById(trainer.getUId()).orElse(null);
+        if (user != null) {
+            user.setRole(com.my.back.entity.UserRole.USER);
+            usersRepo.save(user);
         }
+
         trainerRepo.deleteById(tId);
     }
 
@@ -128,10 +142,86 @@ public class TrainerService {
         t.setIsEmployed(employed);
         TrainerInfo saved = trainerRepo.save(t);
 
-        // TODO: employed=false 시 Users.userRole → USER로 변경 로직 추가 가능
+        // ✅ 재직 상태에 따라 User role 변경
+        Users user = usersRepo.findById(t.getUId()).orElse(null);
+        if (user != null) {
+            if (employed) {
+                // 재직 중 → TRAINER
+                user.setRole(com.my.back.entity.UserRole.TRAINER);
+            } else {
+                // 퇴직 → USER로 복원
+                user.setRole(com.my.back.entity.UserRole.USER);
+            }
+            usersRepo.save(user);
+        }
+
         return toRes(saved,
                 saved.getGymInfo() != null ? saved.getGymInfo().getGName() : null,
                 saved.getUsers() != null ? saved.getUsers().getEmail() : null);
+    }
+
+    /**
+     * 트레이너 본인 프로필 조회
+     * @param uId 유저 ID (JWT에서 추출)
+     * @return TrainerProfileResponse
+     */
+    @Transactional(readOnly = true)
+    public TrainerProfileResponse getMyProfile(Long uId) {
+        TrainerInfo trainer = trainerRepo.findByuId(uId)
+                .orElseThrow(() -> new IllegalArgumentException("Trainer profile not found for user: " + uId));
+
+        String gymName = trainer.getGymInfo() != null ? trainer.getGymInfo().getGName() : null;
+
+        return TrainerProfileResponse.builder()
+                .tId(trainer.getTId())
+                .tName(trainer.getTName())
+                .tBirthDay(trainer.getTBirthDay())
+                .tPhoneNumber(trainer.getTPhoneNumber())
+                .tAwardTitle(trainer.getTAwardTitle())
+                .tAboutMe(trainer.getTAboutMe())
+                .tImageUrl(trainer.getTImageUrl())
+                .isEmployed(trainer.getIsEmployed())
+                .gymName(gymName)
+                .gId(trainer.getGId())
+                .build();
+    }
+
+    /**
+     * 트레이너 본인 프로필 수정
+     * @param uId 유저 ID (JWT에서 추출)
+     * @param request 수정 요청 DTO
+     * @return TrainerProfileResponse
+     */
+    public TrainerProfileResponse updateMyProfile(Long uId, TrainerProfileUpdateRequest request) {
+        TrainerInfo trainer = trainerRepo.findByuId(uId)
+                .orElseThrow(() -> new IllegalArgumentException("Trainer profile not found for user: " + uId));
+
+        // 수정 가능한 필드만 업데이트
+        if (request.getTAwardTitle() != null) {
+            trainer.setTAwardTitle(request.getTAwardTitle());
+        }
+        if (request.getTAboutMe() != null) {
+            trainer.setTAboutMe(request.getTAboutMe());
+        }
+        if (request.getTImageUrl() != null) {
+            trainer.setTImageUrl(request.getTImageUrl());
+        }
+
+        TrainerInfo saved = trainerRepo.save(trainer);
+        String gymName = saved.getGymInfo() != null ? saved.getGymInfo().getGName() : null;
+
+        return TrainerProfileResponse.builder()
+                .tId(saved.getTId())
+                .tName(saved.getTName())
+                .tBirthDay(saved.getTBirthDay())
+                .tPhoneNumber(saved.getTPhoneNumber())
+                .tAwardTitle(saved.getTAwardTitle())
+                .tAboutMe(saved.getTAboutMe())
+                .tImageUrl(saved.getTImageUrl())
+                .isEmployed(saved.getIsEmployed())
+                .gymName(gymName)
+                .gId(saved.getGId())
+                .build();
     }
 
     /** 엔티티 → DTO 변환 */
