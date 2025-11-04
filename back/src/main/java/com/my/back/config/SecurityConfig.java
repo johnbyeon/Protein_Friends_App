@@ -84,6 +84,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 비인증 허용
                         .requestMatchers(HttpMethod.POST, "/api/auth/oauth2/login", "/api/auth/login", "/api/auth/join").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/board-types", "/api/board-types/*").permitAll()
                         .requestMatchers(
                                 "/oauth2/**",
                                 "/login/oauth2/**",           // 콜백

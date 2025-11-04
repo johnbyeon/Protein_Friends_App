@@ -220,7 +220,7 @@ export default function BoardTypeManagement() {
     // orderMappings 생성: typeId는 불변, newOrder만 변경
     const orderMappings = reorderedItems.map((item, index) => ({
       typeId: item.ptypeid,
-      newOrder: index // 0부터 시작하는 순서
+      newOrder: index + 1 // 1부터 시작하는 순서로 변경
     }))
 
     console.log('🔄 순서 변경:', {

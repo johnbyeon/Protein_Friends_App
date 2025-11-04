@@ -8,6 +8,7 @@ import com.my.back.repository.BoardTypeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -20,7 +21,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class BoardTypeService {
 
     private final BoardTypeRepository boardTypeRepository;
@@ -28,16 +28,59 @@ public class BoardTypeService {
     /**
      * 모든 게시글 타입 조회 (displayOrder 기준 정렬)
      */
+    @Transactional(readOnly = true)
     public List<BoardTypeResponse> getAllBoardTypes() {
         log.info("📋 모든 게시글 타입 조회 (displayOrder 정렬)");
+        
+        // 기본 데이터가 없으면 초기 데이터 생성 (별도 트랜잭션으로)
+        if (boardTypeRepository.count() == 0) {
+            initializeDefaultBoardTypes();
+        }
+        
         return boardTypeRepository.findAllOrderByDisplayOrder().stream()
                 .map(BoardTypeResponse::from)
                 .collect(Collectors.toList());
     }
 
     /**
+     * 기본 게시판 타입 초기화
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void initializeDefaultBoardTypes() {
+        long count = boardTypeRepository.count();
+        if (count > 0) {
+            log.info("📋 게시판 타입 데이터 이미 존재 ({}개)", count);
+            return;
+        }
+
+        log.info("📋 기본 게시판 타입 데이터 생성 시작");
+        
+        List<BoardType> defaultTypes = Arrays.asList(
+            BoardType.builder()
+                    .pTypeAddressName("notices")
+                    .pTypeName("공지사항")
+                    .displayOrder(1)
+                    .build(),
+            BoardType.builder()
+                    .pTypeAddressName("events")
+                    .pTypeName("이벤트")
+                    .displayOrder(2)
+                    .build(),
+            BoardType.builder()
+                    .pTypeAddressName("benefits")
+                    .pTypeName("혜택")
+                    .displayOrder(3)
+                    .build()
+        );
+
+        boardTypeRepository.saveAll(defaultTypes);
+        log.info("✅ 기본 게시판 타입 데이터 생성 완료: {}개", defaultTypes.size());
+    }
+
+    /**
      * ID로 게시글 타입 조회
      */
+    @Transactional(readOnly = true)
     public BoardTypeResponse getBoardTypeById(Long id) {
         log.info("📋 게시글 타입 조회: ID={}", id);
         BoardType boardType = boardTypeRepository.findById(id)

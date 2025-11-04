@@ -1,0 +1,10 @@
+<svg width="600" height="600" xmlns="http://www.w3.org/2000/svg" version="1.1" stroke="black" stroke-width="30" fill="none">
+ <title>Abstract user icon</title>
+
+ <g>
+  <title>Layer 1</title>
+  <circle cx="300" cy="300" r="265" id="svg_1" stroke="#db2525"/>
+  <circle cx="300" cy="230" r="115" id="svg_2" stroke="#db2525"/>
+  <path d="m106.81863,481.4a205,205 1 0 1 386.36274,0" id="svg_3" stroke="#db2525"/>
+ </g>
+</svg>
