@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import Navbar from './components/Navbar'
+import Navbar from './components/navbar/Navbar'
 import OAuthMessageBridge from './components/OAuthMessageBridge'
 import { initAuthTimers, useAuthStore } from './stores/authStore'
 import AppRoutes from './routes'

@@ -36,4 +36,7 @@ public class BoardType {
      */
     @Column(name = "p_type_name", nullable = false, length = 50)
     private String pTypeName;
+
+    @Column(name = "display_order", nullable = false)
+    private Integer displayOrder;
 }
