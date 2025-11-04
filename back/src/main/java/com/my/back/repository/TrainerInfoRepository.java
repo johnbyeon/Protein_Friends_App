@@ -6,6 +6,12 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+/**
+ * 트레이너 Repository
+ * - 트레이너 존재 여부
+ * - 지점 트레이너 수 조회
+ */
+
 import java.util.List;
 
 /**
@@ -21,5 +27,8 @@ public interface TrainerInfoRepository extends JpaRepository<TrainerInfo, Long>,
      */
     @Query(value = "SELECT * FROM trainer_info WHERE g_id = :gId AND t_is_employed = true", nativeQuery = true)
     List<TrainerInfo> findByGIdAndEmployed(@Param("gId") Long gId);
-
+    
+  /** 지점에 소속된 트레이너 수 */
+    @Query("select count(t) from TrainerInfo t where t.gId = :gId")
+    long countByGymId(@Param("gId") Long gId);
 }
