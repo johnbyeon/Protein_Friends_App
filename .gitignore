@@ -1,7 +1,7 @@
 
 # infra 전체 제외
 infra/
-
+.claude/
 # (선택) infra 아래 특정 파일만 추적하고 싶다면 예외 추가
 # !infra/docker-compose.prod.yml
 # !infra/README.md

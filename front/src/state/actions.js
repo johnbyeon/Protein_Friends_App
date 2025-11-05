@@ -21,4 +21,4 @@ loginWithJwt: (jwt) => {
     expires_in: ttlSec,
     user
   })
-},
+}

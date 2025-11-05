@@ -62,7 +62,7 @@ public class Users {
     private LocalDateTime updateAt;
 
     /** 프로필 사진 URL (nullable, ex: https://...) */
-    @Column(name = "profile_picture")
+    @Column(name = "profile_picture", columnDefinition = "TEXT")
     private String profilePicture;
 
     /** 소셜 계정 연결 여부 */
