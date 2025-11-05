@@ -16,7 +16,13 @@ import java.time.LocalDateTime;
  *  - User (u_id)
  */
 @Entity
-@Table(name = "class_user_info")
+@Table(
+        name = "class_user_info",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_class_user",
+                columnNames = {"pt_class_id", "u_id"}
+        )
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,8 +30,13 @@ import java.time.LocalDateTime;
 @Builder
 public class ClassUserInfo {
 
-    /** PT클래스 번호 (pt_class_info 테이블 FK, not null, number) */
+    /** 내부 PK (추가됨) */
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    /** PT클래스 번호 (pt_class_info 테이블 FK, not null, number) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pt_class_id", nullable = false)
     private PTClassInfo ptClassInfo;
