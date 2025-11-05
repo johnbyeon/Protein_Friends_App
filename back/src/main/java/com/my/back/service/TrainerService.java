@@ -75,9 +75,11 @@ public class TrainerService {
                 sort.replace("-", ""));
         Pageable pageable = PageRequest.of(page, size, srt);
 
-        Specification<TrainerInfo> spec = Specification.where(TrainerSpecs.gymIdEq(gymId))
-                .and(TrainerSpecs.employedEq(employed))
-                .and(TrainerSpecs.nameLike(q));
+        Specification<TrainerInfo> spec = Specification.allOf(
+                TrainerSpecs.gymIdEq(gymId),
+                TrainerSpecs.employedEq(employed),
+                TrainerSpecs.nameLike(q)
+        );
 
         return trainerRepo.findAll(spec, pageable).map(t ->
                 toRes(t,
