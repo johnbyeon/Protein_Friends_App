@@ -1,0 +1,112 @@
+/* src/styles/lightStreaks.css */
+
+/* hero3 전용 네온 스트릭 배경 */
+.light-streaks-bg {
+  position: relative;
+  width: 100%;
+  height: 520px;              /* b3 높이 감으로 맞춰서 필요하면 조절해도 됨 */
+  overflow: hidden;
+  background-color: #020308;
+
+  /* 밑색: 좌→우로 흐르는 컬러 밴드 (주황 → 핑크 → 보라 → 파랑 → 시안) */
+  background-image: linear-gradient(
+    90deg,
+    #ff5b00 0%,
+    #ff0066 18%,
+    #ff28b4 32%,
+    #8b2bff 50%,
+    #1a4eff 72%,
+    #00caff 86%,
+    #00f5ff 100%
+  );
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+
+  /* 컬러가 물 흐르듯 천천히 이동 + 전체 네온 밝기 살짝 흔들리게 */
+  animation:
+    ls-gradient-move 24s linear infinite alternate,
+    ls-bg-flicker 4s ease-in-out infinite alternate;
+  will-change: background-position, filter;
+}
+
+/* 밝은 세로 라인들 (네온 튜브) */
+.light-streaks-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.9) 0px,
+    rgba(255, 255, 255, 0.9) 1px,
+    rgba(255, 255, 255, 0) 3px
+  );
+  mix-blend-mode: screen;
+  opacity: 0.55;
+  pointer-events: none;
+
+  /* 라인 그룹이 아주 느리게 옆으로 흐르면서, 은은하게 깜빡이는 느낌 */
+  animation:
+    ls-streak-shift 18s linear infinite,
+    ls-streak-flicker 3s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+/* 하단으로 갈수록 어두워지는 그라데이션 (원본처럼 아래가 검게 떨어짐) */
+.light-streaks-bg::after {
+  content: "";
+  position: absolute;
+  inset: 55% 0 0 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    #000 100%
+  );
+  pointer-events: none;
+}
+
+/* ===== Keyframes ===== */
+
+@keyframes ls-gradient-move {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 50% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes ls-bg-flicker {
+  0% {
+    filter: brightness(0.9);
+  }
+  50% {
+    filter: brightness(1.1);
+  }
+  100% {
+    filter: brightness(1.0);
+  }
+}
+
+@keyframes ls-streak-shift {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-80px);
+  }
+}
+
+@keyframes ls-streak-flicker {
+  0% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.55;
+  }
+}

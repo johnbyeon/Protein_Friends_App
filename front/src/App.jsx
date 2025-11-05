@@ -3,9 +3,11 @@ import Navbar from './components/navbar/Navbar'
 import OAuthMessageBridge from './components/OAuthMessageBridge'
 import { initAuthTimers, useAuthStore } from './stores/authStore'
 import AppRoutes from './routes'
+import "./styles/lightStreaks.css";
 
 
 export default function App() {
+
     const { user, token, setUser } = useAuthStore()
   
     useEffect(() => {
@@ -45,11 +47,12 @@ export default function App() {
 
       refreshUserInfo()
     }, [token, setUser])
+
   console.log('🔥 VITE_SERVER_ORIGIN:', import.meta.env.VITE_SERVER_ORIGIN)
   useEffect(() => {
     initAuthTimers()
   }, [])
-  
+
   useEffect(() => {
     const { loginFromResponse } = useAuthStore.getState()
     if (!loginFromResponse) {
@@ -78,4 +81,5 @@ export default function App() {
       <AppRoutes />
     </>
   )
+
 }
