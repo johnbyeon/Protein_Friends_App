@@ -12,17 +12,23 @@ import com.my.back.repository.GymInfoRepository;
 import com.my.back.repository.TrainerInfoRepository;
 import com.my.back.repository.UserRepository;
 import com.my.back.service.spec.TrainerSpecs;
+import com.my.back.util.S3Util;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Duration;
 
 /**
  * TrainerService
  * - 트레이너 비즈니스 로직 처리
  * - CRUD + 필터 + 재직상태 변경 기능
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -31,6 +37,10 @@ public class TrainerService {
     private final TrainerInfoRepository trainerRepo;
     private final UserRepository usersRepo;
     private final GymInfoRepository gymRepo;
+    private final S3PresignService s3PresignService;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
 
     /** 트레이너 등록 */
     public Res create(CreateReq req) {
@@ -45,6 +55,9 @@ public class TrainerService {
             throw new IllegalStateException("This user already has a trainer profile.");
         }
 
+        // 이미지 URL 처리: Presigned URL → S3 Key 추출
+        String imageKey = S3Util.extractS3Key(req.tImageUrl());
+
         TrainerInfo entity = TrainerInfo.builder()
                 .gId(req.gId())
                 .uId(req.uId())
@@ -54,7 +67,7 @@ public class TrainerService {
                 .tAwardTitle(req.tAwardTitle())
                 .tAboutMe(req.tAboutMe())
                 .isEmployed(req.isEmployed() == null ? Boolean.TRUE : req.isEmployed())
-                .tImageUrl(req.tImageUrl())
+                .tImageUrl(imageKey)  // S3 Key만 저장
                 .build();
 
         TrainerInfo saved = trainerRepo.save(entity);
@@ -114,7 +127,11 @@ public class TrainerService {
         if (req.tAwardTitle() != null) t.setTAwardTitle(req.tAwardTitle());
         if (req.tAboutMe() != null) t.setTAboutMe(req.tAboutMe());
         if (req.isEmployed() != null) t.setIsEmployed(req.isEmployed());
-        if (req.tImageUrl() != null) t.setTImageUrl(req.tImageUrl());
+        if (req.tImageUrl() != null) {
+            // 이미지 URL 처리: Presigned URL → S3 Key 추출
+            String imageKey = S3Util.extractS3Key(req.tImageUrl());
+            t.setTImageUrl(imageKey);
+        }
 
         TrainerInfo saved = trainerRepo.save(t);
         return toRes(saved,
@@ -174,6 +191,9 @@ public class TrainerService {
 
         String gymName = trainer.getGymInfo() != null ? trainer.getGymInfo().getGName() : null;
 
+        // 이미지 URL 처리: S3 Key → Presigned URL 변환
+        String imageUrl = convertToPresignedUrl(trainer.getTImageUrl());
+
         return TrainerProfileResponse.builder()
                 .tId(trainer.getTId())
                 .tName(trainer.getTName())
@@ -181,7 +201,7 @@ public class TrainerService {
                 .tPhoneNumber(trainer.getTPhoneNumber())
                 .tAwardTitle(trainer.getTAwardTitle())
                 .tAboutMe(trainer.getTAboutMe())
-                .tImageUrl(trainer.getTImageUrl())
+                .tImageUrl(imageUrl)
                 .isEmployed(trainer.getIsEmployed())
                 .gymName(gymName)
                 .gId(trainer.getGId())
@@ -206,11 +226,16 @@ public class TrainerService {
             trainer.setTAboutMe(request.getTAboutMe());
         }
         if (request.getTImageUrl() != null) {
-            trainer.setTImageUrl(request.getTImageUrl());
+            // 이미지 URL 처리: Presigned URL → S3 Key 추출
+            String imageKey = S3Util.extractS3Key(request.getTImageUrl());
+            trainer.setTImageUrl(imageKey);
         }
 
         TrainerInfo saved = trainerRepo.save(trainer);
         String gymName = saved.getGymInfo() != null ? saved.getGymInfo().getGName() : null;
+
+        // 이미지 URL 처리: S3 Key → Presigned URL 변환
+        String imageUrl = convertToPresignedUrl(saved.getTImageUrl());
 
         return TrainerProfileResponse.builder()
                 .tId(saved.getTId())
@@ -219,7 +244,7 @@ public class TrainerService {
                 .tPhoneNumber(saved.getTPhoneNumber())
                 .tAwardTitle(saved.getTAwardTitle())
                 .tAboutMe(saved.getTAboutMe())
-                .tImageUrl(saved.getTImageUrl())
+                .tImageUrl(imageUrl)
                 .isEmployed(saved.getIsEmployed())
                 .gymName(gymName)
                 .gId(saved.getGId())
@@ -228,6 +253,9 @@ public class TrainerService {
 
     /** 엔티티 → DTO 변환 */
     private Res toRes(TrainerInfo t, String gymName, String userEmail) {
+        // 이미지 URL 처리: S3 Key → Presigned URL 변환
+        String imageUrl = convertToPresignedUrl(t.getTImageUrl());
+
         return new Res(
                 t.getTId(),
                 t.getGId(),
@@ -238,9 +266,40 @@ public class TrainerService {
                 t.getTAwardTitle(),
                 t.getTAboutMe(),
                 t.getIsEmployed(),
-                t.getTImageUrl(),
+                imageUrl,
                 gymName,
                 userEmail
         );
+    }
+
+    /**
+     * S3 Key를 Presigned URL로 변환 (트레이너 프로필 이미지 조회용)
+     * - S3 Key가 이미 URL 형태면 그대로 반환
+     * - S3 Key 형태면 Presigned URL 생성 (24시간 유효)
+     *
+     * @param s3KeyOrUrl S3 Key 또는 URL
+     * @return Presigned URL
+     */
+    private String convertToPresignedUrl(String s3KeyOrUrl) {
+        if (s3KeyOrUrl == null || s3KeyOrUrl.trim().isEmpty()) {
+            return null;
+        }
+
+        // 이미 URL 형태면 그대로 반환 (하위 호환성)
+        if (S3Util.isS3Url(s3KeyOrUrl)) {
+            return s3KeyOrUrl;
+        }
+
+        // S3 Key 형태면 Presigned URL 생성
+        try {
+            return s3PresignService.getDownloadUrl(
+                    bucketName,
+                    s3KeyOrUrl,
+                    Duration.ofHours(24)  // 24시간 유효
+            );
+        } catch (Exception e) {
+            log.error("❌ Presigned URL 생성 실패 (TrainerInfo.tImageUrl): key={}", s3KeyOrUrl, e);
+            return s3KeyOrUrl;  // 실패 시 원본 반환
+        }
     }
 }

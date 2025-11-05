@@ -2,6 +2,7 @@ package com.my.back.controller;
 
 import com.my.back.dto.BoardListResponse;
 import com.my.back.dto.BoardResponse;
+import com.my.back.dto.CustomUserDetails;
 import com.my.back.entity.Users;
 import com.my.back.repository.UserRepository;
 import com.my.back.service.BoardService;
@@ -50,15 +51,28 @@ public class BoardController {
 
     /**
      * 게시글 상세 조회
-     * 접근 권한: 모든 사용자
+     * 접근 권한: 로그인 사용자만
      * @param pId 게시글 ID
+     * @param userDetails 로그인한 사용자 정보 (JWT에서 추출)
      * @return 게시글 상세 정보
      */
     @GetMapping("/{pId}")
-    public ResponseEntity<?> getBoardDetail(@PathVariable Long pId) {
-        log.info("📄 [GET] /api/boards/{} - 게시글 상세 조회", pId);
+    public ResponseEntity<?> getBoardDetail(
+            @PathVariable Long pId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        log.info("📄 [GET] /api/boards/{} - 게시글 상세 조회 (email={})", pId, userDetails.getUsername());
         try {
-            BoardResponse board = boardService.getBoardDetail(pId);
+            // 로그인한 유저의 ID 조회
+            String email = userDetails.getUsername();
+            Users user = userRepository.findByEmail(email);
+            if (user == null) {
+                log.error("❌ 사용자를 찾을 수 없습니다: {}", email);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorResponse("사용자를 찾을 수 없습니다."));
+            }
+
+            BoardResponse board = boardService.getBoardDetail(pId, user.getUId());
             return ResponseEntity.ok(board);
         } catch (IllegalArgumentException e) {
             log.error("❌ 게시글 조회 실패: {}", e.getMessage());
@@ -108,21 +122,25 @@ public class BoardController {
     }
 
     /**
-     * 게시글 조회수 기록
+     * 게시글 조회수 기록 (별도 API - 필요시 사용)
      * 접근 권한: 로그인한 사용자
      * @param pId 게시글 ID
-     * @param email 로그인한 사용자 이메일 (JWT에서 추출)
+     * @param userDetails 로그인한 사용자 정보 (JWT에서 추출)
      * @return 성공 메시지
      */
     @PostMapping("/{pId}/view")
     public ResponseEntity<?> recordView(
             @PathVariable Long pId,
-            @AuthenticationPrincipal String email
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         log.info("👁️ [POST] /api/boards/{}/view - 조회수 기록", pId);
+        log.info("🔍 [DEBUG] userDetails: {}", userDetails != null ? userDetails.getUsername() : "NULL");
 
         try {
             // 이메일로 유저 ID 조회
+            String email = userDetails.getUsername();
+            log.info("🔍 [DEBUG] 추출된 email: {}", email);
+            
             Users user = userRepository.findByEmail(email);
             if (user == null) {
                 log.error("❌ 사용자를 찾을 수 없습니다: {}", email);
@@ -130,8 +148,10 @@ public class BoardController {
                         .body(new ErrorResponse("사용자를 찾을 수 없습니다."));
             }
 
+            log.info("🔍 [DEBUG] 찾은 user: uId={}, email={}", user.getUId(), user.getEmail());
+
             // 조회수 기록
-            boardService.recordView(pId, user.getUId());
+            boardService.recordBoardView(pId, user.getUId());
 
             return ResponseEntity.ok(new SuccessResponse("조회수가 기록되었습니다."));
         } catch (Exception e) {

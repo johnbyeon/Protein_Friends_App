@@ -90,6 +90,32 @@ const AdminNavbar = () => {
                 </div>
             </div>
 
+            <div className="relative group">
+                <button className="flex items-center gap-1 text-lg font-medium text-gray-400">
+                    <span className="group-hover:underline group-hover:text-text-light mr-3">고객센터</span>
+                    <span className="material-symbols-outlined text-lg transition-transform group-hover:rotate-180 group-hover:text-text-light">expand_more</span>
+                </button>
+                <div
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-black border border-border-dark
+                              rounded-md shadow-lg z-10 opacity-0 scale-95 pointer-events-none group-hover:pointer-events-auto
+                              group-hover:opacity-80 group-hover:scale-100 group-hover:block transform transition-all duration-200 ease-out origin-top
+                              before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2 before:block"
+                >
+                    <Link
+                        to="/admin/support/faqs"
+                        className="block px-4 py-2 text-lg hover:bg-primary/20 border-b border-border-dark"
+                    >
+                        FAQ 관리
+                    </Link>
+                    <Link
+                        to="/admin/support/inquiries"
+                        className="block px-4 py-2 text-lg hover:bg-primary/20"
+                    >
+                        1:1 문의 관리
+                    </Link>
+                </div>
+            </div>
+
         </>
 
     )
