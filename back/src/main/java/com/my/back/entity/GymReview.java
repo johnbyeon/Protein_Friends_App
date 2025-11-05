@@ -62,4 +62,12 @@ public class GymReview {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", insertable = false, updatable = false)
     private Users reviewer;
+
+    // 리뷰 수정
+    public void update(int rating, String reviewText) {
+        this.gRating = rating;
+        this.gReview = reviewText;
+    }
+
+
 }
