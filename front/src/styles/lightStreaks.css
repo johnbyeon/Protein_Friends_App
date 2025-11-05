@@ -1,0 +1,102 @@
+/* src/styles/lightStreaks.css */
+
+.light-streaks-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* 공통 레이어: 세로 스트라이프 + 컬러 그라데이션 */
+.light-streaks-layer {
+  position: absolute;
+  inset: 0;
+  background-image:
+    /* 세로 스트라이프 */
+    repeating-linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.18) 0px,
+      rgba(255, 255, 255, 0.18) 1px,
+      rgba(255, 255, 255, 0) 2px
+    ),
+    /* 컬러 그라데이션 */
+    linear-gradient(
+      90deg,
+      #ff7a00 0%,
+      #ff0066 18%,
+      #ff00ff 32%,
+      #7c3dff 48%,
+      #005bff 65%,
+      #00d5ff 82%,
+      #00ffb5 100%
+    );
+  background-size: 260% 100%, 260% 100%;
+  background-position: 0% 0%, 0% 0%;
+  mix-blend-mode: screen;
+  animation:
+    light-streaks-shift 16s linear infinite,
+    light-streaks-pulse 3.2s ease-in-out infinite alternate;
+}
+
+/* 메인 빛 기둥 영역 */
+.light-streaks-core {
+  top: 0;
+  bottom: 40%;
+  filter: blur(0.4px);
+}
+
+/* 하단 반사 영역 */
+.light-streaks-reflection {
+  top: 45%;
+  bottom: -25%;
+  transform-origin: top center;
+  transform: scaleY(-1);
+  opacity: 0.55;
+  filter: blur(10px);
+}
+
+/* 위/아래 페이드로 주변 배경과 자연스럽게 연결 */
+.light-streaks-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.light-streaks-fade-top {
+  top: 0;
+  height: 40%;
+  background: linear-gradient(to bottom, #000 0%, transparent 100%);
+}
+
+.light-streaks-fade-bottom {
+  bottom: 0;
+  height: 40%;
+  background: linear-gradient(to top, #000 0%, transparent 100%);
+}
+
+/* 색이 천천히 좌→우로 흐르는 애니메이션 */
+@keyframes light-streaks-shift {
+  0% {
+    background-position: 0% 0%, 0% 0%;
+  }
+  50% {
+    background-position: -130% 0%, -65% 0%;
+  }
+  100% {
+    background-position: 0% 0%, 0% 0%;
+  }
+}
+
+/* 네온의 미세한 깜빡임/호흡 */
+@keyframes light-streaks-pulse {
+  0% {
+    opacity: 0.85;
+    box-shadow: 0 0 18px rgba(255, 255, 255, 0.26);
+  }
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 32px rgba(255, 255, 255, 0.7);
+  }
+}
