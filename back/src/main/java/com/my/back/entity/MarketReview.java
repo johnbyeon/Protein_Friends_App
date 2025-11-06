@@ -3,6 +3,8 @@ package com.my.back.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 
 import java.time.LocalDateTime;
 
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "market_review")
+@EntityListeners(AuditingEntityListener.class)// DB 테이블명 명시 (필수)
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
