@@ -5,6 +5,8 @@ import com.my.back.dto.UploadUrlRequest;
 import com.my.back.dto.UploadUrlResponse;
 import com.my.back.dto.UserDTO;
 import com.my.back.entity.Image;
+import com.my.back.entity.MembershipService;
+import com.my.back.repository.MembershipServiceRepository;
 import com.my.back.service.ImageService;
 import com.my.back.service.S3PresignService;
 import com.my.back.service.UserService;
@@ -26,6 +28,7 @@ public class S3Controller {
     private final S3PresignService s3Service;
     private final ImageService imageService;
     private final UserService userService;
+    private final MembershipServiceRepository membershipServiceRepository;
 
     private static final String BUCKET_NAME = "protein-friends-s3";
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -116,7 +119,7 @@ public class S3Controller {
 
     /**
      * S3 다운로드 URL 발급
-     * 본인이 업로드한 이미지만 조회 가능
+     * 본인이 업로드한 이미지와 PT 서비스 이미지는 모든 로그인 유저가 조회 가능
      * 이미지 타입에 따라 만료 시간 차등 적용
      */
     @GetMapping("/download")
@@ -143,16 +146,19 @@ public class S3Controller {
             // 3. DB에서 이미지 확인
             Image image = imageService.getImageByKey(key);
 
-            // 4. 권한 확인 (본인 이미지만)
-            if (!image.getUserId().equals(user.getUId())) {
+            // 4. 권한 확인 (본인 이미지 또는 PT/회원권 관련 이미지는 모든 로그인 유저 접근 가능)
+            if (!image.getUserId().equals(user.getUId()) && 
+                !"PT_SERVICE".equals(image.getImageType()) && 
+                !"PT_TICKET".equals(image.getImageType()) &&
+                !"MEMBERSHIP_SERVICE".equals(image.getImageType())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body("접근 권한이 없습니다");
             }
 
-            // 4. 이미지 타입별 만료 시간 설정
+            // 5. 이미지 타입별 만료 시간 설정
             java.time.Duration expiration = getExpirationByImageType(image.getImageType());
 
-            // 5. Presigned GET URL 발급
+            // 6. Presigned GET URL 발급
             String url = s3Service.getDownloadUrl(BUCKET_NAME, key, expiration);
 
             return ResponseEntity.ok(url);
@@ -163,6 +169,42 @@ public class S3Controller {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("다운로드 URL 발급 실패: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 회원권 이미지 다운로드 URL 발급
+     * membership_service 테이블의 이미지는 모든 로그인 유저 접근 가능
+     */
+    @GetMapping("/membership-download")
+    public ResponseEntity<?> getMembershipImageUrl(
+            @RequestParam String key,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        try {
+            // 1. 인증 확인
+            if (userDetails == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("로그인이 필요합니다");
+            }
+
+            // 2. membership_service 테이블에서 이미지 확인
+            MembershipService membership = membershipServiceRepository.findByMembershipPicUrl(key)
+                    .orElse(null);
+
+            if (membership == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("회원권을 찾을 수 없습니다");
+            }
+
+            // 3. Presigned GET URL 발급 (2시간 유효)
+            String url = s3Service.getDownloadUrl(BUCKET_NAME, key, java.time.Duration.ofHours(2));
+
+            return ResponseEntity.ok(url);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("회원권 이미지 URL 발급 실패: " + e.getMessage());
         }
     }
 
@@ -183,6 +225,10 @@ public class S3Controller {
                 return java.time.Duration.ofMinutes(30); // 인바디: 30분 (민감)
             case "EXERCISE":
                 return java.time.Duration.ofHours(12); // 운동: 12시간
+            case "PT_SERVICE":
+            case "PT_TICKET":
+            case "MEMBERSHIP_SERVICE":
+                return java.time.Duration.ofHours(2); // PT/회원권 관련: 2시간
             default:
                 return java.time.Duration.ofHours(1); // 기타: 1시간
         }

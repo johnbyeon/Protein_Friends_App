@@ -1,47 +1,87 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { apiJson } from '../lib/api'
 
 export default function MyCoupons() {
-  const [coupons] = useState([
-    {
-      id: '#000123',
-      title: '신규 회원 PT 1회 50% 할인',
-      type: 'PT',
-      discount: '50%',
-      startDate: '2024.06.01',
-      endDate: '2024.08.31',
-      daysLeft: 30,
-      minAmount: '50,000원',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAf91iV5VThofm1FnsxpvNhi-J-eKGSaJW6WYIn9rxQrwhuG5s1myCHp3E3AKo6McFYwfhtDg3B2Znk_AwCz-3pY13C23SSzMovqu7jEARIYMBw8BkFohyZnrTszaxJsT47_DJ2nuc4N18b8pD3aeb1RCUo-jxDcoKIErhrvEIC_wNeBohPCcDQitRcEg176x9tKyGNLe7dIuQmsLMmTPSdrPiPVfEkv5UUywzCNjX1EiUa5TyOBfw4b6wxb6PdA7z-bE5REDGK2z3v',
-      status: 'active'
-    },
-    {
-      id: '#000124',
-      title: '여름맞이 멤버십 1개월 2만원 할인',
-      type: '멤버십',
-      discount: '₩20,000',
-      startDate: '2024.07.01',
-      endDate: '2024.07.31',
-      daysLeft: 1,
-      minAmount: '100,000원',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC-pHAJh1YIDBCP_mAvWPZ-_lKV-TQCKUwdIxPpvVzPh_lACdD1_YXTym3TEQ2WaDZxkLC-8DAfMWB9O2-cjDYMQakMGxGdHGq31Km1XxixLjBt4cyUp1UKkc6n7xRV2nQRkRCFZpYhhKIITtAGVnJ8zixE2bStefJU-W2ams2_Ds1_O_XFadCuWDQF-LTc1-egWFb9Wktuq36BPcX20fxv2kLGijOObSddqZ1laQGvl8LzPCNxA82OSB0a060qZjw1RX4bVCv37IId',
-      status: 'active'
-    }
-  ])
+  const [coupons, setCoupons] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const [expiredCoupons] = useState([
-    {
-      id: '#000125',
-      title: '봄맞이 PT 5회권 10% 할인',
-      type: 'PT',
-      discount: '10%',
-      startDate: '2024.03.01',
-      endDate: '2024.05.31',
-      minAmount: '200,000원',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAf91iV5VThofm1FnsxpvNhi-J-eKGSaJW6WYIn9rxQrwhuG5s1myCHp3E3AKo6McFYwfhtDg3B2Znk_AwCz-3pY13C23SSzMovqu7jEARIYMBw8BkFohyZnrTszaxJsT47_DJ2nuc4N18b8pD3aeb1RCUo-jxDcoKIErhrvEIC_wNeBohPCcDQitRcEg176x9tKyGNLe7dIuQmsLMmTPSdrPiPVfEkv5UUywzCNjX1EiUa5TyOBfw4b6wxb6PdA7z-bE5REDGK2z3v',
-      status: 'expired'
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      try {
+        setLoading(true)
+        const response = await apiJson('/my/coupons')
+        if (!response.ok) {
+          throw new Error(response.data?.message || '쿠폰 데이터를 불러오는데 실패했습니다.')
+        }
+        setCoupons(response.data)
+      } catch (err) {
+        console.error('쿠폰 데이터를 불러오는데 실패했습니다:', err)
+        setError('쿠폰 데이터를 불러오는데 실패했습니다.')
+      } finally {
+        setLoading(false)
+      }
     }
-  ])
+
+    fetchCoupons()
+  }, [])
+
+  // 활성 쿠폰과 만료된 쿠폰 분리
+  const activeCoupons = (coupons || []).filter(coupon => 
+    coupon.status === 'ACTIVE' || coupon.status === 'UPCOMING'
+  )
+  const expiredCoupons = (coupons || []).filter(coupon => 
+    coupon.status === 'EXPIRED' || coupon.status === 'USED'
+  )
+
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString) => {
+    if (!dateString) return ''
+    const date = new Date(dateString)
+    return date.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).replace(/\./g, '.').replace(/ /g, '')
+  }
+
+  // 금액 포맷팅 함수
+  const formatAmount = (amount) => {
+    if (!amount) return '0원'
+    return `${amount.toLocaleString()}원`
+  }
+
+  if (loading) {
+    return (
+      <main className="bg-background-dark text-text-light min-h-screen">
+        <div className="mx-auto max-w-4xl px-6 py-16">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <p className="mt-4 text-gray-400">쿠폰 데이터를 불러오는 중...</p>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="bg-background-dark text-text-light min-h-screen">
+        <div className="mx-auto max-w-4xl px-6 py-16">
+          <div className="text-center">
+            <p className="text-red-400">{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="mt-4 px-4 py-2 bg-primary text-black rounded-lg hover:opacity-80"
+            >
+              다시 시도
+            </button>
+          </div>
+        </div>
+      </main>
+    )
+  }
 
    return (
       <main className="bg-background-dark text-text-light min-h-screen">
@@ -64,37 +104,42 @@ export default function MyCoupons() {
                 보유한 할인권
               </h3>
               <div className="space-y-6">
-                {coupons.map(coupon => (
+                {activeCoupons.map(coupon => (
                   <div
-                    key={coupon.id}
+                    key={coupon.recDisId}
                     className="flex flex-col sm:flex-row items-start sm:items-center gap-6 rounded-xl border border-primary/40 bg-surface-dark/60 shadow-[0_0_25px_-5px_var(--color-primary)] p-6 transition-all hover:shadow-[0_0_40px_-5px_var(--color-primary)]"
                   >
                     <img
-                      src={coupon.image}
+                      src={coupon.thumbnailUrl}
                       alt={coupon.title}
                       className="h-24 w-24 flex-shrink-0 rounded-lg object-cover"
                     />
                     <div className="flex-1">
-                      <p className="text-sm text-gray-400">{coupon.id}</p>
+                      <p className="text-sm text-gray-400">{coupon.code}</p>
                       <p className="text-2xl font-bold text-text-light mt-1">{coupon.title}</p>
                       <p className="text-gray-400 mt-2">
-                        사용기간: <span className="text-white">{coupon.startDate}</span> ~{' '}
-                        <span className="text-white">{coupon.endDate}</span> (D-{coupon.daysLeft})
+                        사용기간: <span className="text-white">{formatDate(coupon.startAt)}</span> ~{' '}
+                        <span className="text-white">{formatDate(coupon.endAt)}</span> ({coupon.dday})
                       </p>
                       <p className="text-gray-400">
-                        최소 금액: <span className="text-white">{coupon.minAmount}</span>
+                        최소 금액: <span className="text-white">{formatAmount(coupon.minThreshold)}</span>
                       </p>
                     </div>
                     <div className="text-right">
                       <span className="inline-block rounded-full bg-primary/20 px-3 py-1 text-sm font-semibold text-primary">
-                        {coupon.type}
+                        {coupon.badge}
                       </span>
                       <p className="text-3xl font-bold text-primary mt-2">
-                        {coupon.discount}
+                        {coupon.displayValue}
                       </p>
                     </div>
                   </div>
                 ))}
+                {activeCoupons.length === 0 && (
+                  <div className="text-center py-8 text-gray-400">
+                    보유한 할인권이 없습니다.
+                  </div>
+                )}
               </div>
             </section>
 
@@ -106,35 +151,40 @@ export default function MyCoupons() {
               <div className="space-y-6">
                 {expiredCoupons.map(coupon => (
                   <div
-                    key={coupon.id}
+                    key={coupon.recDisId}
                     className="flex flex-col sm:flex-row items-start sm:items-center gap-6 rounded-xl border border-border-dark bg-surface-dark/40 p-6 opacity-60"
                   >
                     <img
-                      src={coupon.image}
+                      src={coupon.thumbnailUrl}
                       alt={coupon.title}
                       className="h-24 w-24 flex-shrink-0 rounded-lg object-cover"
                     />
                     <div className="flex-1">
-                      <p className="text-sm text-gray-500">{coupon.id}</p>
+                      <p className="text-sm text-gray-500">{coupon.code}</p>
                       <p className="text-2xl font-bold text-gray-400 mt-1">{coupon.title}</p>
                       <p className="text-gray-500 mt-2">
-                        사용기간: <span>{coupon.startDate}</span> ~{' '}
-                        <span>{coupon.endDate}</span>
+                        사용기간: <span>{formatDate(coupon.startAt)}</span> ~{' '}
+                        <span>{formatDate(coupon.endAt)}</span>
                       </p>
                       <p className="text-gray-500">
-                        최소 금액: <span>{coupon.minAmount}</span>
+                        최소 금액: <span>{formatAmount(coupon.minThreshold)}</span>
                       </p>
                     </div>
                     <div className="text-right">
                       <span className="inline-block rounded-full bg-gray-600/20 px-3 py-1 text-sm font-semibold text-gray-400">
-                        {coupon.type}
+                        {coupon.badge}
                       </span>
                       <p className="text-3xl font-bold text-gray-500 mt-2">
-                        {coupon.discount}
+                        {coupon.displayValue}
                       </p>
                     </div>
                   </div>
                 ))}
+                {expiredCoupons.length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    만료된 할인권이 없습니다.
+                  </div>
+                )}
               </div>
             </section>
           </div>

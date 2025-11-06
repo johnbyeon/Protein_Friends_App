@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { get, put, presignUpload, getViewUrl } from '../../../lib/api'
+import { apiJson, put, presignUpload, getViewUrl } from '../../../lib/api'
 
 const BranchEdit = () => {
     const navigate = useNavigate()
@@ -12,9 +12,7 @@ const BranchEdit = () => {
         operatingHours: '',
         parkingInfo: '',
         stations: '',
-        amenities: '',
         image: '',
-        description: '',
     })
     const [imageFile, setImageFile] = useState(null)
     const [imagePreview, setImagePreview] = useState('')
@@ -28,26 +26,63 @@ const BranchEdit = () => {
 
     const fetchBranch = async () => {
         try {
-            const branch = await get(`/api/admin/branches/${id}`)
+            console.log('=== BRANCH EDIT FETCH START ===')
+            console.log('1. Fetching branch data for ID:', id)
+            console.log('2. API Endpoint:', `/api/branches/${id}`)
+            
+            const response = await apiJson(`/api/branches/${id}`)
+            console.log('3. Raw API Response:', response)
+            console.log('4. Response status:', response.status)
+            console.log('5. Response ok:', response.ok)
+            console.log('6. Response data type:', typeof response.data)
+            console.log('7. Response data:', response.data)
+            
+            const branch = response.data
+            console.log('6. Branch object:', branch)
+            console.log('7. Branch keys:', Object.keys(branch || {}))
+            
+            if (branch) {
+                console.log('8. Branch fields:')
+                console.log('   - gName:', branch.gName)
+                console.log('   - gAddress:', branch.gAddress)
+                console.log('   - gTel:', branch.gTel)
+                console.log('   - gWorkoutDuration:', branch.gWorkoutDuration)
+                console.log('   - gParking:', branch.gParking)
+                console.log('   - gImageUrl:', branch.gImageUrl)
+                console.log('   - stations:', branch.stations)
+                console.log('   - stations length:', branch.stations?.length || 0)
+            }
+            
             // API 응답을 폼 형식으로 변환
-            setFormValues({
-                name: branch.gName,
-                address: branch.gAddress,
-                phone: branch.gTel,
+            const formValues = {
+                name: branch.gName || '',
+                address: branch.gAddress || '',
+                phone: branch.gTel || '',
                 operatingHours: branch.gWorkoutDuration || '',
                 parkingInfo: branch.gParking || '',
                 stations: branch.stations?.map(station =>
-                    `${station.gLineNumber}|${station.gStationName}|${station.gWalkingDistance}`
+                    `${station.stationLine}|${station.stationName}|${station.walkTime}`
                 ).join('\n') || '',
-                amenities: '', // API에 없음
                 image: branch.gImageUrl || '',
-                description: '',
-            })
+            }
+            console.log('9. Form values to set:', formValues)
+            console.log('10. Setting form values...')
+            setFormValues(formValues)
+            console.log('11. Setting image preview:', branch.gImageUrl)
             setImagePreview(branch.gImageUrl || '')
+            console.log('12. Form values and image preview set successfully')
         } catch (error) {
-            console.error('Failed to fetch branch:', error)
-            // TODO: 에러 처리
+            console.error('=== BRANCH EDIT FETCH ERROR ===')
+            console.error('Error object:', error)
+            console.error('Error message:', error.message)
+            console.error('Error stack:', error.stack)
+            console.error('Error response:', error.response)
+            console.error('Error status:', error.response?.status)
+            console.error('Error status text:', error.response?.statusText)
+            console.error('Error data:', error.response?.data)
+            console.error('Error headers:', error.response?.headers)
         } finally {
+            console.log('=== BRANCH EDIT FETCH END ===')
             setLoading(false)
         }
     }
@@ -68,13 +103,20 @@ const BranchEdit = () => {
     const handleSubmit = async (event) => {
         event.preventDefault()
         setSubmitting(true)
+        console.log('=== BRANCH EDIT SUBMIT START ===')
+        console.log('1. Form values:', formValues)
+        console.log('2. Image file:', imageFile)
+        console.log('3. Current image URL:', formValues.image)
 
         try {
             let imageUrl = formValues.image
 
             // 이미지 파일이 있으면 S3 업로드
             if (imageFile) {
+                console.log('4. Starting S3 upload process...')
                 setUploading(true)
+                
+                console.log('5. Requesting presigned URL...')
                 const { key, putUrl, imageId } = await presignUpload({
                     filename: imageFile.name,
                     contentType: imageFile.type,
@@ -82,7 +124,9 @@ const BranchEdit = () => {
                     description: `${formValues.name} 지점 이미지`,
                     imageType: 'PROFILE' // 지점 이미지 타입
                 })
+                console.log('6. Presigned URL received:', { key, putUrl, imageId })
 
+                console.log('7. Uploading to S3...')
                 // S3에 파일 업로드
                 const xhr = new XMLHttpRequest()
                 xhr.open('PUT', putUrl, true)
@@ -90,13 +134,27 @@ const BranchEdit = () => {
                 xhr.send(imageFile)
 
                 await new Promise((resolve, reject) => {
-                    xhr.onload = () => resolve()
-                    xhr.onerror = () => reject(new Error('Upload failed'))
+                    xhr.onload = () => {
+                        console.log('8. S3 upload response status:', xhr.status)
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            resolve()
+                        } else {
+                            reject(new Error(`S3 upload failed with status ${xhr.status}`))
+                        }
+                    }
+                    xhr.onerror = () => {
+                        console.error('9. S3 upload error:', xhr)
+                        reject(new Error('Upload failed'))
+                    }
                 })
 
+                console.log('10. Getting view URL...')
                 // 조회 URL 발급
                 imageUrl = await getViewUrl(key)
+                console.log('11. View URL received:', imageUrl)
                 setUploading(false)
+            } else {
+                console.log('4. No image file to upload, using existing URL')
             }
 
             // 지점 수정 API 호출
@@ -109,16 +167,26 @@ const BranchEdit = () => {
                 gLatitude: 0, // TODO: 지도에서 좌표 가져오기
                 gLongitude: 0, // TODO: 지도에서 좌표 가져오기
                 gImageUrl: imageUrl,
-                // stations와 amenities는 별도 처리 필요
+                // stations는 별도 처리 필요
             }
 
-            await put(`/api/admin/branches/${id}`, branchData)
+            console.log('12. Calling branch update API...')
+            console.log('13. Branch data to send:', branchData)
+            
+            const updateResponse = await put(`/api/admin/branches/${id}`, branchData)
+            console.log('14. Branch update response:', updateResponse)
 
-            console.log('Branch updated successfully:', branchData)
+            console.log('15. Branch updated successfully:', branchData)
+            console.log('=== BRANCH EDIT SUBMIT SUCCESS ===')
             navigate('/admin/centers/branches', { replace: true })
         } catch (error) {
-            console.error('Failed to update branch:', error)
-            // TODO: 에러 처리
+            console.error('=== BRANCH EDIT SUBMIT ERROR ===')
+            console.error('Error object:', error)
+            console.error('Error message:', error.message)
+            console.error('Error stack:', error.stack)
+            console.error('Error response:', error.response)
+            console.error('Error status:', error.response?.status)
+            console.error('Error data:', error.response?.data)
         } finally {
             setSubmitting(false)
             setUploading(false)
@@ -177,14 +245,7 @@ const BranchEdit = () => {
                             required
                         />
 
-                        <FormTextarea
-                            label="상세 소개"
-                            name="description"
-                            value={formValues.description}
-                            onChange={handleChange}
-                            placeholder="지점 특징, 담당 프로그램 등을 자유롭게 작성하세요."
-                            rows={4}
-                        />
+
 
                         <div className="grid gap-6 md:grid-cols-2">
                             <FormTextarea
@@ -203,22 +264,13 @@ const BranchEdit = () => {
                             />
                         </div>
 
-                        <div className="grid gap-6 md:grid-cols-2">
-                            <FormTextarea
-                                label="주변 역 정보"
-                                name="stations"
-                                value={formValues.stations}
-                                onChange={handleChange}
-                                placeholder="노선|역 이름|도보 거리 형태로 입력 (예: 2|강남역|도보 5분)"
-                            />
-                            <FormTextarea
-                                label="편의 시설"
-                                name="amenities"
-                                value={formValues.amenities}
-                                onChange={handleChange}
-                                placeholder="한 줄에 하나씩 입력 (예: 프라이빗 PT룸 6개)"
-                            />
-                        </div>
+                        <FormTextarea
+                            label="주변 역 정보"
+                            name="stations"
+                            value={formValues.stations}
+                            onChange={handleChange}
+                            placeholder="노선|역 이름|도보 거리 형태로 입력 (예: 2|강남역|도보 5분)"
+                        />
 
                         <div className="space-y-3">
                             <label className="block text-sm">

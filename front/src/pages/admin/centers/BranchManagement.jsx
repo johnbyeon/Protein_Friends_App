@@ -4,14 +4,12 @@ import { del, post, put } from '../../../lib/api'
 import { useBranchStore } from '../../../stores/branchStore'
 
 const emptyBranch = {
-    id: null,
     name: '',
     address: '',
     phone: '',
     operatingHours: '',
     parkingInfo: '',
     stations: '',
-    amenities: '',
     image: '',
 }
 
@@ -53,7 +51,6 @@ const BranchManagement = () => {
             operatingHours: branch.operatingHours.join('\n'),
             parkingInfo: branch.parkingInfo,
             stations: branch.stations.map((station) => `${station.line}|${station.label}|${station.distance}`).join('\n'),
-            amenities: branch.amenities.join('\n'),
             image: branch.image,
         })
         setIsModalOpen(true)
@@ -91,10 +88,6 @@ const BranchManagement = () => {
                         color: determineLineColor(lineNumber),
                     }
                 }),
-            amenities: formValues.amenities
-                .split('\n')
-                .map((line) => line.trim())
-                .filter(Boolean),
             image: formValues.image || editingBranch?.image || '',
         }
     }
@@ -319,13 +312,6 @@ const BranchManagement = () => {
                                 value={formValues.stations}
                                 onChange={handleChange}
                                 placeholder="노선|역 이름|도보 거리 형태로 입력 (예: 2|강남역|도보 5분)"
-                            />
-                            <FormTextarea
-                                label="편의 시설"
-                                name="amenities"
-                                value={formValues.amenities}
-                                onChange={handleChange}
-                                placeholder="한 줄에 하나씩 입력하세요."
                             />
                             <FormInput
                                 label="대표 이미지 URL"

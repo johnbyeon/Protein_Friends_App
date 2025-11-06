@@ -88,14 +88,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/boards", "/api/boards/*", "/api/boards/type/*", "/api/boards/popups").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/branches", "/api/branches/*", "/api/branches/*/trainers").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/search").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/food", "/api/food/search").permitAll()
                         .requestMatchers(
                                 "/oauth2/**",
                                 "/login/oauth2/**",           // 콜백
                                 "/actuator/health",
-                                "/error"
+                                "/error",
+                                "/uploads/**"                 // 정적 파일 접근 허용
                         ).permitAll()
                         // 관리자/트레이너 전용 (게시판 관리)
                         .requestMatchers("/api/admin/boards/**").hasAnyRole("ADMIN", "TRAINER")
+                        .requestMatchers("/api/admin/memberships/**").hasAnyRole("ADMIN", "TRAINER")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // 트레이너 전용
                         .requestMatchers("/api/trainer/**").hasRole("TRAINER")

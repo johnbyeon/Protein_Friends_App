@@ -22,6 +22,10 @@ export default function AdminBoardList() {
   const [selectedBoard, setSelectedBoard] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
+  // 디버깅용 로그
+  console.log('🔍 [AdminBoardList] 사용자 역할:', user?.role)
+  console.log('🔍 [AdminBoardList] 현재 경로:', location.pathname)
+
   // 사용자 role에 따른 기본 경로 설정
   const getBasePath = () => {
     if (user?.role === 'ROLE_ADMIN') return '/admin'
@@ -41,8 +45,10 @@ export default function AdminBoardList() {
       
       // boardTypes가 있고 typeAddressName이 있으면 현재 타입 설정
       if (boardTypes.length > 0 && typeAddressName) {
-        const type = boardTypes.find(t => t.ptypeaddressName === typeAddressName)
-        if (type && (!currentType || currentType.ptypeid !== type.ptypeid)) {
+        const type = boardTypes.find(t => 
+          t.pTypeAddressName === typeAddressName || t.ptypeaddressName === typeAddressName
+        )
+        if (type && (!currentType || (currentType.pTypeId || currentType.ptypeid) !== (type.pTypeId || type.ptypeid))) {
           setCurrentType(type)
         }
       }
@@ -57,7 +63,8 @@ export default function AdminBoardList() {
     let isMounted = true
     
     const loadBoards = async () => {
-      if (!currentType?.ptypeid) return
+      const typeId = currentType?.pTypeId || currentType?.ptypeid
+      if (!typeId) return
 
       setLoading(true)
       setError(null)
@@ -66,11 +73,30 @@ export default function AdminBoardList() {
         const SERVER_ORIGIN = import.meta.env.VITE_SERVER_ORIGIN || ''
         const token = localStorage.getItem('jwt')
 
-        const response = await fetch(`${SERVER_ORIGIN}/api/admin/boards/type/${currentType.ptypeid}`, {
+        console.log('🔍 [AdminBoardList] API 호출 전 확인:')
+        console.log('  - 토큰 존재 여부:', !!token)
+        console.log('  - 사용자 역할:', user?.role)
+        console.log('  - 요청 URL:', `${SERVER_ORIGIN}/api/admin/boards/type/${typeId}`)
+        
+        // JWT 토큰 디코딩해서 내용 확인
+        if (token) {
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]))
+            console.log('🔍 [AdminBoardList] JWT 토큰 내용:', payload)
+            console.log('🔍 [AdminBoardList] JWT 역할 정보:', payload.roles || payload.authorities || payload.role)
+          } catch (e) {
+            console.error('🔍 [AdminBoardList] JWT 디코딩 실패:', e)
+          }
+        }
+
+        const response = await fetch(`${SERVER_ORIGIN}/api/admin/boards/type/${typeId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         })
+
+        console.log('🔍 [AdminBoardList] API 응답 상태:', response.status)
+        console.log('🔍 [AdminBoardList] API 응답 헤더:', response.headers)
 
         if (response.status === 401) {
           navigate('/login')

@@ -37,6 +37,11 @@ public class MembershipLog {
     @Column(name = "membership_id", nullable = false)
     private Long membershipId;
 
+    /** 회원권 서비스 정보 (membership_service 테이블과 조인) */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "membership_id", referencedColumnName = "membership_id", insertable = false, updatable = false)
+    private MembershipService membershipService;
+
     /** 회원권 이름 (not null, string) */
     @Column(name = "membership_name", nullable = false)
     private String membershipName;

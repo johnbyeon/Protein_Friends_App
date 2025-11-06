@@ -22,7 +22,7 @@ import { CSS } from '@dnd-kit/utilities'
  */
 function SortableItem({ boardType, onEdit, onDelete, loading }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: boardType.ptypeid
+    id: boardType.pTypeId || boardType.ptypeid
   })
 
   const style = {
@@ -49,8 +49,8 @@ function SortableItem({ boardType, onEdit, onDelete, loading }) {
         </button>
 
         <div className="flex flex-col gap-1">
-          <span className="text-text-light dark:text-white/80 font-medium">{boardType.ptypename}</span>
-          <span className="text-xs text-subtle-text-light dark:text-white/50">/{boardType.ptypeaddressName}</span>
+          <span className="text-text-light dark:text-white/80 font-medium">{boardType.pTypeName || boardType.ptypename}</span>
+          <span className="text-xs text-subtle-text-light dark:text-white/50">/{boardType.pTypeAddressName || boardType.ptypeaddressName}</span>
         </div>
       </div>
 
@@ -63,7 +63,7 @@ function SortableItem({ boardType, onEdit, onDelete, loading }) {
           <span className="material-symbols-outlined text-xl">edit</span>
         </button>
         <button
-          onClick={() => onDelete(boardType.ptypeid, boardType.ptypename)}
+          onClick={() => onDelete(boardType.pTypeId || boardType.ptypeid, boardType.pTypeName || boardType.ptypename)}
           className="text-primary hover:text-red-400 transition-colors"
           disabled={loading}
         >
@@ -140,8 +140,8 @@ export default function BoardTypeManagement() {
 
     try {
       await addBoardType({
-        ptypename: newTypeName.trim(),
-        ptypeaddressName: newTypeAddress.trim()
+        pTypeName: newTypeName.trim(),
+        pTypeAddressName: newTypeAddress.trim()
       })
       setNewTypeName('')
       setNewTypeAddress('')
@@ -154,8 +154,8 @@ export default function BoardTypeManagement() {
   // 수정 모달 열기
   const openEditModal = (boardType) => {
     setEditingType(boardType)
-    setEditTypeName(boardType.ptypename)
-    setEditTypeAddress(boardType.ptypeaddressName)
+    setEditTypeName(boardType.pTypeName || boardType.ptypename)
+    setEditTypeAddress(boardType.pTypeAddressName || boardType.ptypeaddressName)
     setIsEditModalOpen(true)
   }
 
@@ -177,9 +177,9 @@ export default function BoardTypeManagement() {
     }
 
     try {
-      await updateBoardType(editingType.ptypeid, {
-        ptypename: editTypeName.trim(),
-        ptypeaddressName: editTypeAddress.trim()
+      await updateBoardType(editingType.pTypeId || editingType.ptypeid, {
+        pTypeName: editTypeName.trim(),
+        pTypeAddressName: editTypeAddress.trim()
       })
       closeEditModal()
       alert('게시글 타입이 수정되었습니다.')
@@ -210,22 +210,22 @@ export default function BoardTypeManagement() {
       return
     }
 
-    const oldIndex = boardTypes.findIndex((item) => item.ptypeid === active.id)
-    const newIndex = boardTypes.findIndex((item) => item.ptypeid === over.id)
+    const oldIndex = boardTypes.findIndex((item) => (item.pTypeId || item.ptypeid) === active.id)
+    const newIndex = boardTypes.findIndex((item) => (item.pTypeId || item.ptypeid) === over.id)
 
     // 로컬에서 순서 변경 (UI 즉시 반영)
     const reorderedItems = arrayMove(boardTypes, oldIndex, newIndex)
 
     // orderMappings 생성: typeId는 불변, newOrder만 변경
     const orderMappings = reorderedItems.map((item, index) => ({
-      typeId: item.ptypeid,
+      typeId: item.pTypeId || item.ptypeid,
       newOrder: index + 1 // 1부터 시작하는 순서로 변경
     }))
 
     console.log('🔄 순서 변경:', {
       oldIndex,
       newIndex,
-      reorderedItems: reorderedItems.map((item) => ({ id: item.ptypeid, name: item.ptypename })),
+      reorderedItems: reorderedItems.map((item) => ({ id: item.pTypeId || item.ptypeid, name: item.pTypeName || item.ptypename })),
       orderMappings
     })
 
@@ -281,11 +281,11 @@ export default function BoardTypeManagement() {
                 </p>
               ) : (
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                  <SortableContext items={boardTypes.map((item) => item.ptypeid)} strategy={verticalListSortingStrategy}>
+                  <SortableContext items={boardTypes.map((item) => item.pTypeId || item.ptypeid)} strategy={verticalListSortingStrategy}>
                     <ul className="space-y-3">
                       {boardTypes.map((boardType) => (
                         <SortableItem
-                          key={boardType.ptypeid}
+                          key={boardType.pTypeId || boardType.ptypeid}
                           boardType={boardType}
                           onEdit={openEditModal}
                           onDelete={handleDelete}

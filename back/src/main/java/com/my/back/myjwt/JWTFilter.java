@@ -3,6 +3,7 @@ package com.my.back.myjwt;
 import com.my.back.dto.CustomUserDetails;
 import com.my.back.entity.UserRole;
 import com.my.back.entity.Users;
+import com.my.back.repository.UserRepository;
 import com.my.back.service.JwtTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,6 +26,7 @@ import java.io.IOException;
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtTokenService;
+    private final UserRepository userRepository;
     private boolean shouldBypass(HttpServletRequest request) {
         String p = request.getRequestURI();
         return p.startsWith("/api/auth/login")
@@ -82,11 +84,14 @@ public class JWTFilter extends OncePerRequestFilter {
                 return;
             }
 
-            // ✅ 1️⃣ Users 객체 생성 (DB 없이 최소 정보만 사용)
-            Users user = new Users();
-            user.setEmail(email);
-            user.setName(email);  // 임시 이름 (DB에서 안 불러오니까)
-            user.setRole(UserRole.valueOf(role.replace("ROLE_", ""))); // enum 변환
+            // ✅ 1️⃣ Users 객체 생성 (DB에서 최신 정보로 사용)
+            Users user = userRepository.findByEmail(email);
+            if (user == null) {
+                log.error("❌ [JWTFilter] User not found in database: {}", email);
+                filterChain.doFilter(request, response);
+                return;
+            }
+            log.info("🔹 [JWTFilter] Found user in DB - email={}, role={}", user.getEmail(), user.getRole());
 
             // ✅ 2️⃣ CustomUserDetails로 감싸기
             CustomUserDetails userDetails = new CustomUserDetails(user);

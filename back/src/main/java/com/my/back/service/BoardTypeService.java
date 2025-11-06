@@ -94,18 +94,12 @@ public class BoardTypeService {
     @Transactional
     public BoardTypeResponse createBoardType(BoardTypeRequest request) {
         log.info("➕ 게시글 타입 생성: addressName={}, typeName={}",
-                request.getPtypeaddressName(), request.getPtypename());
+                request.getPTypeAddressName(), request.getPTypeName());
 
         // URL 주소 이름 중복 체크
-        if (boardTypeRepository.existsByPTypeAddressName(request.getPtypeaddressName())) {
-            throw new IllegalArgumentException("이미 사용 중인 URL 주소입니다: " + request.getPtypeaddressName());
+        if (boardTypeRepository.existsByPTypeAddressName(request.getPTypeAddressName())) {
+            throw new IllegalArgumentException("이미 사용 중인 URL 주소입니다: " + request.getPTypeAddressName());
         }
-
-        // 다음 ID 계산 (현재 최대 ID + 1)
-        Long nextId = boardTypeRepository.findAll().stream()
-                .map(BoardType::getPTypeId)
-                .max(Long::compareTo)
-                .orElse(0L) + 1;
 
         // displayOrder 기본값 설정 (요청값이 없으면 마지막 순서로)
         Integer displayOrder = request.getDisplayOrder();
@@ -116,10 +110,10 @@ public class BoardTypeService {
                     .orElse(-1) + 1;
         }
 
+        // ID는 Hibernate가 자동으로 생성하도록 설정 (수동 설정 제거)
         BoardType boardType = BoardType.builder()
-                .pTypeId(nextId)
-                .pTypeAddressName(request.getPtypeaddressName())
-                .pTypeName(request.getPtypename())
+                .pTypeAddressName(request.getPTypeAddressName())
+                .pTypeName(request.getPTypeName())
                 .displayOrder(displayOrder)
                 .build();
 
@@ -140,14 +134,14 @@ public class BoardTypeService {
                 .orElseThrow(() -> new IllegalArgumentException("게시글 타입을 찾을 수 없습니다: " + id));
 
         // URL 주소 변경 시 중복 체크
-        if (!boardType.getPTypeAddressName().equals(request.getPtypeaddressName())) {
-            if (boardTypeRepository.existsByPTypeAddressName(request.getPtypeaddressName())) {
-                throw new IllegalArgumentException("이미 사용 중인 URL 주소입니다: " + request.getPtypeaddressName());
+        if (!boardType.getPTypeAddressName().equals(request.getPTypeAddressName())) {
+            if (boardTypeRepository.existsByPTypeAddressName(request.getPTypeAddressName())) {
+                throw new IllegalArgumentException("이미 사용 중인 URL 주소입니다: " + request.getPTypeAddressName());
             }
         }
 
-        boardType.setPTypeAddressName(request.getPtypeaddressName());
-        boardType.setPTypeName(request.getPtypename());
+        boardType.setPTypeAddressName(request.getPTypeAddressName());
+        boardType.setPTypeName(request.getPTypeName());
 
         // displayOrder가 제공된 경우에만 업데이트
         if (request.getDisplayOrder() != null) {

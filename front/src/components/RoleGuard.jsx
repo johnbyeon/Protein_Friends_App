@@ -7,7 +7,7 @@ import { useAuthStore } from '../stores/authStore'
  * @param {string[]} allowedRoles - 접근 허용 역할 배열 (예: ['USER'], ['TRAINER', 'ADMIN'])
  * @param {string} redirectTo - 접근 거부 시 리다이렉트할 경로 (기본: /app/home)
  */
-export default function RoleGuard({ children, allowedRoles, redirectTo = '/app/home' }) {
+export default function RoleGuard({ children, allowedRoles, redirectTo = null }) {
   const { user } = useAuthStore()
 
   if (!user) {
@@ -18,7 +18,26 @@ export default function RoleGuard({ children, allowedRoles, redirectTo = '/app/h
   const hasAccess = allowedRoles.includes(userRole)
 
   if (!hasAccess) {
-    return <Navigate to={redirectTo} replace />
+    // 역할에 따른 적절한 리다이렉트 경로 결정
+    let redirectPath = redirectTo || '/home'
+    
+    if (!redirectTo) {
+      switch (userRole) {
+        case 'USER':
+          redirectPath = '/home'
+          break
+        case 'TRAINER':
+          redirectPath = '/trainer/dashboard'
+          break
+        case 'ADMIN':
+          redirectPath = '/admin/dashboard'
+          break
+        default:
+          redirectPath = '/home'
+      }
+    }
+    
+    return <Navigate to={redirectPath} replace />
   }
 
   return children

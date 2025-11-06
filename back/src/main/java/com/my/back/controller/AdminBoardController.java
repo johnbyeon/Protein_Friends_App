@@ -39,8 +39,11 @@ public class AdminBoardController {
      * @return 게시글 목록
      */
     @GetMapping("/type/{pTypeId}")
-    public ResponseEntity<?> getBoardsByTypeForAdmin(@PathVariable Long pTypeId) {
+    public ResponseEntity<?> getBoardsByTypeForAdmin(@PathVariable Long pTypeId, @AuthenticationPrincipal CustomUserDetails userDetails) {
         log.info("📋 [ADMIN GET] /api/admin/boards/type/{} - 관리자용 게시글 목록 조회", pTypeId);
+        log.info("🔍 [ADMIN] 사용자 정보: {}", userDetails != null ? userDetails.getUsername() : "null");
+        log.info("🔍 [ADMIN] 사용자 권한: {}", userDetails != null ? userDetails.getAuthorities() : "null");
+        
         try {
             List<BoardListResponse> boards = adminBoardService.getAllBoardsByType(pTypeId);
             return ResponseEntity.ok(boards);

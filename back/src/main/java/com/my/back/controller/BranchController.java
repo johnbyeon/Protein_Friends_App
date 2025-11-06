@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import java.util.Optional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,12 +65,39 @@ public class BranchController {
     }
 
     /**
-     * 특정 지점 상세 조회
+     * 특정 지점 상세 조회 (공개)
      *
      * @param id 지점 번호
      * @return 지점 상세 정보
      */
     @GetMapping("/branches/{id}")
+    public ResponseEntity<?> getBranchDetailPublic(@PathVariable Long id) {
+        log.info("지점 상세 조회 요청 (공개) - gId: {}", id);
+
+        try {
+            BranchDetailResponse branch = branchService.getBranchDetailPublic(id);
+            return ResponseEntity.ok(branch);
+
+        } catch (IllegalArgumentException e) {
+            log.error("지점 조회 실패: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+
+        } catch (Exception e) {
+            log.error("지점 상세 조회 중 예외 발생", e);
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "지점 조회 중 오류가 발생했습니다."));
+        }
+    }
+
+    /**
+     * 특정 지점 상세 조회 (인증 사용자용)
+     *
+     * @param id 지점 번호
+     * @param userDetails 사용자 정보
+     * @return 지점 상세 정보
+     */
+    @GetMapping("/branches/{id}/detail")
     public ResponseEntity<?> getBranchDetail(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         log.info("지점 상세 조회 요청 - gId: {}", id);
 

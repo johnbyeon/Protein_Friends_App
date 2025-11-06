@@ -41,8 +41,8 @@ const AdminNavbar = () => {
         }
 
         return boardTypes.map((type) => ({
-            label: type.ptypename,
-            to: `/admin/boards/${type.ptypeaddressName}`,
+            label: type.pTypeName,
+            to: `/admin/boards/${type.pTypeAddressName}`,
         }))
     }, [boardTypes, loading])
 
@@ -71,23 +71,14 @@ const AdminNavbar = () => {
         {
             label: '마켓관리',
             items: [
-                { label: '상품 보기', to: '/admin/market/products' },
-                { label: '상품 등록', to: '/admin/market/products/new' },
-                { label: '주문 리스트', to: '/admin/market/orders' },
-                { label: '할인권 관리', to: '/admin/market/coupons' },
                 { label: 'PT 이용권 관리', to: '/admin/market/pt-passes' },
                 { label: '기간제 회원권 관리', to: '/admin/market/memberships' },
             ],
         },
         {
-            label: '매출관리',
-            items: [{ label: '트레이너별 매출보기', to: '/admin/sales/trainers' }],
-        },
-        {
             label: '수업관리',
             items: [
                 { label: '수업 시간표', to: '/admin/classes/schedule' },
-                { label: '수업 신규등록', to: '/admin/classes/new' },
             ],
         },
         {
@@ -95,20 +86,6 @@ const AdminNavbar = () => {
             items: [
                 { label: '트레이너 목록', to: '/admin/trainers' },
                 { label: '트레이너 신규등록', to: '/admin/trainers/new' },
-            ],
-        },
-        {
-            label: '현장판매',
-            items: [
-                { label: '기간제 회원권 판매', to: '/admin/pos/membership' },
-                { label: 'PT 이용권 판매', to: '/admin/pos/pt-pass' },
-            ],
-        },
-        {
-            label: '회원관리',
-            items: [
-                { label: '회원 리스트', to: '/admin/members' },
-                { label: '할인권 배포', to: '/admin/discounts/distribute' },
             ],
         },
     ]

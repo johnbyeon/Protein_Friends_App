@@ -81,7 +81,44 @@ public class BranchService {
     }
 
     /**
-     * 특정 지점 상세 조회
+     * 특정 지점 상세 조회 (공개)
+     *
+     * @param gId 지점 번호
+     * @return 지점 상세 정보
+     */
+    @Transactional(readOnly = true)
+    public BranchDetailResponse getBranchDetailPublic(Long gId) {
+        log.info("지점 상세 조회 (공개) - gId: {}", gId);
+
+        GymInfo gym = gymInfoRepository.findById(gId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지점입니다. gId=" + gId));
+
+        // 주변 역 정보 조회
+        List<GymStationInfo> stations = gymStationInfoRepository.findByGId(gId);
+        List<BranchStationResponse> stationResponses = stations.stream()
+                .map(station -> BranchStationResponse.builder()
+                        .stationName(station.getGStationName())
+                        .stationLine(extractLineNumber(station.getGLineNumber()))
+                        .walkTime(extractWalkTime(station.getGWalkingDistance()))
+                        .build())
+                .collect(Collectors.toList());
+
+        return BranchDetailResponse.builder()
+                .gId(gym.getGId())
+                .gName(gym.getGName())
+                .gAddress(gym.getGAddress())
+                .gTel(gym.getGTel())
+                .gWorkoutDuration(gym.getGWorkoutDuration())
+                .gParking(gym.getGParking())
+                .gLatitude(gym.getGLatitude())
+                .gLongitude(gym.getGLongitude())
+                .gImageUrl(gym.getGImageUrl())
+                .stations(stationResponses)
+                .build();
+    }
+
+    /**
+     * 특정 지점 상세 조회 (인증 사용자용)
      *
      * @param gId 지점 번호
      * @param userDetails 사용자 정보 (권한 체크용)

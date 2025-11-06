@@ -86,7 +86,7 @@ public class GymInfo {
      * 지점 사진 URL (nullable)
      * - 예: "https://s3.amazonaws.com/gym/1.jpg"
      */
-    @Column(name = "g_image_url", length = 500)
+    @Column(name = "g_image_url", length = 2000)
     @JsonProperty("gImageUrl")
     private String gImageUrl;
 }

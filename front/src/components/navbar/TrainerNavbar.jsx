@@ -41,8 +41,8 @@ const TrainerNavbar = () => {
         }
 
         return boardTypes.map((type) => ({
-            label: type.ptypename,
-            to: `/trainer/boards/${type.ptypeaddressName}`,
+            label: type.pTypeName || type.ptypename,
+            to: `/trainer/boards/${type.pTypeAddressName || type.ptypeaddressName}`,
         }))
     }, [boardTypes, loading])
 
@@ -64,48 +64,19 @@ const TrainerNavbar = () => {
         {
             label: '마켓관리',
             items: [
-                { label: '상품 보기', disabled: true },
-                { label: '상품 등록', disabled: true },
-                { label: '주문 리스트', disabled: true },
-                { label: '할인권 관리', disabled: true },
-                { label: 'PT 이용권 관리', disabled: true },
-                { label: '기간제 회원권 관리', disabled: true },
+                { label: 'PT 이용권 관리', to: '/trainer/market/pt-tickets' },
+                { label: '기간제 회원권 관리', to: '/trainer/market/memberships' },
             ],
         },
-        {
-            label: '매출관리',
-            items: [{ label: '트레이너별 매출보기', disabled: true }],
-        },
-        {
-            label: '수업관리',
-            items: [
-                { label: '수업 시간표', disabled: true },
-                { label: '수업 신규등록', disabled: true },
-            ],
-        },
-        {
-            label: '트레이너업무',
-            items: [
-                { label: '트레이너 정보', to: '/trainer/trainers' },
-                { label: '내 프로필', to: '/trainer/profile' },
-                { label: '수업 일정', to: '/trainer/schedule' },
-                { label: '자료 업로드', to: '/trainer/upload' },
-            ],
-        },
+
         {
             label: '현장판매',
             items: [
-                { label: '기간제 회원권 판매', disabled: true },
-                { label: 'PT 이용권 판매', disabled: true },
+                { label: '기간제 회원권 판매', to: '/trainer/pos/membership' },
+                { label: 'PT 이용권 판매', to: '/trainer/pos/pt-pass' },
             ],
         },
-        {
-            label: '회원관리',
-            items: [
-                { label: '회원 리스트', disabled: true },
-                { label: '할인권 배포', disabled: true },
-            ],
-        },
+
     ]
 
     return (

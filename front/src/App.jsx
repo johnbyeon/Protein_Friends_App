@@ -76,10 +76,10 @@ export default function App() {
             if (Array.isArray(popupData) && popupData.length > 0) {
               console.log('🔍 첫 번째 팝업 데이터:', popupData[0])
               console.log('🔍 첫 번째 팝업 키들:', Object.keys(popupData[0]))
-              console.log('🔍 첫 번째 팝업 pTitle:', popupData[0].pTitle)
-              console.log('🔍 첫 번째 팝업 pContent:', popupData[0].pContent)
-              console.log('🔍 첫 번째 팝업 pImageUrl:', popupData[0].pImageUrl)
-              console.log('🔍 첫 번째 팝업 pTypeName:', popupData[0].pTypeName)
+              console.log('🔍 첫 번째 팝업 ptitle:', popupData[0].ptitle)
+              console.log('🔍 첫 번째 팝업 pcontent:', popupData[0].pcontent)
+              console.log('🔍 첫 번째 팝업 pimageUrl:', popupData[0].pimageUrl)
+              console.log('🔍 첫 번째 팝업 ptypeName:', popupData[0].ptypeName)
             }
             
             // 오늘 하루 보지 않기로 설정된 팝업 필터링

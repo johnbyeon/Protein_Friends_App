@@ -43,4 +43,29 @@ public interface MembershipLogRepository extends JpaRepository<MembershipLog, Lo
               and g.gId = :gId
             """)
     boolean hasUsageHistory(@Param("userId") Long userId, @Param("gId") Long gId);
+
+    /**
+     * 회원권 로그와 membership_service를 조인해서 이미지 URL 포함 조회
+     */
+    @Query("""
+            select ml
+            from MembershipLog ml
+            left join fetch ml.membershipService
+            where ml.users.uId = :userId
+            order by ml.createDate desc
+            """)
+    List<MembershipLog> findAllWithImageByUserId(@Param("userId") Long userId);
+
+    /**
+     * 회원권 로그와 membership_service를 조인해서 상태별 이미지 URL 포함 조회
+     */
+    @Query("""
+            select ml
+            from MembershipLog ml
+            left join fetch ml.membershipService
+            where ml.users.uId = :userId
+              and ml.status = :status
+            order by ml.createDate desc
+            """)
+    List<MembershipLog> findAllWithImageByUserIdAndStatus(@Param("userId") Long userId, @Param("status") MembershipStatus status);
 }

@@ -43,11 +43,11 @@ const UserNavbar = () => {
                     ) : boardTypes.length > 0 ? (
                         boardTypes.map((type) => (
                             <Link
-                                key={type.ptypeid}
-                                to={`/boards/${type.ptypeaddressName}`}
+                                key={type.pTypeId || type.ptypeid}
+                                to={`/boards/${type.pTypeAddressName || type.ptypeaddressName}`}
                                 className="block px-4 py-2 text-lg hover:bg-primary/20"
                             >
-                                {type.ptypename}
+                                {type.pTypeName || type.ptypename}
                             </Link>
                         ))
                     ) : (
@@ -79,12 +79,7 @@ const UserNavbar = () => {
                 </div>
             </div>
 
-             <div className="relative group">
-                <button className="flex items-center gap-1 text-lg font-medium text-gray-400">
-                    <Link to="/trainers" className="group-hover:underline group-hover:text-text-light mr-3">트레이너</Link>
-                </button>
-
-            </div>
+             
              <div className="relative group">
                 <button className="flex items-center gap-1 text-lg font-medium text-gray-400">
                     <Link to="/branches" className="group-hover:underline group-hover:text-text-light mr-3">지점 정보</Link>

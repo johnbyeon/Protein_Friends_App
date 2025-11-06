@@ -29,7 +29,8 @@ public enum ErrorCode {
     PT_CLASS_RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "예약 정보를 찾을 수 없습니다."),
     INSUFFICIENT_PT_COUNT(HttpStatus.BAD_REQUEST, "남은 PT 횟수가 부족합니다."),
     PT_TICKET_NOT_FOUND(HttpStatus.BAD_REQUEST, "사용 가능한 PT 이용권이 없습니다."),
-    PT_TICKET_RESTORE_NOT_FOUND(HttpStatus.BAD_REQUEST, "복구할 PT 이용권 정보를 찾을 수 없습니다.");
+    PT_TICKET_RESTORE_NOT_FOUND(HttpStatus.BAD_REQUEST, "복구할 PT 이용권 정보를 찾을 수 없습니다."),
+    MEMBERSHIP_NOT_FOUND(HttpStatus.NOT_FOUND, "회원권 상품을 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;

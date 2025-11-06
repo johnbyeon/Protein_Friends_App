@@ -44,7 +44,9 @@ export default function BoardList() {
     console.log('🔍 [BoardList] typeAddressName:', typeAddressName)
     
     if (boardTypes.length > 0 && typeAddressName) {
-      const type = boardTypes.find(t => t.ptypeaddressName === typeAddressName)
+      const type = boardTypes.find(t => 
+        t.pTypeAddressName === typeAddressName || t.ptypeaddressName === typeAddressName
+      )
       console.log('🔍 [BoardList] 찾은 타입:', type)
       setCurrentType(type)
     } else {
@@ -78,7 +80,7 @@ export default function BoardList() {
           headers['Authorization'] = `Bearer ${token}`
         }
 
-        const typeId = currentType.ptypeid
+        const typeId = currentType.pTypeId || currentType.ptypeid
         console.log('🔍 [BoardList] API 호출 - typeId:', typeId)
         console.log('🔍 [BoardList] API 호출 - currentType:', currentType)
         

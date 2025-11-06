@@ -42,7 +42,7 @@ public class MyMembershipService {
      * - 각 로그를 MembershipCardDto 형태로 변환하여 반환
      */
     public List<MembershipCardDto> getAllMemberships(Long userId) {
-        List<MembershipLog> logs = logRepo.findAllByUsers_uIdOrderByCreateDateDesc(userId);
+        List<MembershipLog> logs = logRepo.findAllWithImageByUserId(userId);
         return logs.stream().map(this::convertToDto).toList();
     }
 
@@ -55,7 +55,7 @@ public class MyMembershipService {
      * - 상태 필터링 기능 추가 버전
      */
     public List<MembershipCardDto> getMembershipsByStatus(Long userId, MembershipStatus status) {
-        List<MembershipLog> logs = logRepo.findAllByUsers_uIdAndStatusOrderByCreateDateDesc(userId, status);
+        List<MembershipLog> logs = logRepo.findAllWithImageByUserIdAndStatus(userId, status);
         return logs.stream().map(this::convertToDto).toList();
     }
 
@@ -84,7 +84,13 @@ public class MyMembershipService {
         // 🔹 (4) UI 표시용 상태 텍스트로 변환
         String uiStatus = toUiStatus(effective, log.getStartDate());
 
-        // 🔹 (5) 최종 DTO 빌드
+        // 🔹 (5) 이미지 URL 조회 (membership_service 테이블과 조인)
+        String imageUrl = null;
+        if (log.getMembershipService() != null) {
+            imageUrl = log.getMembershipService().getMembershipPicUrl();
+        }
+
+        // 🔹 (6) 최종 DTO 빌드
         return MembershipCardDto.builder()
                 .mLogId(log.getMLogId())                                    // 회원권 ID
                 .title(log.getMembershipName())                              // 회원권 이름
@@ -100,6 +106,7 @@ public class MyMembershipService {
                 .stopUsed(stops.size())                                      // 정지 사용 횟수
                 .stopLimit(log.getStopCount() != null ? log.getStopCount() : 0) // 정지 제한 횟수
                 .stops(stops)                                                // 정지 내역 리스트
+                .imageUrl(imageUrl)                                          // 회원권 이미지 URL
                 .build();
     }
 

@@ -2,6 +2,44 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { get, put, presignUpload, getViewUrl } from '../../lib/api'
 
+// S3 이미지 컴포넌트
+function S3Image({ imageKey, alt, className, onError }) {
+  const [imageUrl, setImageUrl] = useState('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjQwIiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Mb2FkaW5nLi4uPC90ZXh0Pgo8L3N2Zz4=')
+  const [loading, setLoading] = useState(true)
+
+  console.log('🔍 [TrainerProfile] S3Image 렌더링:', { imageKey, alt })
+
+  useEffect(() => {
+    const loadImage = async () => {
+      try {
+        setLoading(true)
+        console.log('🔍 [TrainerProfile] 이미지 URL 요청:', imageKey)
+        const url = await getViewUrl(imageKey)
+        console.log('🔍 [TrainerProfile] 받은 이미지 URL:', url)
+        setImageUrl(url)
+      } catch (error) {
+        console.error('💥 [TrainerProfile] 이미지 로드 실패:', error)
+        setImageUrl('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjQwIiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5ObyBJbWFnZTwvdGV4dD4KPC9zdmc+')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (imageKey) {
+      loadImage()
+    }
+  }, [imageKey])
+
+  return (
+    <img 
+      src={imageUrl} 
+      alt={alt} 
+      className={className}
+      onError={onError}
+    />
+  )
+}
+
 // S3 업로드 헬퍼
 function putWithProgress(putUrl, file, contentType, onProgress) {
   return new Promise((resolve, reject) => {
@@ -40,25 +78,52 @@ export default function TrainerProfile() {
   // 트레이너 본인 정보 불러오기
   useEffect(() => {
     const loadTrainerProfile = async () => {
+      console.log('🔄 [TrainerProfile] 트레이너 정보 로드 시작')
       setFetchLoading(true)
       try {
+        console.log('📡 [TrainerProfile] API 호출: GET /api/trainer/profile')
         const res = await get('/api/trainer/profile')
+        
+        console.log('📊 [TrainerProfile] API 응답 상태:', res.status, res.statusText)
+        
         if (res.ok) {
           const data = await res.json()
-          console.log('✅ 트레이너 정보 로드:', data)
+          console.log('✅ [TrainerProfile] 트레이너 정보 로드 성공:', data)
+          console.log('🔍 [TrainerProfile] 데이터 필드 확인:', {
+            tId: data.tId,
+            tName: data.tName,
+            tAwardTitle: data.tAwardTitle,
+            tAboutMe: data.tAboutMe,
+            tImageUrl: data.tImageUrl,
+            isEmployed: data.isEmployed
+          })
+          
           setTrainerData(data)
-          setTAwardTitle(data.tawardTitle || '')
-          setTAboutMe(data.taboutMe || '')
-          setTImageUrl(data.timageUrl || '')
-          setImagePreview(data.timageUrl || '')
+          setTAwardTitle(data.tAwardTitle || '')
+          setTAboutMe(data.tAboutMe || '')
+          setTImageUrl(data.tImageUrl || '')
+          setImagePreview(data.tImageUrl || '')
+          
+          console.log('📝 [TrainerProfile] 상태 설정 완료:', {
+            awardTitle: data.tAwardTitle || '',
+            aboutMe: data.tAboutMe || '',
+            imageUrl: data.tImageUrl || ''
+          })
         } else {
-          setMessage('❌ 트레이너 정보를 불러오는데 실패했습니다.')
+          const errorText = await res.text()
+          console.error('❌ [TrainerProfile] 트레이너 정보 로드 실패:', {
+            status: res.status,
+            statusText: res.statusText,
+            errorBody: errorText
+          })
+          setMessage(`❌ 트레이너 정보를 불러오는데 실패했습니다 (${res.status}): ${errorText}`)
         }
       } catch (err) {
-        console.error('트레이너 정보 로드 에러:', err)
-        setMessage('❌ 트레이너 정보 로드 중 오류 발생')
+        console.error('💥 [TrainerProfile] 트레이너 정보 로드 에러:', err)
+        setMessage('❌ 트레이너 정보 로드 중 오류 발생: ' + err.message)
       } finally {
         setFetchLoading(false)
+        console.log('🏁 [TrainerProfile] 트레이너 정보 로드 완료')
       }
     }
 
@@ -66,18 +131,30 @@ export default function TrainerProfile() {
   }, [])
 
   // 이미지 파일 선택
-  // 이미지 선택 및 자동 업로드
+   // 이미지 선택 및 자동 업로드
   const handleImageChange = async (e) => {
+    console.log('🔄 [TrainerProfile] 이미지 변경 시작')
     const file = e.target.files?.[0]
-    if (!file) return
+    if (!file) {
+      console.log('⚠️ [TrainerProfile] 파일이 선택되지 않음')
+      return
+    }
+
+    console.log('📁 [TrainerProfile] 선택된 파일 정보:', {
+      name: file.name,
+      type: file.type,
+      size: file.size
+    })
 
     const allowedTypes = ['image/png', 'image/jpeg', 'image/webp']
     if (!allowedTypes.includes(file.type)) {
+      console.error('❌ [TrainerProfile] 허용되지 않는 파일 타입:', file.type)
       setMessage('❌ PNG/JPEG/WEBP만 업로드 가능합니다')
       return
     }
 
     if (file.size > 10 * 1024 * 1024) {
+      console.error('❌ [TrainerProfile] 파일 크기 초과:', file.size)
       setMessage('❌ 최대 10MB까지 허용됩니다')
       return
     }
@@ -87,10 +164,13 @@ export default function TrainerProfile() {
     setMessage('')
     setUploadProgress(0)
 
+    console.log('⬆️ [TrainerProfile] S3 업로드 시작')
+
     // 자동으로 S3 업로드 시작
     try {
       setMessage('이미지 업로드 중...')
 
+      console.log('📡 [TrainerProfile] Presigned URL 요청')
       const { key, putUrl } = await presignUpload({
         filename: file.name,
         contentType: file.type,
@@ -99,13 +179,19 @@ export default function TrainerProfile() {
         imageType: 'PROFILE',
       })
 
+      console.log('✅ [TrainerProfile] Presigned URL 획득:', { key, putUrl: putUrl.substring(0, 100) + '...' })
+
+      console.log('📤 [TrainerProfile] S3에 파일 업로드 중...')
       await putWithProgress(putUrl, file, file.type, setUploadProgress)
 
-      const viewUrl = await getViewUrl(key)
-      setTImageUrl(viewUrl)
+      console.log('🔑 [TrainerProfile] S3 Key 저장:', key)
+      
+      // S3 Key를 저장 (Presigned URL이 아님)
+      setTImageUrl(key)
+      setImagePreview('') // 미리보기 초기화하여 DB 이미지 표시
       setMessage('✅ 이미지 업로드 완료')
     } catch (err) {
-      console.error('이미지 업로드 실패:', err)
+      console.error('💥 [TrainerProfile] 이미지 업로드 실패:', err)
       setMessage('❌ 이미지 업로드 실패: ' + err.message)
     }
   }
@@ -113,6 +199,7 @@ export default function TrainerProfile() {
   // 폼 제출
   const handleSubmit = async (e) => {
     e.preventDefault()
+    console.log('🔄 [TrainerProfile] 프로필 수정 시작')
     setLoading(true)
     setMessage('')
 
@@ -123,22 +210,49 @@ export default function TrainerProfile() {
         tImageUrl: tImageUrl || null,
       }
 
+      console.log('📝 [TrainerProfile] 수정 요청 데이터:', payload)
+      console.log('📡 [TrainerProfile] API 호출: PUT /api/trainer/profile')
+
       const res = await put('/api/trainer/profile', payload)
 
+      console.log('📊 [TrainerProfile] 수정 API 응답 상태:', res.status, res.statusText)
+
       if (res.ok) {
-        setMessage('✅ 프로필이 수정되었습니다.')
-        setTimeout(() => {
-          navigate('/trainer/dashboard')
-        }, 1500)
+        try {
+          const updatedData = await res.json()
+          console.log('✅ [TrainerProfile] 프로필 수정 성공:', updatedData)
+          setMessage('✅ 프로필이 수정되었습니다.')
+          setTimeout(() => {
+            navigate('/trainer/dashboard')
+          }, 1500)
+        } catch (jsonError) {
+          console.log('✅ [TrainerProfile] 프로필 수정 성공 (JSON 응답 없음)')
+          setMessage('✅ 프로필이 수정되었습니다.')
+          setTimeout(() => {
+            navigate('/trainer/dashboard')
+          }, 1500)
+        }
       } else {
         const errorText = await res.text()
-        setMessage(`❌ 수정 실패: ${errorText}`)
+        console.error('❌ [TrainerProfile] 프로필 수정 실패:', {
+          status: res.status,
+          statusText: res.statusText,
+          errorBody: errorText,
+          requestPayload: payload
+        })
+        setMessage(`❌ 수정 실패 (${res.status}): ${errorText}`)
       }
     } catch (err) {
-      console.error('프로필 수정 에러:', err)
-      setMessage('❌ 프로필 수정 중 오류 발생')
+      console.error('💥 [TrainerProfile] 프로필 수정 에러:', err)
+      console.log('🔍 [TrainerProfile] 에러 발생 시 현재 상태:', {
+        tAwardTitle,
+        tAboutMe,
+        tImageUrl
+      })
+      setMessage('❌ 프로필 수정 중 오류 발생: ' + err.message)
     } finally {
       setLoading(false)
+      console.log('🏁 [TrainerProfile] 프로필 수정 처리 완료')
     }
   }
 
@@ -215,6 +329,12 @@ export default function TrainerProfile() {
                         <span className="material-symbols-outlined text-5xl text-white">photo_camera</span>
                       </div>
                     </>
+                  ) : trainerData?.tImageUrl ? (
+                    <S3Image 
+                      imageKey={trainerData.tImageUrl}
+                      alt="프로필" 
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="text-center">
                       <span className="material-symbols-outlined text-5xl text-gray-400 mb-2 block">photo_camera</span>

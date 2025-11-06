@@ -93,7 +93,84 @@ export async function apiJson(input, init = {}) {
   const isFormData = init.body instanceof FormData
   if (!isFormData) headers.set('Content-Type', 'application/json')
 
+  console.log('🔍 [apiJson] 요청:', input, init)
   const res = await api(input, { ...init, headers })
+  console.log('🔍 [apiJson] 응답 상태:', res.status, res.statusText)
+  console.log('🔍 [apiJson] 응답 headers:', Object.fromEntries(res.headers.entries()))
+  
+  let data = null
+  try {
+    const text = await res.text()
+    console.log('🔍 [apiJson] 응답 텍스트 (앞 100자):', text.substring(0, 100))
+    console.log('🔍 [apiJson] 응답 텍스트 길이:', text.length)
+    
+    if (text.trim()) {
+      data = JSON.parse(text)
+      console.log('🔍 [apiJson] 파싱된 데이터 타입:', typeof data, 'isArray:', Array.isArray(data))
+      console.log('🔍 [apiJson] 파싱된 데이터 길이:', data?.length)
+    } else {
+      console.log('🔍 [apiJson] 응답 텍스트가 비어있음')
+    }
+  } catch (e) {
+    console.error('❌ [apiJson] JSON 파싱 에러:', e)
+    // body가 비어있을 수 있음
+  }
+  return { ok: res.ok, status: res.status, data, raw: res }
+}
+
+// ===== 메서드 헬퍼 =====
+export const get = (url, init) => {
+  console.log('🔍 GET 요청 URL:', url)
+  return api(url, { ...(init || {}), method: 'GET' })
+}
+
+export const del = (url, init) =>
+  api(url, { ...(init || {}), method: 'DELETE' })
+
+export const patch = (url, body, init) => {
+  const isForm = body instanceof FormData
+  const headers = new Headers(init?.headers || {})
+  if (!isForm) headers.set('Content-Type', 'application/json')
+  return api(url, {
+    ...(init || {}),
+    method: 'PATCH',
+    body: isForm ? body : JSON.stringify(body),
+    headers
+  })
+}
+
+export const post = (url, body, init) => {
+  const isForm = body instanceof FormData
+  const headers = new Headers(init?.headers || {})
+  if (!isForm) {
+    headers.set('Content-Type', 'application/json')
+    console.log('🔍 POST 요청 URL:', url)
+    console.log('🔍 POST 요청 바디:', body)
+  }
+  return api(url, {
+    ...(init || {}),
+    method: 'POST',
+    body: isForm ? body : JSON.stringify(body),
+    headers
+  })
+}
+
+export const put = async (url, body, init) => {
+  const isForm = body instanceof FormData
+  const headers = new Headers(init?.headers || {})
+  if (!isForm) headers.set('Content-Type', 'application/json')
+  const res = await api(url, {
+    ...(init || {}),
+    method: 'PUT',
+    body: isForm ? body : JSON.stringify(body),
+    headers
+  })
+  
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || `PUT request failed with status ${res.status}`)
+  }
+  
   let data = null
   try {
     data = await res.json()
@@ -103,107 +180,7 @@ export async function apiJson(input, init = {}) {
   return { ok: res.ok, status: res.status, data, raw: res }
 }
 
-// ===== 메서드 헬퍼 =====
-export const get = (url, init) =>
-  api(url, { ...(init || {}), method: 'GET' })
-
-export const del = (url, init) =>
-  api(url, { ...(init || {}), method: 'DELETE' })
-
-export const post = (url, body, init) => {
-  const isForm = body instanceof FormData
-  const headers = new Headers(init?.headers || {})
-  if (!isForm) headers.set('Content-Type', 'application/json')
-  return api(url, {
-    ...(init || {}),
-    method: 'POST',
-    body: isForm ? body : JSON.stringify(body),
-    headers
-  })
-}
-
-export const put = (url, body, init) => {
-  const isForm = body instanceof FormData
-  const headers = new Headers(init?.headers || {})
-  if (!isForm) headers.set('Content-Type', 'application/json')
-  return api(url, {
-    ...(init || {}),
-    method: 'PUT',
-    body: isForm ? body : JSON.stringify(body),
-    headers
-  })
-}
-
-// ===== S3 업로드 관련 API =====
-
-/**
- * S3 Presigned Upload URL 발급 (인증 필수, DB 자동 저장)
- * @param {Object} params - { filename, contentType, contentLength, description, imageType }
- * @returns {Promise<{ key: string, putUrl: string, imageId: number }>}
- */
-export async function presignUpload({ filename, contentType, contentLength, description = '', imageType = 'MEAL' }) {
-  const res = await post('/api/s3/upload', {
-    filename,
-    contentType,
-    contentLength,
-    description,
-    imageType
-  })
-
-  if (!res.ok) {
-    const err = await res.text()
-    throw new Error(err || 'Presign upload 실패')
-  }
-
-  return res.json()
-}
-
-/**
- * S3에서 파일 조회 URL 발급 (인증 필수, 본인 이미지만)
- * @param {string} key - S3 객체 키
- * @returns {Promise<string>} - Presigned GET URL
- */
-export async function getViewUrl(key) {
-  const res = await get(`/api/s3/download?key=${encodeURIComponent(key)}`)
-
-  if (!res.ok) {
-    const err = await res.text()
-    throw new Error(err || 'View URL 발급 실패')
-  }
-
-  return res.text()
-}
-
-/**
- * 내 이미지 목록 조회 (인증 필수)
- * @returns {Promise<Array>} - 이미지 목록
- */
-export async function getMyImages() {
-  const res = await get('/api/s3/my-images')
-
-  if (!res.ok) {
-    const err = await res.text()
-    throw new Error(err || '이미지 목록 조회 실패')
-  }
-
-  return res.json()
-}
-
-/**
- * 이미지 삭제 (인증 필수, 본인 이미지만)
- * @param {number} imageId - 이미지 ID
- * @returns {Promise<string>} - 성공 메시지
- */
-export async function deleteImage(imageId) {
-  const res = await del(`/api/s3/images/${imageId}`)
-
-  if (!res.ok) {
-    const err = await res.text()
-    throw new Error(err || '이미지 삭제 실패')
-  }
-
-  return res.text()
-}
+// ===== 1:1 문의 관련 API =====
 
 /**
  * 1:1 문의 목록 조회 (인증 필수 - ADMIN/TRAINER)
@@ -224,7 +201,7 @@ export async function getInquiries(status = 'unanswered', page = 0, size = 10) {
 }
 
 /**
- * 1:1 문의 상세 조회 (인증 필수 - ADMIN/TRAINER)
+ * 1:1 문의 상세 조회 (인증 필수 - ADMIN/TRAINER/USER)
  * @param {number} id - 문의 ID
  * @returns {Promise<Object>} - 문의 상세 정보
  */
@@ -336,6 +313,8 @@ export async function createInquiry(data) {
   return res.json()
 }
 
+// ===== FAQ 관련 API =====
+
 /**
  * FAQ 목록 조회 (공통)
  * @param {string} category - 카테고리 (옵션)
@@ -437,4 +416,178 @@ export async function deleteFaq(id) {
   }
 
   return res.text()
+}
+
+// ===== S3 업로드 관련 API =====
+
+/**
+ * S3 Presigned Upload URL 발급 (인증 필수, DB 자동 저장)
+ * @param {Object} params - { filename, contentType, contentLength, description, imageType }
+ * @returns {Promise<{ key: string, putUrl: string, imageId: number }>}
+ */
+export async function presignUpload({ filename, contentType, contentLength, description = '', imageType = 'MEAL' }) {
+  const res = await post('/api/s3/upload', {
+    filename,
+    contentType,
+    contentLength,
+    description,
+    imageType
+  })
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || 'Presign upload 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * S3에서 파일 조회 URL 발급 (인증 필수, 본인 이미지만)
+ * @param {string} key - S3 객체 키
+ * @returns {Promise<string>} - Presigned GET URL
+ */
+export async function getViewUrl(key) {
+  const res = await get(`/api/s3/download?key=${encodeURIComponent(key)}`)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || 'View URL 발급 실패')
+  }
+
+  return res.text()
+}
+
+/**
+ * 회원권 이미지 조회 URL 발급 (인증 필수, 모든 회원권 이미지 접근 가능)
+ * @param {string} key - S3 객체 키
+ * @returns {Promise<string>} - Presigned GET URL
+ */
+export async function getMembershipImageUrl(key) {
+  const res = await get(`/api/s3/membership-download?key=${encodeURIComponent(key)}`)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || '회원권 이미지 URL 발급 실패')
+  }
+
+  return res.text()
+}
+
+// ===== PT 이용권 관리 API =====
+
+/**
+ * PT 이용권 목록 조회 (트레이너용)
+ * @returns {Promise<Array>} - PT 이용권 목록
+ */
+export async function getPtTickets() {
+  const res = await get('/api/trainer/pt-services')
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || 'PT 이용권 목록 조회 실패')
+  }
+
+  const data = await res.json()
+  console.log('🔍 파싱된 데이터:', data)
+  return data
+}
+
+/**
+ * 활성화된 PT 이용권 목록 조회 (POS용)
+ * @returns {Promise<Array>} - 활성화된 PT 이용권 목록
+ */
+export async function getActivePtTickets() {
+  const res = await get('/api/trainer/pt-services/active')
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || '활성화된 PT 이용권 목록 조회 실패')
+  }
+
+  const data = await res.json()
+  return data
+}
+
+/**
+ * PT 이용권 생성 (트레이너용)
+ * @param {Object} data - { ptName, ptCount, ptDurationDays, ptPrice, ptSalePrice, ptPicUrl }
+ * @returns {Promise<Object>} - 생성된 PT 이용권 정보
+ */
+export async function createPtTicket(data) {
+  const res = await post('/api/trainer/pt-services', data)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || 'PT 이용권 생성 실패')
+  }
+
+  return res.data
+}
+
+/**
+ * PT 이용권 수정 (트레이너용)
+ * @param {number} id - PT 이용권 ID
+ * @param {Object} data - { ptName, ptCount, ptDurationDays, ptPrice, ptSalePrice, ptPicUrl }
+ * @returns {Promise<Object>} - 수정된 PT 이용권 정보
+ */
+export async function updatePtTicket(id, data) {
+  const res = await put(`/api/trainer/pt-services/${id}`, data)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || 'PT 이용권 수정 실패')
+  }
+
+  return res.data
+}
+
+/**
+ * PT 이용권 삭제 (트레이너용)
+ * @param {number} id - PT 이용권 ID
+ * @returns {Promise<string>} - 성공 메시지
+ */
+export async function deletePtTicket(id) {
+  const res = await del(`/api/trainer/pt-services/${id}`)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || 'PT 이용권 삭제 실패')
+  }
+
+  return res.text()
+}
+
+// ===== POS (현장 판매) 관련 API =====
+
+/**
+ * PT 이용권 현장 판매
+ * @param {Object} data - PT 이용권 판매 데이터
+ * @returns {Promise<Object>} - 판매 결과
+ */
+export async function sellPtPass(data) {
+  const res = await post('/api/trainer/pos/pt-pass', data)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || 'PT 이용권 판매 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * 회원권 현장 판매
+ * @param {Object} data - 회원권 판매 데이터
+ * @returns {Promise<Object>} - 판매 결과
+ */
+export async function sellMembership(data) {
+  const res = await post('/api/trainer/pos/membership', data)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || '회원권 판매 실패')
+  }
+
+  return res.json()
 }

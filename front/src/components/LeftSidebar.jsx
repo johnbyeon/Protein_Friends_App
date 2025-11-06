@@ -25,6 +25,8 @@ const LeftSidebar = () => {
 
     // 현재 경로로부터 메뉴 카테고리 파악
     const category = getMenuCategoryFromPath(location.pathname)
+    console.log('🔍 LeftSidebar - 현재 경로:', location.pathname)
+    console.log('🔍 LeftSidebar - 인식된 카테고리:', category)
 
     // 카테고리가 없으면 사이드바 표시 안 함 (홈 등)
     if (!category) {
@@ -42,10 +44,30 @@ const LeftSidebar = () => {
             items: boardTypes.map(type => (
                 
                 {
-                label: type.ptypename,
-                path: `/boards/${type.ptypeaddressName}`,
+                label: type.pTypeName || type.ptypename || '제목 없음',
+                path: `/boards/${type.pTypeAddressName || type.ptypeaddressName || type.pTypeId || type.ptypeid}`,
                 icon: 'article'
             }))
+        }
+    }
+
+    // 관리자 게시판인 경우 동적으로 메뉴 생성
+    if (category === 'admin-boards' && boardTypes.length > 0) {
+        const staticItems = menuConfig['admin-boards'].items || []
+        const dynamicBoardItems = boardTypes.map(type => {
+            const typeName = type.pTypeName || type.ptypename || ''
+            return {
+                label: typeName || '제목 없음',
+                path: `/admin/boards/${type.pTypeAddressName || type.ptypeaddressName || type.pTypeId || type.ptypeid}`,
+                icon: typeName.includes('공지') ? 'campaign' : 
+                     typeName.includes('이벤트') ? 'celebration' :
+                     typeName.includes('혜택') ? 'redeem' : 'article'
+            }
+        })
+        
+        menuData = {
+            ...menuConfig['admin-boards'],
+            items: [...staticItems, ...dynamicBoardItems]
         }
     }
 
@@ -53,10 +75,10 @@ const LeftSidebar = () => {
     if (category === 'trainer-boards' && boardTypes.length > 0) {
         const staticItems = menuConfig['trainer-boards'].items || []
         const dynamicBoardItems = boardTypes.map(type => {
-            const typeName = type.ptypename
+            const typeName = type.pTypeName || type.ptypename || ''
             return {
-                label: typeName,
-                path: `/trainer/boards/${type.ptypeaddressName}`,
+                label: typeName || '제목 없음',
+                path: `/trainer/boards/${type.pTypeAddressName || type.ptypeaddressName || type.pTypeId || type.ptypeid}`,
                 icon: typeName.includes('공지') ? 'campaign' : 
                      typeName.includes('이벤트') ? 'celebration' :
                      typeName.includes('혜택') ? 'redeem' : 'article'

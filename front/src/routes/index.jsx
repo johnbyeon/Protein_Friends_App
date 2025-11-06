@@ -19,6 +19,8 @@ import MyCoupons from '../pages/MyCoupons'
 import MyMemberships from '../pages/MyMemberships'
 import MyPTPasses from '../pages/MyPTPasses'
 import MyInbody from '../pages/MyInbody'
+import Calories from '../pages/Calories'
+import DietPlans from '../pages/DietPlans'
 import MyInquiries from '../pages/user/support/MyInquiries'
 import InquiryDetail from '../pages/user/support/InquiryDetail'
 import NewInquiry from '../pages/user/support/NewInquiry'
@@ -40,6 +42,11 @@ import TrainerInfo from '../pages/trainer/TrainerInfo'
 import InquiryManagement from '../pages/admin/support/InquiryManagement'
 import InquiryReply from '../pages/admin/support/InquiryReply'
 import FaqManagement from '../pages/admin/support/FaqManagement'
+import ClassSchedule from '../pages/admin/classes/ClassSchedule'
+import PosPT_Pass from '../pages/pos/PosPT_Pass'
+import PosMembership from '../pages/pos/PosMembership'
+import PtTicketManagement from '../pages/market/PtTicketManagement'
+import MembershipManagement from '../pages/admin/market/MembershipManagement'
 
 // Access & Branch Pages
 import AccessCheck from '../pages/access/AccessCheck'
@@ -82,6 +89,8 @@ export default function AppRoutes() {
         <Route path="access" element={<AccessCheck />} />
         <Route path="branches" element={<BranchListPage />} />
         <Route path="branches/:gid" element={<BranchDetailPage />} />
+        <Route path="calories" element={<Calories />} />
+        <Route path="diet/plans" element={<DietPlans />} />
 
         {/* ==================== 고객센터 (유저용) ==================== */}
         <Route path="support/inquiries" element={<MyInquiries />} />
@@ -123,9 +132,19 @@ export default function AppRoutes() {
                 </RoleGuard>
               }
             />
+          </Route>
 
+          {/* ==================== USER 전용 (my 경로) ==================== */}
           <Route
-            path="coupons"
+            path="my/info"
+            element={
+              <RoleGuard allowedRoles={['USER']}>
+                <MyInfo />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="my/coupons"
             element={
               <RoleGuard allowedRoles={['USER']}>
                 <MyCoupons />
@@ -133,7 +152,7 @@ export default function AppRoutes() {
             }
           />
           <Route
-            path="memberships"
+            path="my/memberships"
             element={
               <RoleGuard allowedRoles={['USER']}>
                 <MyMemberships />
@@ -141,7 +160,7 @@ export default function AppRoutes() {
             }
           />
           <Route
-            path="pt-passes"
+            path="my/pt-passes"
             element={
               <RoleGuard allowedRoles={['USER']}>
                 <MyPTPasses />
@@ -149,14 +168,13 @@ export default function AppRoutes() {
             }
           />
           <Route
-            path="inbody"
+            path="my/inbody"
             element={
               <RoleGuard allowedRoles={['USER']}>
                 <MyInbody />
               </RoleGuard>
             }
           />
-        </Route>
 
         {/* ==================== TRAINER 전용 ==================== */}
         <Route path="trainer">
@@ -222,6 +240,44 @@ export default function AppRoutes() {
             element={
               <RoleGuard allowedRoles={['TRAINER']}>
                 <TrainerProfile />
+              </RoleGuard>
+            }
+          />
+
+          {/* 마켓 관리 - PT 이용권 관리 */}
+          <Route
+            path="market/pt-tickets"
+            element={
+              <RoleGuard allowedRoles={['TRAINER']}>
+                <PtTicketManagement />
+              </RoleGuard>
+            }
+          />
+
+          {/* 마켓 관리 - 기간제 회원권 관리 */}
+          <Route
+            path="market/memberships"
+            element={
+              <RoleGuard allowedRoles={['TRAINER']}>
+                <MembershipManagement />
+              </RoleGuard>
+            }
+          />
+
+          {/* 현장 판매 */}
+          <Route
+            path="pos/pt-pass"
+            element={
+              <RoleGuard allowedRoles={['TRAINER']}>
+                <PosPT_Pass />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="pos/membership"
+            element={
+              <RoleGuard allowedRoles={['TRAINER']}>
+                <PosMembership />
               </RoleGuard>
             }
           />
@@ -401,6 +457,34 @@ export default function AppRoutes() {
               </RoleGuard>
             }
           />
+          {/* 현장 판매 */}
+          <Route
+            path="pos/pt-pass"
+            element={
+              <RoleGuard allowedRoles={['ADMIN']}>
+                <PosPT_Pass />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="pos/membership"
+            element={
+              <RoleGuard allowedRoles={['ADMIN']}>
+                <PosMembership />
+              </RoleGuard>
+            }
+          />
+
+          {/* 수업 관리 */}
+          <Route
+            path="classes/schedule"
+            element={
+              <RoleGuard allowedRoles={['ADMIN']}>
+                <ClassSchedule />
+              </RoleGuard>
+            }
+          />
+
           {/* 추가 관리자 페이지들... */}
         </Route>
       </Route>

@@ -243,7 +243,7 @@ export default function MyInfo() {
       const res = await put('/api/users/me/info', payload)
 
       if (res.ok) {
-        const updated = await res.json()
+        const updated = res.data
         setUserInfo(updated)
         setMessage('✅ 정보가 저장되었습니다.')
         alert('정보가 저장되었습니다.')
@@ -258,7 +258,7 @@ export default function MyInfo() {
           })
         }
       } else {
-        const errorText = await res.text()
+        const errorText = res.data || '저장에 실패했습니다.'
         setMessage(`❌ 저장 실패: ${errorText}`)
       }
     } catch (err) {

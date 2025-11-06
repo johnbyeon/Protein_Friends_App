@@ -41,6 +41,7 @@ public class MembershipCardDto {
     private LocalDate buyDate;    // 구매일자
     private LocalDate startDate;  // 시작일
     private LocalDate endDate;    // 종료일 (정지 보정 포함)
+    private String imageUrl;      // 회원권 이미지 URL
 
     // ---------- 금액 및 정지 관련 ----------
     private int stopUsed;         // 실제 정지 사용 횟수

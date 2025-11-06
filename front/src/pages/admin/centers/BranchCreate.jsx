@@ -11,9 +11,7 @@ const BranchCreate = () => {
         operatingHours: '',
         parkingInfo: '',
         stations: '',
-        amenities: '',
         image: '',
-        description: '',
     })
     const [imageFile, setImageFile] = useState(null)
     const [imagePreview, setImagePreview] = useState('')
@@ -133,14 +131,7 @@ const BranchCreate = () => {
                             required
                         />
 
-                        <FormTextarea
-                            label="상세 소개"
-                            name="description"
-                            value={formValues.description}
-                            onChange={handleChange}
-                            placeholder="지점 특징, 담당 프로그램 등을 자유롭게 작성하세요."
-                            rows={4}
-                        />
+
 
                         <div className="grid gap-6 md:grid-cols-2">
                             <FormTextarea
@@ -159,22 +150,13 @@ const BranchCreate = () => {
                             />
                         </div>
 
-                        <div className="grid gap-6 md:grid-cols-2">
-                            <FormTextarea
-                                label="주변 역 정보"
-                                name="stations"
-                                value={formValues.stations}
-                                onChange={handleChange}
-                                placeholder="노선|역 이름|도보 거리 형태로 입력 (예: 2|강남역|도보 5분)"
-                            />
-                            <FormTextarea
-                                label="편의 시설"
-                                name="amenities"
-                                value={formValues.amenities}
-                                onChange={handleChange}
-                                placeholder="한 줄에 하나씩 입력 (예: 프라이빗 PT룸 6개)"
-                            />
-                        </div>
+                        <FormTextarea
+                            label="주변 역 정보"
+                            name="stations"
+                            value={formValues.stations}
+                            onChange={handleChange}
+                            placeholder="노선|역 이름|도보 거리 형태로 입력 (예: 2|강남역|도보 5분)"
+                        />
 
                          <div className="space-y-3">
                              <label className="block text-sm">

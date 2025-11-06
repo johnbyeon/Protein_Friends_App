@@ -52,4 +52,11 @@ public interface PtInfoRepository extends JpaRepository<PtInfo, Long> {
             order by p.endDate desc
             """)
     List<PtInfo> findTicketsForRestore(@Param("uId") Long uId, @Param("tId") Long tId);
+
+    /**
+     * 사용자의 모든 활성 PT 이용권 조회
+     * - 마이페이지 PT 이용권 목록
+     */
+    @Query(value = "SELECT * FROM pt_info WHERE u_id = :userId AND status = true", nativeQuery = true)
+    List<PtInfo> findByUsers_UIdAndStatusTrue(@Param("userId") Long userId);
 }

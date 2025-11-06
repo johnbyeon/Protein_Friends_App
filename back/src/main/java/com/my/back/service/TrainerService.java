@@ -214,6 +214,7 @@ public class TrainerService {
      * @param request 수정 요청 DTO
      * @return TrainerProfileResponse
      */
+    @Transactional
     public TrainerProfileResponse updateMyProfile(Long uId, TrainerProfileUpdateRequest request) {
         TrainerInfo trainer = trainerRepo.findByuId(uId)
                 .orElseThrow(() -> new IllegalArgumentException("Trainer profile not found for user: " + uId));

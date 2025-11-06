@@ -1,33 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { apiJson } from '../lib/api';
 
 export default function MyInbody() {
   const [showModal, setShowModal] = useState(false);
   const [modalImage, setModalImage] = useState('');
+  const [inbodyData, setInbodyData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // 인바디 데이터 (실제로는 API에서 가져올 데이터)
-  const inbodyData = [
-    {
-      date: '2024년 5월 11일',
-      images: [
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuAf91iV5VThofm1FnsxpvNhi-J-eKGSaJW6WYIn9rxQrwhuG5s1myCHp3E3AKo6McFYwfhtDg3B2Znk_AwCz-3pY13C23SSzMovqu7jEARIYMBw8BkFohyZnrTszaxJsT47_DJ2nuc4N18b8pD3aeb1RCUo-jxDcoKIErhrvEIC_wNeBohPCcDQitRcEg176x9tKyGNLe7dIuQmsLMmTPSdrPiPVfEkv5UUywzCNjX1EiUa5TyOBfw4b6wxb6PdA7z-bE5REDGK2z3v',
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuC-pHAJh1YIDBCP_mAvWPZ-_lKV-TQCKUwdIxPpvVzPh_lACdD1_YXTym3TEQ2WaDZxkLC-8DAfMWB9O2-cjDYMQakMGxGdHGq31Km1XxixLjBt4cyUp1UKkc6n7xRV2nQRkRCFZpYhhKIITtAGVnJ8zixE2bStefJU-W2ams2_Ds1_O_XFadCuWDQF-LTc1-egWFb9Wktuq36BPcX20fxv2kLGijOObSddqZ1laQGvl8LzPCNxA82OSB0a060qZjw1RX4bVCv37IId'
-      ]
-    },
-    {
-      date: '2024년 4월 25일',
-      images: [
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuAf91iV5VThofm1FnsxpvNhi-J-eKGSaJW6WYIn9rxQrwhuG5s1myCHp3E3AKo6McFYwfhtDg3B2Znk_AwCz-3pY13C23SSzMovqu7jEARIYMBw8BkFohyZnrTszaxJsT47_DJ2nuc4N18b8pD3aeb1RCUo-jxDcoKIErhrvEIC_wNeBohPCcDQitRcEg176x9tKyGNLe7dIuQmsLMmTPSdrPiPVfEkv5UUywzCNjX1EiUa5TyOBfw4b6wxb6PdA7z-bE5REDGK2z3v'
-      ]
-    },
-    {
-      date: '2024년 4월 10일',
-      images: [
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuC-pHAJh1YIDBCP_mAvWPZ-_lKV-TQCKUwdIxPpvVzPh_lACdD1_YXTym3TEQ2WaDZxkLC-8DAfMWB9O2-cjDYMQakMGxGdHGq31Km1XxixLjBt4cyUp1UKkc6n7xRV2nQRkRCFZpYhhKIITtAGVnJ8zixE2bStefJU-W2ams2_Ds1_O_XFadCuWDQF-LTc1-egWFb9Wktuq36BPcX20fxv2kLGijOObSddqZ1laQGvl8LzPCNxA82OSB0a060qZjw1RX4bVCv37IId',
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuAf91iV5VThofm1FnsxpvNhi-J-eKGSaJW6WYIn9rxQrwhuG5s1myCHp3E3AKo6McFYwfhtDg3B2Znk_AwCz-3pY13C23SSzMovqu7jEARIYMBw8BkFohyZnrTszaxJsT47_DJ2nuc4N18b8pD3aeb1RCUo-jxDcoKIErhrvEIC_wNeBohPCcDQitRcEg176x9tKyGNLe7dIuQmsLMmTPSdrPiPVfEkv5UUywzCNjX1EiUa5TyOBfw4b6wxb6PdA7z-bE5REDGK2z3v',
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuC-pHAJh1YIDBCP_mAvWPZ-_lKV-TQCKUwdIxPpvVzPh_lACdD1_YXTym3TEQ2WaDZxkLC-8DAfMWB9O2-cjDYMQakMGxGdHGq31Km1XxixLjBt4cyUp1UKkc6n7xRV2nQRkRCFZpYhhKIITtAGVnJ8zixE2bStefJU-W2ams2_Ds1_O_XFadCuWDQF-LTc1-egWFb9Wktuq36BPcX20fxv2kLGijOObSddqZ1laQGvl8LzPCNxA82OSB0a060qZjw1RX4bVCv37IId'
-      ]
-    }
-  ];
+  useEffect(() => {
+    const fetchInbodyData = async () => {
+      try {
+        setLoading(true);
+        const response = await apiJson('/my/inbody');
+        if (!response.ok) {
+          throw new Error(response.data?.message || '인바디 데이터를 불러오는데 실패했습니다.');
+        }
+        setInbodyData(response.data);
+      } catch (err) {
+        console.error('인바디 데이터를 불러오는데 실패했습니다:', err);
+        setError('인바디 데이터를 불러오는데 실패했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInbodyData();
+  }, []);
 
   const handleImageClick = (imageUrl) => {
     setModalImage(imageUrl);
@@ -45,6 +44,41 @@ export default function MyInbody() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex min-h-screen w-full flex-col bg-background-dark">
+        <main className="flex-1 bg-background-dark">
+          <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <p className="mt-4 text-gray-400">인바디 데이터를 불러오는 중...</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen w-full flex-col bg-background-dark">
+        <main className="flex-1 bg-background-dark">
+          <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <p className="text-red-400">{error}</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="mt-4 px-4 py-2 bg-primary text-black rounded-lg hover:opacity-80"
+              >
+                다시 시도
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-background-dark">
       <main className="flex-1 bg-background-dark">
@@ -52,33 +86,39 @@ export default function MyInbody() {
           {/* 헤더 */}
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-white">내 인바디 데이터</h1>
-            <p className="text-gray-400 mt-2">박도윤 회원님 (#PT00125)</p>
+            <p className="text-gray-400 mt-2">인바디 측정 기록</p>
           </div>
 
           {/* 인바디 데이터 섹션 */}
           <div className="space-y-10">
-            {inbodyData.map((section, sectionIndex) => (
+            {(inbodyData || []).map((section, sectionIndex) => (
               <div key={sectionIndex}>
                 <h2 className="text-xl font-semibold text-gray-300 mb-4 border-b border-primary pb-2">
                   {section.date}
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {section.images.map((imageUrl, imageIndex) => (
+                  {(section.images || []).map((image, imageIndex) => (
                     <div
                       key={imageIndex}
                       className="cursor-pointer"
-                      onClick={() => handleImageClick(imageUrl)}
+                      onClick={() => handleImageClick(image.inbodyPicUrl)}
                     >
                       <img
                         alt={`인바디 이미지 ${sectionIndex + 1}-${imageIndex + 1}`}
                         className="rounded-lg object-cover w-full h-auto aspect-[3/4] transition-transform duration-300 hover:scale-105"
-                        src={imageUrl}
+                        src={image.inbodyPicUrl}
                       />
                     </div>
                   ))}
                 </div>
               </div>
             ))}
+            {(!inbodyData || inbodyData.length === 0) && (
+              <div className="text-center py-16 text-gray-400">
+                <p className="text-xl">인바디 데이터가 없습니다.</p>
+                <p className="mt-2">트레이너에게 문의하여 인바디 측정을 진행해주세요.</p>
+              </div>
+            )}
           </div>
         </div>
       </main>

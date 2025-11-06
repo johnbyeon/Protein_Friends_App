@@ -6,19 +6,18 @@ spring:
         - common
       prod:
         - common
-  config:
-    import: optional:file:.env
+
 
 ---
 spring:
   config:
     activate:
-      on-profile: common
+      on-profile: local
 
 cloud:
   aws:
     s3:
-      bucket: ${S3_BUCKET_NAME}
+      bucket: protein-friends-s3
 
 ---
 spring:
@@ -29,12 +28,12 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/proteinfriends_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: ${MYSQL_USER}
-    password: ${MYSQL_PASSWORD}
+    username: root
+    password: 1111
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
     sql:
       init:
