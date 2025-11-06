@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -26,6 +27,7 @@ public class DiscountLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "rec_dis_id", nullable = false)
+    @JsonProperty("recDisId")
     private Long recDisId;
 
     /** 유저 아이디 (user 테이블 FK, not null, number) */
@@ -40,13 +42,16 @@ public class DiscountLog {
 
     /** 사용여부 (not null, boolean) */
     @Column(name = "is_used", nullable = false)
+    @JsonProperty("isUsed")
     private Boolean isUsed;
 
     /** 사용날짜 (not null, date time) */
     @Column(name = "used_date", nullable = false)
+    @JsonProperty("usedDate")
     private LocalDateTime usedDate;
 
     /** 발급날짜 (not null, date time) */
     @Column(name = "create_date", nullable = false)
+    @JsonProperty("createDate")
     private LocalDateTime createDate;
 }

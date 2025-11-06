@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -26,6 +27,7 @@ public class PtUsedLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pt_h_id", nullable = false)
+    @JsonProperty("ptHId")
     private Long ptHId;
 
     /** 유저 아이디 (user 테이블 FK) */
@@ -40,19 +42,23 @@ public class PtUsedLog {
 
     /** 사용일 (not null, date time) */
     @Column(name = "date", nullable = false)
+    @JsonProperty("date")
     private LocalDateTime date;
 
     /** 피티 총 횟수 (not null, number) */
     @Column(name = "total_count", nullable = false)
+    @JsonProperty("totalCount")
     private Integer totalCount;
 
     /** 피티 총 사용 횟수 (not null, number) */
     @Column(name = "used_count", nullable = false)
+    @JsonProperty("usedCount")
     private Integer usedCount;
 
     /** 활성화 상태 (default true, not null, boolean) */
     @Column(name = "status", nullable = false)
     @Builder.Default
+    @JsonProperty("status")
     private Boolean status = true;
 
     /** PT 클래스 번호 (pt_class_info 테이블 FK, not null, number) */

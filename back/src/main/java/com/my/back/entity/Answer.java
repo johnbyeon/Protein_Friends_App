@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -30,6 +31,7 @@ public class Answer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "answer_id", nullable = false)
+    @JsonProperty("answerId")
     private Long answerId;
 
     /** 질문등록번호 (question 테이블 FK, not null, number) */
@@ -44,19 +46,23 @@ public class Answer {
 
     /** 답변글 (not null, string) */
     @Column(name = "answer", nullable = false)
+    @JsonProperty("answer")
     private String answer;
 
     /** 답변 작성일 (not null, date time) */
     @CreatedDate
     @Column(name = "create_date", nullable = false)
+    @JsonProperty("createDate")
     private LocalDateTime createDate;
 
     /** 답변 수정일 (not null, date time) */
     @LastModifiedDate
     @Column(name = "update_date", nullable = false)
+    @JsonProperty("updateDate")
     private LocalDateTime updateDate;
 
     /** 답변 확인 날짜 (date time) */
     @Column(name = "read_date")
+    @JsonProperty("readDate")
     private LocalDateTime readDate;
 }

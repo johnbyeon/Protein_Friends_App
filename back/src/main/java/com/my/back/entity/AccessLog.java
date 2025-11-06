@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -27,6 +28,7 @@ public class AccessLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "a_id")
+    @JsonProperty("aId")
     private Long aId;
 
     /**
@@ -34,6 +36,7 @@ public class AccessLog {
      * - 외래키로 gym_info 테이블 연결
      */
     @Column(name = "g_id", nullable = false)
+    @JsonProperty("gId")
     private Long gId;
 
     /**
@@ -41,6 +44,7 @@ public class AccessLog {
      * - 외래키로 user 테이블 연결
      */
     @Column(name = "u_id", nullable = false)
+    @JsonProperty("uId")
     private Long uId;
 
     /**
@@ -50,6 +54,7 @@ public class AccessLog {
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "access_direction", nullable = false)
+    @JsonProperty("accessDirection")
     private AccessDirection accessDirection;
 
     /**
@@ -58,6 +63,7 @@ public class AccessLog {
      */
     @CreatedDate
     @Column(name = "access_time", nullable = false, updatable = false)
+    @JsonProperty("accessTime")
     private LocalDateTime accessTime;
 
     // === 관계 매핑 (선택적, 성능 고려) ===

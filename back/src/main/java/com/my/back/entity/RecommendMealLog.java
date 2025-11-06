@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,23 +17,28 @@ public class RecommendMealLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "rec_id")
+    @JsonProperty("id")
     private Long id;
 
     /** 추천 음식 */
     @Column(name = "rec_food", nullable = false, length = 255)
+    @JsonProperty("food")
     private String food;
 
     /** 총 칼로리 */
     @Column(name = "rec_kcal")
+    @JsonProperty("kcal")
     private Integer kcal;
 
     /** 식단 이미지 (이미지 URL 등) */
     @Column(name = "rec_pic", length = 500)
+    @JsonProperty("pic")
     private String pic;
 
     /** 식사 정보 (아침, 점심, 저녁, 간식 등) */
     @Enumerated(EnumType.STRING)
     @Column(name = "meal_type", nullable = false, length = 20)
+    @JsonProperty("mealType")
     private MealType mealType;
 
     /** 추천 식단(부모) — 다대일 관계 */

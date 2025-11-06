@@ -13,6 +13,8 @@ import com.my.back.repository.PtInfoRepository;
 import com.my.back.repository.projection.GymReviewView;
 import com.my.back.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,31 @@ public class GymReviewService {
     private final MembershipLogRepository membershipLogRepository;
     private final PtInfoRepository ptInfoRepository;
     private final SecurityUtil securityUtil;
+
+    // 리뷰 요약 조회 (평균 별점, 총 개수, 리뷰 목록)
+    public GymReviewDtos.GymReviewListRes getGymReviewSummary(Long gId) {
+        validateGymExists(gId);
+
+        // 평균 별점과 총 개수 조회
+        Double averageRating = gymReviewRepository.getAverageRating(gId);
+        Long totalCount = gymReviewRepository.countByGId(gId);
+
+        // 최근 리뷰 10개 조회
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<GymReviewView> reviews = gymReviewRepository.findReviewsByGymId(gId, pageable);
+
+        List<GymReviewDtos.GymReviewItem> reviewItems = reviews.getContent().stream()
+                .map(r -> new GymReviewDtos.GymReviewItem(
+                        r.uId(),
+                        r.userNickname(),
+                        r.gRating(),
+                        r.gReview(),
+                        r.createdAt()
+                ))
+                .toList();
+
+        return new GymReviewDtos.GymReviewListRes(averageRating, totalCount, reviewItems);
+    }
 
     // 리뷰 리스트 조회
     public PageResponse<GymReviewDtos.GymReviewItem> getGymReviews(Long gId, int page, int size) {

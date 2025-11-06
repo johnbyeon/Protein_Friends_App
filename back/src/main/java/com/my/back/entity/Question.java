@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -29,6 +30,7 @@ public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "q_id", nullable = false)
+    @JsonProperty("qId")
     private Long qId;
 
     /** 유저 아이디 (user 테이블 FK, not null, number) */
@@ -38,24 +40,29 @@ public class Question {
 
     /** 질문 제목 (not null, string) */
     @Column(name = "q_title", nullable = false)
+    @JsonProperty("qTitle")
     private String qTitle;
 
     /** 질문 내용 (not null, string) */
     @Column(name = "q_content", nullable = false)
+    @JsonProperty("qContent")
     private String qContent;
 
     /** 비밀글 설정 (default false, boolean) */
     @Column(name = "q_is_secret", nullable = false)
     @Builder.Default
+    @JsonProperty("qIsSecret")
     private Boolean qIsSecret = false;
 
     /** 작성일 (not null, date time) */
     @CreatedDate
     @Column(name = "q_create_date", nullable = false)
+    @JsonProperty("qCreateDate")
     private LocalDateTime qCreateDate;
 
     /** 수정일 (not null, date time) */
     @LastModifiedDate
     @Column(name = "q_update_date", nullable = false)
+    @JsonProperty("qUpdateDate")
     private LocalDateTime qUpdateDate;
 }

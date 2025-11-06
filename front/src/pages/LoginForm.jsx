@@ -258,10 +258,10 @@ export default function LoginForm({
 
           {/* 링크 영역 */}
           <div className="flex justify-between text-sm text-gray-400 mt-6">
-            <Link to="/auth/register" className="hover:text-primary">회원가입</Link>
+            <Link to="/register" className="hover:text-primary">회원가입</Link>
             <div className="space-x-3">
-              <Link to="/auth/find-id" className="hover:text-primary">아이디 찾기</Link>
-              <Link to="/auth/reset-password" className="hover:text-primary">비밀번호 찾기</Link>
+              <Link to="/find-id" className="hover:text-primary">아이디 찾기</Link>
+              <Link to="/reset-password" className="hover:text-primary">비밀번호 찾기</Link>
             </div>
           </div>
         </div>

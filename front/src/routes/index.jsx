@@ -20,6 +20,8 @@ import MyMemberships from '../pages/MyMemberships'
 import MyPTPasses from '../pages/MyPTPasses'
 import MyInbody from '../pages/MyInbody'
 import MyInquiries from '../pages/user/support/MyInquiries'
+import InquiryDetail from '../pages/user/support/InquiryDetail'
+import NewInquiry from '../pages/user/support/NewInquiry'
 import FaqList from '../pages/user/support/FaqList'
 
 // Board Components
@@ -34,13 +36,18 @@ import AdminDashboard from '../pages/AdminDashboard'
 import UploadTest from '../pages/UploadTest'
 import TrainerCreate from '../pages/admin/trainers/TrainerCreate'
 import TrainerProfile from '../pages/trainer/TrainerProfile'
+import TrainerInfo from '../pages/trainer/TrainerInfo'
 import InquiryManagement from '../pages/admin/support/InquiryManagement'
 import InquiryReply from '../pages/admin/support/InquiryReply'
 import FaqManagement from '../pages/admin/support/FaqManagement'
 
 // Access & Branch Pages
 import AccessCheck from '../pages/access/AccessCheck'
-import BranchDetail from '../pages/branches/BranchDetail'
+import BranchListPage from '../pages/branches/BranchListPage'
+import BranchDetailPage from '../pages/branches/BranchDetailPage' 
+import BranchManagement from '../pages/admin/centers/BranchManagement'
+import BranchCreate from '../pages/admin/centers/BranchCreate'
+import BranchEdit from '../pages/admin/centers/BranchEdit'
 
 export default function AppRoutes() {
   return (
@@ -73,22 +80,49 @@ export default function AppRoutes() {
 
         {/* ==================== 공통 기능 ==================== */}
         <Route path="access" element={<AccessCheck />} />
-        <Route path="branches" element={<BranchDetail />} />
+        <Route path="branches" element={<BranchListPage />} />
+        <Route path="branches/:gid" element={<BranchDetailPage />} />
 
         {/* ==================== 고객센터 (유저용) ==================== */}
         <Route path="support/inquiries" element={<MyInquiries />} />
+        <Route path="support/inquiries/new" element={<NewInquiry />} />
+        <Route path="support/inquiries/:id" element={<InquiryDetail />} />
         <Route path="support/faqs" element={<FaqList />} />
 
-        {/* ==================== USER 전용 ==================== */}
-        <Route path="user">
-          <Route
-            path="home"
-            element={
-              <RoleGuard allowedRoles={['USER']}>
-                <Home />
-              </RoleGuard>
-            }
-          />
+          {/* ==================== USER 전용 ==================== */}
+          <Route path="user">
+            <Route
+              path="support/inquiries"
+              element={
+                <RoleGuard allowedRoles={['USER']}>
+                  <MyInquiries />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="support/inquiries/new"
+              element={
+                <RoleGuard allowedRoles={['USER']}>
+                  <NewInquiry />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="support/inquiries/:id"
+              element={
+                <RoleGuard allowedRoles={['USER']}>
+                  <InquiryDetail />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="home"
+              element={
+                <RoleGuard allowedRoles={['USER']}>
+                  <Home />
+                </RoleGuard>
+              }
+            />
 
           <Route
             path="coupons"
@@ -140,7 +174,7 @@ export default function AppRoutes() {
           <Route
             path="boards/:typeAddressName"
             element={
-              <RoleGuard allowedRoles={['TRAINER']}>
+              <RoleGuard allowedRoles={['ADMIN', 'TRAINER']}>
                 <AdminBoardList />
               </RoleGuard>
             }
@@ -148,7 +182,7 @@ export default function AppRoutes() {
           <Route
             path="boards/:typeAddressName/new"
             element={
-              <RoleGuard allowedRoles={['TRAINER']}>
+              <RoleGuard allowedRoles={['ADMIN', 'TRAINER']}>
                 <BoardForm />
               </RoleGuard>
             }
@@ -156,7 +190,7 @@ export default function AppRoutes() {
           <Route
             path="boards/:typeAddressName/:pId/edit"
             element={
-              <RoleGuard allowedRoles={['TRAINER']}>
+              <RoleGuard allowedRoles={['ADMIN', 'TRAINER']}>
                 <BoardForm />
               </RoleGuard>
             }
@@ -166,18 +200,18 @@ export default function AppRoutes() {
           <Route
             path="board-types"
             element={
-              <RoleGuard allowedRoles={['TRAINER']}>
+              <RoleGuard allowedRoles={['ADMIN', 'TRAINER']}>
                 <BoardTypeManagement />
               </RoleGuard>
             }
           />
 
-          {/* 트레이너 관리 - 목록 조회만 가능 (등록은 ADMIN 전용) */}
+          {/* 트레이너 정보 조회 */}
           <Route
             path="trainers"
             element={
               <RoleGuard allowedRoles={['TRAINER']}>
-                <div>트레이너 목록 페이지 (개발 예정)</div>
+                <TrainerInfo />
               </RoleGuard>
             }
           />
@@ -254,7 +288,7 @@ export default function AppRoutes() {
           <Route
             path="boards/:typeAddressName"
             element={
-              <RoleGuard allowedRoles={['ADMIN']}>
+              <RoleGuard allowedRoles={['ADMIN', 'TRAINER']}>
                 <AdminBoardList />
               </RoleGuard>
             }
@@ -262,7 +296,7 @@ export default function AppRoutes() {
           <Route
             path="boards/:typeAddressName/new"
             element={
-              <RoleGuard allowedRoles={['ADMIN']}>
+              <RoleGuard allowedRoles={['ADMIN', 'TRAINER']}>
                 <BoardForm />
               </RoleGuard>
             }
@@ -270,7 +304,7 @@ export default function AppRoutes() {
           <Route
             path="boards/:typeAddressName/:pId/edit"
             element={
-              <RoleGuard allowedRoles={['ADMIN']}>
+              <RoleGuard allowedRoles={['ADMIN', 'TRAINER']}>
                 <BoardForm />
               </RoleGuard>
             }
@@ -280,18 +314,44 @@ export default function AppRoutes() {
           <Route
             path="board-types"
             element={
-              <RoleGuard allowedRoles={['ADMIN']}>
+              <RoleGuard allowedRoles={['ADMIN', 'TRAINER']}>
                 <BoardTypeManagement />
               </RoleGuard>
             }
           />
+
+          {/* 지점 관리 */}
+          <Route
+            path="centers/branches"
+            element={
+              <RoleGuard allowedRoles={['ADMIN']}>
+                <BranchManagement />
+              </RoleGuard>
+            }
+          />
+           <Route
+             path="centers/branches/new"
+             element={
+               <RoleGuard allowedRoles={['ADMIN']}>
+                 <BranchCreate />
+               </RoleGuard>
+             }
+           />
+           <Route
+             path="centers/branches/:id/edit"
+             element={
+               <RoleGuard allowedRoles={['ADMIN']}>
+                 <BranchEdit />
+               </RoleGuard>
+             }
+           />
 
           {/* 트레이너 관리 */}
           <Route
             path="trainers"
             element={
               <RoleGuard allowedRoles={['ADMIN']}>
-                <div>트레이너 목록 페이지 (개발 예정)</div>
+                <TrainerInfo />
               </RoleGuard>
             }
           />

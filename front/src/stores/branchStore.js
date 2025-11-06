@@ -1,6 +1,7 @@
 // src/stores/branchStore.js
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { useAuthStore } from './authStore'
 
 /**
  * Branch Store
@@ -59,10 +60,14 @@ export const useBranchStore = create(
             throw new Error(`지점 목록 조회 실패: ${response.status} - ${errorText}`)
           }
 
-          const data = await response.json()
+           const data = await response.json()
 
-          console.log('🔍 [branchStore] 받은 데이터:', data)
-          console.log('🔍 [branchStore] 데이터 타입:', typeof data, 'isArray:', Array.isArray(data))
+           console.log('🔍 [branchStore] 받은 데이터:', data)
+           console.log('🔍 [branchStore] 데이터 타입:', typeof data, 'isArray:', Array.isArray(data))
+           if (Array.isArray(data) && data.length > 0) {
+               console.log('🔍 [branchStore] 첫 번째 지점 샘플:', data[0])
+               console.log('🔍 [branchStore] 첫 번째 지점 키들:', Object.keys(data[0]))
+           }
 
           set({
             branches: data,
@@ -130,6 +135,36 @@ export const useBranchStore = create(
           return data
         } catch (error) {
           console.error('❌ 트레이너 목록 조회 에러:', error)
+          return []
+        }
+      },
+
+      /**
+       * 지점별 리뷰 목록 가져오기
+       */
+      fetchBranchReviews: async (branchId) => {
+        try {
+          const SERVER_ORIGIN = import.meta.env.VITE_SERVER_ORIGIN || ''
+          const token = useAuthStore.getState().token
+          const response = await fetch(`${SERVER_ORIGIN}/api/branches/${branchId}/reviews`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+
+          if (!response.ok) {
+            if (response.status === 401) {
+              console.log('🔒 리뷰 조회 권한 없음 (401), 빈 배열 반환')
+              return []
+            }
+            throw new Error(`리뷰 목록 조회 실패: ${response.status}`)
+          }
+
+          const data = await response.json()
+          console.log('✅ 리뷰 목록 로드:', data.length, '개')
+          return data
+        } catch (error) {
+          console.error('❌ 리뷰 목록 조회 에러:', error)
           return []
         }
       },

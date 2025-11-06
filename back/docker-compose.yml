@@ -3,11 +3,23 @@ services:
     image: mysql:8.0
     container_name: db
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: proteinfriends_db
     ports:
       - "3307:3306"
     volumes:
       - dbdata:/var/lib/mysql
+  app:
+    build: .
+    container_name: app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      SPRING_PROFILES_ACTIVE: local
+    restart: on-failure
 volumes:
   dbdata:

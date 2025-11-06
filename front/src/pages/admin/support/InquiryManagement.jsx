@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { getInquiries, getUnansweredCount, getAnsweredCount } from '../../../lib/api'
-import LeftSidebar from '../../../components/LeftSidebar'
 
 export default function InquiryManagement() {
   const navigate = useNavigate()
@@ -76,9 +75,7 @@ export default function InquiryManagement() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background-dark">
-      <LeftSidebar />
-      <main className="flex-1 px-4 sm:px-6 lg:px-8 py-8 bg-background-dark font-display text-text-light">
+    <main className="px-4 sm:px-6 lg:px-8 py-8 bg-background-dark font-display text-text-light min-h-screen">
         <div className="flex flex-col max-w-7xl mx-auto gap-8">
           {/* 헤더 */}
           <div className="flex flex-col gap-2">
@@ -181,8 +178,7 @@ export default function InquiryManagement() {
             </div>
           )}
         </div>
-      </main>
-    </div>
+  </main>
   )
 }
 

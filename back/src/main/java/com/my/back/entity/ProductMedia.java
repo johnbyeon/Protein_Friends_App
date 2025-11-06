@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,24 +18,28 @@ public class ProductMedia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "prod_m_id", nullable = false)
+    @JsonProperty("prodMId")
     private Long prodMId;
 
     /**
      * 상품번호 (not null)
      */
     @Column(name = "prod_id", nullable = false)
+    @JsonProperty("prodId")
     private Long prodId;
 
     /**
      * 사진 url (not null)
      */
     @Column(name = "prod_url", nullable = false, length = 500)
+    @JsonProperty("prodUrl")
     private String prodUrl;
 
     /**
      * 사진텍스트 (nullable)
      */
     @Column(name = "alt_text", length = 200)
+    @JsonProperty("altText")
     private String altText;
 
     /**
@@ -42,6 +47,7 @@ public class ProductMedia {
      */
     @Column(name = "sort_order")
     @Builder.Default
+    @JsonProperty("sortOrder")
     private Integer sortOrder = 0;
 
     /**
@@ -49,6 +55,7 @@ public class ProductMedia {
      */
     @Column(name = "is_primary")
     @Builder.Default
+    @JsonProperty("isPrimary")
     private Boolean isPrimary = false;
 
     // === 관계 매핑 (LAZY) ===

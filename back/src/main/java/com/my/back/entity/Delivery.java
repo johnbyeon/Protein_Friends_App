@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,6 +24,7 @@ public class Delivery {
      */
     @Id
     @Column(name = "order_id", nullable = false, length = 50)
+    @JsonProperty("orderId")
     private String orderId;
 
     /**
@@ -30,6 +32,7 @@ public class Delivery {
      * - 예: "CJ", "HANJIN", "LOTTE"
      */
     @Column(name = "delivery_code", nullable = false, length = 50)
+    @JsonProperty("deliveryCode")
     private String deliveryCode;
 
     /**
@@ -37,6 +40,7 @@ public class Delivery {
      * - 예: "123456789012"
      */
     @Column(name = "invoice_code", nullable = false, length = 100)
+    @JsonProperty("invoiceCode")
     private String invoiceCode;
 
     // === 관계 매핑 (LAZY) ===

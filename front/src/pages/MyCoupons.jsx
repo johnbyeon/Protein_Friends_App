@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import LeftSidebar from '../components/LeftSidebar'
 
 export default function MyCoupons() {
   const [coupons] = useState([
@@ -30,10 +29,22 @@ export default function MyCoupons() {
     }
   ])
 
+  const [expiredCoupons] = useState([
+    {
+      id: '#000125',
+      title: '봄맞이 PT 5회권 10% 할인',
+      type: 'PT',
+      discount: '10%',
+      startDate: '2024.03.01',
+      endDate: '2024.05.31',
+      minAmount: '200,000원',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAf91iV5VThofm1FnsxpvNhi-J-eKGSaJW6WYIn9rxQrwhuG5s1myCHp3E3AKo6McFYwfhtDg3B2Znk_AwCz-3pY13C23SSzMovqu7jEARIYMBw8BkFohyZnrTszaxJsT47_DJ2nuc4N18b8pD3aeb1RCUo-jxDcoKIErhrvEIC_wNeBohPCcDQitRcEg176x9tKyGNLe7dIuQmsLMmTPSdrPiPVfEkv5UUywzCNjX1EiUa5TyOBfw4b6wxb6PdA7z-bE5REDGK2z3v',
+      status: 'expired'
+    }
+  ])
+
    return (
-    <div className="flex min-h-screen bg-background-dark">
-      <LeftSidebar />
-      <main className="flex-1 bg-background-dark text-text-light">
+      <main className="bg-background-dark text-text-light min-h-screen">
         <div className="mx-auto max-w-4xl px-6 py-16">
           
           {/* 헤더 */}
@@ -128,7 +139,6 @@ export default function MyCoupons() {
             </section>
           </div>
         </div>
-      </main>
-    </div>
+  </main>
   )
 }

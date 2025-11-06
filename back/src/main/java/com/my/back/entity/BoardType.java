@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,6 +23,7 @@ public class BoardType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "p_type_id", nullable = false)
+    @JsonProperty("pTypeId")
     private Long pTypeId;
 
     /**
@@ -29,14 +31,17 @@ public class BoardType {
      * - 예: "notices", "events", "benefits"
      */
     @Column(name = "p_type_address_name", nullable = false, length = 50)
+    @JsonProperty("pTypeAddressName")
     private String pTypeAddressName;
     /**
      * 게시글 타입 이름 (not null)
      * - 예: "공지", "이벤트", "혜택"
      */
     @Column(name = "p_type_name", nullable = false, length = 50)
+    @JsonProperty("pTypeName")
     private String pTypeName;
 
     @Column(name = "display_order", nullable = false)
+    @JsonProperty("displayOrder")
     private Integer displayOrder;
 }

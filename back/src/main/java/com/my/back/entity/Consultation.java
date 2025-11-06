@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -27,11 +28,13 @@ public class Consultation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "c_id", nullable = false)
+    @JsonProperty("cId")
     private Long cId;
 
     /** 회원이면 true(미등록회원은 false) (default false, boolean) */
     @Column(name = "is_member", nullable = false)
     @Builder.Default
+    @JsonProperty("isMember")
     private Boolean isMember = false;
 
     /** 유저아이디 (user 테이블 FK, number) */
@@ -46,23 +49,28 @@ public class Consultation {
 
     /** 상담제목 (not null, string) */
     @Column(name = "subtitle", nullable = false)
+    @JsonProperty("subtitle")
     private String subtitle;
 
     /** 상담노트기록 (not null, string) */
     @Column(name = "note", nullable = false)
+    @JsonProperty("note")
     private String note;
 
     /** 상담노트 등록시간 (not null, date time) */
     @CreatedDate
     @Column(name = "c_date", nullable = false)
+    @JsonProperty("cDate")
     private LocalDateTime cDate;
 
     /** 조치내용 (string) */
     @Column(name = "next_action")
+    @JsonProperty("nextAction")
     private String nextAction;
 
     /** 상담진행상태 (enum: 상담완료, 상담중) */
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
+    @JsonProperty("status")
     private ConsultationStatus status;
 }

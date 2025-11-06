@@ -171,5 +171,18 @@ public class QuestionService {
         
         return response;
     }
+
+    /**
+     * 사용자의 문의 목록 조회
+     */
+    public Page<QuestionResponse> getQuestionsByUser(String userEmail, Pageable pageable) {
+        Users user = userRepository.findByEmail(userEmail);
+        if (user == null) {
+            throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+        }
+        
+        Page<Question> questions = questionRepository.findByUsers_UIdOrderByQCreateDateDesc(user.getUId(), pageable);
+        return questions.map(this::convertToResponse);
+    }
 }
 

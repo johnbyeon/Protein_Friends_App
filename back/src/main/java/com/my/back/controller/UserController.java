@@ -8,6 +8,10 @@ import com.my.back.entity.Users;
 import com.my.back.repository.UserRepository;
 import com.my.back.dto.UserProfileUpdateRequest;
 import com.my.back.service.UserService;
+import com.my.back.service.QuestionService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +30,7 @@ public class UserController {
     private final UserRepository userRepository;
     private final UserService userService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final QuestionService questionService;
 
     /**
      * ✅ 프로필 업데이트 (소셜 로그인 이후 이름/전화번호 입력)
@@ -91,6 +96,7 @@ public class UserController {
                 .kakaoLinked(user.isKakaoLinked())
                 .createAt(user.getCreateAt())
                 .updateAt(user.getUpdateAt())
+                .gId(user.getUserInfo() != null ? user.getUserInfo().getGId() : null)
                 .build();
         
         return ResponseEntity.ok(response);
@@ -215,6 +221,34 @@ public class UserController {
             log.error("❌ 비밀번호 변경 실패: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("비밀번호 변경 중 오류가 발생했습니다.");
+        }
+    }
+
+    /**
+     * 사용자 1:1 문의 목록 조회
+     * GET /api/users/me/inquiries?page=0&size=10
+     */
+    @GetMapping("/me/inquiries")
+    public ResponseEntity<?> getMyInquiries(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal(expression = "username") String email
+    ) {
+        try {
+            if (email == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("로그인이 필요합니다.");
+            }
+
+            Pageable pageable = PageRequest.of(page, size);
+            Page<com.my.back.dto.QuestionResponse> result = questionService.getQuestionsByUser(email, pageable);
+
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            log.error("사용자 문의 목록 조회 실패: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("문의 목록 조회 중 오류가 발생했습니다.");
         }
     }
 }

@@ -48,5 +48,8 @@ public class UserBasicResponse {
     
     @JsonProperty("updateAt")
     private LocalDateTime updateAt;
+    
+    @JsonProperty("gId")
+    private Long gId;              // 소속 지점 ID
 }
 

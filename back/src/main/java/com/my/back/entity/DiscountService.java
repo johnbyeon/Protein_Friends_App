@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -26,56 +27,68 @@ public class DiscountService {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "dis_id", nullable = false)
+    @JsonProperty("disId")
     private Long disId;
 
     /** 할인권 이름 (not null, string) */
     @Column(name = "dis_name", nullable = false)
+    @JsonProperty("disName")
     private String disName;
 
     /** 할인권 사진 url */
     @Column(name = "dis_pic_url")
+    @JsonProperty("disPicUrl")
     private String disPicUrl;
 
     /** 할인해줄 가격 (default 0, not null, number) */
     @Column(name = "dis_price", nullable = false)
     @Builder.Default
+    @JsonProperty("disPrice")
     private Integer disPrice = 0;
 
     /** 할인 퍼센트 (default 0, not null, number) */
     @Column(name = "dis_percent", nullable = false)
     @Builder.Default
+    @JsonProperty("disPercent")
     private Integer disPercent = 0;
 
     /** 할인권 시작기간 (date time) */
     @Column(name = "dis_start_date")
+    @JsonProperty("disStartDate")
     private LocalDateTime disStartDate;
 
     /** 할인권 종료기간 (date time) */
     @Column(name = "dis_end_date")
+    @JsonProperty("disEndDate")
     private LocalDateTime disEndDate;
 
     /** 할인 타입 (enum: PT 할인, 상품할인, 이용권 할인) */
     @Enumerated(EnumType.STRING)
     @Column(name = "dis_type", nullable = false)
+    @JsonProperty("disType")
     private DiscountType disType;
 
     /** 적용금액 (얼마부터 적용할지, default 0, not null, number) */
     @Column(name = "dis_threshold_amount", nullable = false)
     @Builder.Default
+    @JsonProperty("disThresholdAmount")
     private Integer disThresholdAmount = 0;
 
     /** 할인권 배포여부 (default true, boolean) */
     @Column(name = "is_active")
     @Builder.Default
+    @JsonProperty("isActive")
     private Boolean isActive = true;
 
     /** 할인권 생성일 (not null, date time) */
     @CreatedDate
     @Column(name = "dis_create_at", nullable = false)
+    @JsonProperty("disCreateAt")
     private LocalDateTime disCreateAt;
 
     /** 할인권 수정일 (not null, date time) */
     @LastModifiedDate
     @Column(name = "dis_update_at", nullable = false)
+    @JsonProperty("disUpdateAt")
     private LocalDateTime disUpdateAt;
 }

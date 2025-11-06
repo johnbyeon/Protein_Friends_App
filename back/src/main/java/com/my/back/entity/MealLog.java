@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -23,6 +24,7 @@ public class MealLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "record_id", nullable = false)
+    @JsonProperty("recordId")
     private Long recordId;
 
     /** 유저아이디 */
@@ -37,11 +39,13 @@ public class MealLog {
 
     /** 식사정보(아침,점심,브런치등) */
     @Column(name = "meal_type", nullable = false)
+    @JsonProperty("mealType")
     private String mealType;
 
     /** 등록일 */
     @CreatedDate
     @Column(name = "date", nullable = false)
+    @JsonProperty("date")
     private LocalDateTime date;
 
 }

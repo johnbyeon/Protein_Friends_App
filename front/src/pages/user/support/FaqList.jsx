@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { getFaqs, getFaqCategories } from '../../../lib/api'
-import LeftSidebar from '../../../components/LeftSidebar'
 
 export default function FaqList() {
   const [faqs, setFaqs] = useState([])
@@ -49,9 +48,7 @@ export default function FaqList() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background-dark">
-      <LeftSidebar />
-      <main className="flex-1 px-4 sm:px-6 lg:px-8 py-8 bg-background-dark font-display text-text-light">
+    <main className="px-4 sm:px-6 lg:px-8 py-8 bg-background-dark font-display text-text-light min-h-screen">
         <div className="max-w-4xl mx-auto flex flex-col gap-8">
           {/* 헤더 */}
           <div className="flex flex-col gap-4">
@@ -177,8 +174,7 @@ export default function FaqList() {
             </div>
           )}
         </div>
-      </main>
-    </div>
+    </main>
   )
 }
 

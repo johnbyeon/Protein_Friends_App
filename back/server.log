@@ -1,4 +1,29 @@
-xargs: sysconf(_SC_ARG_MAX) failed
-The operation couldn’t be completed. Unable to locate a Java Runtime.
-Please visit http://www.java.com for information on installing Java.
 
+> Task :compileJava FAILED
+/Users/byeonjihwan/Documents/ProteinFriends/back/src/main/java/com/my/back/service/BranchService.java:67: error: variable currentUserId might already have been assigned
+                currentUserId = null;
+                ^
+Note: /Users/byeonjihwan/Documents/ProteinFriends/back/src/main/java/com/my/back/config/SecurityConfig.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+1 error
+
+[Incubating] Problems report is available at: file:///Users/byeonjihwan/Documents/ProteinFriends/back/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler output below.
+  Note: /Users/byeonjihwan/Documents/ProteinFriends/back/src/main/java/com/my/back/config/SecurityConfig.java uses or overrides a deprecated API.
+  Note: Recompile with -Xlint:deprecation for details.
+  /Users/byeonjihwan/Documents/ProteinFriends/back/src/main/java/com/my/back/service/BranchService.java:67: error: variable currentUserId might already have been assigned
+                  currentUserId = null;
+                  ^
+  1 error
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights.
+
+BUILD FAILED in 906ms
+1 actionable task: 1 executed

@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,12 +21,14 @@ public class GymStationInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "station_id")
+    @JsonProperty("stationId")
     private Long stationId;
     /**
      * 지점 번호 (복합키 일부, not null)
      * - gym_info.g_id 참조
      */
     @Column(name = "g_id", nullable = false)
+    @JsonProperty("gId")
     private Long gId;
 
     /**
@@ -33,6 +36,7 @@ public class GymStationInfo {
      * - 예: "강남역"
      */
     @Column(name = "g_station_name", nullable = false, length = 100)
+    @JsonProperty("gStationName")
     private String gStationName;
 
     /**
@@ -40,6 +44,7 @@ public class GymStationInfo {
      * - 예: "2호선"
      */
     @Column(name = "g_line_number", nullable = false, length = 50)
+    @JsonProperty("gLineNumber")
     private String gLineNumber;
 
     /**
@@ -47,6 +52,7 @@ public class GymStationInfo {
      * - 예: "도보 5분"
      */
     @Column(name = "g_walking_distance", nullable = false, length = 100)
+    @JsonProperty("gWalkingDistance")
     private String gWalkingDistance;
 
     // === 관계 매핑 (LAZY) ===

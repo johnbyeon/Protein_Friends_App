@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ public class MembershipStopLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "stop_log_id", nullable = false)
+    @JsonProperty("stopLogId")
     private Long stopLogId;
 
     /** 회원증 기록 번호 (membership_log 테이블 FK, not null, number) */
@@ -34,26 +36,32 @@ public class MembershipStopLog {
 
     /** 회원권 상품번호 (not null, number) */
     @Column(name = "membership_id", nullable = false)
+    @JsonProperty("membershipId")
     private Long membershipId;
 
     /** 회원권 시작일 (not null, date) */
     @Column(name = "start_date", nullable = false)
+    @JsonProperty("startDate")
     private LocalDate startDate;
 
     /** 회원권 정지 전 종료일 (not null, date) */
     @Column(name = "end_date", nullable = false)
+    @JsonProperty("endDate")
     private LocalDate endDate;
 
     /** 회원권 정지일 (not null, date time) */
     @Column(name = "stop_date", nullable = false)
+    @JsonProperty("stopDate")
     private LocalDateTime stopDate;
 
     /** 정지로 연장되는 기간 (not null, number) */
     @Column(name = "plus_date", nullable = false)
+    @JsonProperty("plusDate")
     private Integer plusDate;
 
     /** 정지사유 (default 0, not null, number) */
     @Column(name = "reason_note", nullable = false)
     @Builder.Default
+    @JsonProperty("reasonNote")
     private Integer reasonNote = 0;
 }

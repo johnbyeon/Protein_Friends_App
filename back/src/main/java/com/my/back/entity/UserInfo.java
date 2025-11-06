@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -29,6 +30,7 @@ public class UserInfo {
      */
     @Id
     @Column(name = "u_id")
+    @JsonProperty("uId")
     private Long uId;
 
     /**
@@ -41,32 +43,40 @@ public class UserInfo {
     private Users users;
 
     /** 성별 (nullable, ex: "남자", "여자", "기타") */
+    @JsonProperty("gender")
     private String gender;
 
     /** 주소 (nullable, ex: "서울시 강남구...") */
+    @JsonProperty("address")
     private String address;
 
     /** 생년월일 (nullable, ex: 1990-01-01) */
     @Column(name = "birth_day")
+    @JsonProperty("birthDay")
     private LocalDate birthDay;
 
     /** 소속 지점 번호 (nullable, gym_info.g_id 참조) */
+    @JsonProperty("gId")
     private Long gId;
 
     /** 키 (nullable, ex: "175cm") */
+    @JsonProperty("height")
     private String height;
 
     /** 몸무게 (nullable, ex: "70kg") */
+    @JsonProperty("weight")
     private String weight;
 
     /** 기록 생성일시 (not null, 자동 생성) */
     @CreatedDate
     @Column(name = "create_at", nullable = false, updatable = false)
+    @JsonProperty("createAt")
     private LocalDateTime createAt;
 
     /** 마지막 수정일시 (not null, 자동 갱신) */
     @LastModifiedDate
     @Column(name = "update_at", nullable = false)
+    @JsonProperty("updateAt")
     private LocalDateTime updateAt;
 
     // ✅ 추가: 감사 미동작/트랜잭션 타이밍 이슈에도 NOT NULL 보장

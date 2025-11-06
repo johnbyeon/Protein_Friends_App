@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -29,6 +30,7 @@ public class PurchaseLog {
      */
     @Id
     @Column(name = "order_id", length = 50)
+    @JsonProperty("orderId")
     private String orderId;
 
     /**
@@ -37,6 +39,7 @@ public class PurchaseLog {
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "product_type", nullable = false)
+    @JsonProperty("productType")
     private ProductType productType;
 
     /**
@@ -44,6 +47,7 @@ public class PurchaseLog {
      * - PT: pt_id, MARKET: prod_id, MEMBERSHIP: membership_id
      */
     @Column(name = "product_id", nullable = false, length = 100)
+    @JsonProperty("productId")
     private String productId;
 
     /**
@@ -51,6 +55,7 @@ public class PurchaseLog {
      * - PT: 횟수, MARKET: 개수, MEMBERSHIP: 1
      */
     @Column(name = "product_count", nullable = false)
+    @JsonProperty("productCount")
     private Integer productCount;
 
     /**
@@ -58,6 +63,7 @@ public class PurchaseLog {
      * - 할인 전 금액
      */
     @Column(name = "original_price", nullable = false)
+    @JsonProperty("originalPrice")
     private BigDecimal originalPrice;
 
     /**
@@ -66,6 +72,7 @@ public class PurchaseLog {
      */
     @Column(name = "discount_amount")
     @Builder.Default
+    @JsonProperty("discountAmount")
     private BigDecimal discountAmount = BigDecimal.ZERO;
 
     /**
@@ -73,6 +80,7 @@ public class PurchaseLog {
      * - original_price - discount_amount
      */
     @Column(name = "final_price", nullable = false)
+    @JsonProperty("finalPrice")
     private BigDecimal finalPrice;
 
     /**
@@ -81,6 +89,7 @@ public class PurchaseLog {
      */
     @CreatedDate
     @Column(name = "order_datetime", nullable = false, updatable = false)
+    @JsonProperty("orderDatetime")
     private LocalDateTime orderDatetime;
 
     /**
@@ -89,6 +98,7 @@ public class PurchaseLog {
      */
     @Column(name = "is_delivery")
     @Builder.Default
+    @JsonProperty("isDelivery")
     private Boolean isDelivery = true;
 
     /**
@@ -98,5 +108,6 @@ public class PurchaseLog {
     @Enumerated(EnumType.STRING)
     @Column(name = "is_deal", nullable = false)
     @Builder.Default
+    @JsonProperty("dealStatus")
     private DealStatus dealStatus = DealStatus.SUCCESS;
 }

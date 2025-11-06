@@ -1,6 +1,17 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
 
+/* 전역 스크롤 설정 */
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+  overflow: auto;
+}
+
 /* === 기본 테마 (유저: 네온 그린) === */
 @theme {
   --color-primary: #3DFA2F;

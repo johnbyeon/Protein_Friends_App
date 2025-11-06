@@ -175,7 +175,7 @@ export const menuConfig = {
             {
                 label: '게시판 타입 관리',
                 path: '/admin/board-types',
-                icon: 'category'
+                icon: 'settings'
             }
         ]
     },
@@ -196,6 +196,37 @@ export const menuConfig = {
                 icon: 'list'
             }
         ]
+    },
+
+    // 관리자 - 지점 관리
+    'admin-centers': {
+        title: '지점관리',
+        icon: 'location_on',
+        items: [
+            {
+                label: '지점 목록',
+                path: '/admin/centers/branches',
+                icon: 'list'
+            },
+            {
+                label: '지점 등록',
+                path: '/admin/centers/branches/new',
+                icon: 'add_location'
+            }
+        ]
+    },
+
+    // 트레이너 - 게시판 관리
+    'trainer-boards': {
+        title: '게시판 관리',
+        icon: 'article',
+        items: [
+            {
+                label: '게시판 타입 설정',
+                path: '/trainer/board-types',
+                icon: 'settings'
+            }
+        ] // boardTypeStore에서 동적으로 게시판 메뉴 추가됨
     },
 
     // 트레이너 - 고객센터
@@ -241,10 +272,16 @@ export function getMenuCategoryFromPath(pathname) {
     if (pathname.startsWith('/admin/trainers')) {
         return 'admin-trainers'
     }
+    if (pathname.startsWith('/admin/centers')) {
+        return 'admin-centers'
+    }
 
     // Trainer 경로 처리
     if (pathname.startsWith('/trainer/support')) {
         return 'trainer-support'
+    }
+    if (pathname.startsWith('/trainer/boards') || pathname.startsWith('/trainer/board-types')) {
+        return 'trainer-boards'
     }
 
     // User 경로 처리

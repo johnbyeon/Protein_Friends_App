@@ -1,6 +1,7 @@
 package com.my.back.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -30,52 +31,64 @@ public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "u_id")
+    @JsonProperty("uId")
     private Long uId;
 
     /** 이메일 (로그인 ID, unique, not null) */
     @Column(nullable = false, unique = true)
+    @JsonProperty("email")
     private String email;
 
     /** 비밀번호 (not null, 암호화 저장) */
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     /** 회원 이름 (nullable) */
+    @JsonProperty("name")
     private String name;
 
     /** 휴대전화번호 (nullable, ex: 010-1234-5678) */
+    @JsonProperty("phone")
     private String phone;
 
     /** 회원 역할 (not null, enum) */
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
+    @JsonProperty("role")
     private UserRole role;
 
     /** 가입일시 (not null, 자동 생성) */
     @CreatedDate
     @Column(name = "create_at", nullable = false, updatable = false)
+    @JsonProperty("createAt")
     private LocalDateTime createAt;
 
     /** 마지막 로그인/수정일시 (not null, 자동 갱신) */
     @LastModifiedDate
     @Column(name = "update_at", nullable = false)
+    @JsonProperty("updateAt")
     private LocalDateTime updateAt;
 
     /** 프로필 사진 URL (nullable, ex: https://...) */
     @Column(name = "profile_picture", columnDefinition = "TEXT")
+    @JsonProperty("profilePicture")
     private String profilePicture;
 
     /** 소셜 계정 연결 여부 */
     @Column(nullable = false)
     @Builder.Default
+    @JsonProperty("googleLinked")
     private boolean googleLinked = false;
 
     @Column(nullable = false)
     @Builder.Default
+    @JsonProperty("naverLinked")
     private boolean naverLinked = false;
 
     @Column(nullable = false)
     @Builder.Default
+    @JsonProperty("kakaoLinked")
     private boolean kakaoLinked = false;
 
     @OneToOne(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)

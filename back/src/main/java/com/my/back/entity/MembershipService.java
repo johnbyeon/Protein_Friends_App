@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -25,41 +26,50 @@ public class MembershipService {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "membership_id", nullable = false)
+    @JsonProperty("membershipId")
     private Long membershipId;
 
     /** 회원권 이미지 url */
     @Column(name = "membership_pic_url")
+    @JsonProperty("membershipPicUrl")
     private String membershipPicUrl;
 
     /** 회원권 이름 (not null, string) */
     @Column(name = "membership_name", nullable = false)
+    @JsonProperty("membershipName")
     private String membershipName;
 
     /** 회원권 기간 (시작일로부터 며칠) (not null, number) */
     @Column(name = "membership_duration_days", nullable = false)
+    @JsonProperty("membershipDurationDays")
     private Integer membershipDurationDays;
 
     /** 회원권 가격 (not null, number) */
     @Column(name = "membership_price", nullable = false)
+    @JsonProperty("membershipPrice")
     private Integer membershipPrice;
 
     /** 회원권 할인금액 (default 0, not null, number) */
     @Column(name = "membership_sale_price", nullable = false)
     @Builder.Default
+    @JsonProperty("membershipSalePrice")
     private Integer membershipSalePrice = 0;
 
     /** 판매중 여부 (default true, not null, boolean) */
     @Column(name = "is_active", nullable = false)
     @Builder.Default
+    @JsonProperty("isActive")
     private Boolean isActive = true;
 
     /** 회원권 만든 날짜 (not null, date time) */
     @CreatedDate
     @Column(name = "create_at", nullable = false)
+    @JsonProperty("createAt")
     private LocalDateTime createAt;
 
     /** 회원권 수정 날짜 (not null, date time) */
     @LastModifiedDate
     @Column(name = "update_at", nullable = false)
+    @JsonProperty("updateAt")
     private LocalDateTime updateAt;
 }

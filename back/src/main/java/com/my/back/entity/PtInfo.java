@@ -1,5 +1,7 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -22,18 +24,21 @@ public class PtInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pt_record_id", nullable = false)
+    @JsonProperty("ptRecordId")
     private Long ptRecordId;
 
     /**
      * PT 아이디 (not null)
      */
     @Column(name = "pt_id", nullable = false)
+    @JsonProperty("ptId")
     private Long ptId;
 
     /**
      * 유저 아이디 (not null)
      */
     @Column(name = "u_id", nullable = false)
+    @JsonProperty("uId")
     private Long uId;
 
     /**
@@ -41,6 +46,7 @@ public class PtInfo {
      */
     @Column(name = "t_id")
     @Builder.Default
+    @JsonProperty("tId")
     private Long tId = 0L;
 
     /**
@@ -48,24 +54,28 @@ public class PtInfo {
      */
     @Column(name = "pt_col")
     @Builder.Default
+    @JsonProperty("ptCol")
     private Long ptCol = 0L;
 
     /**
      * PT 이름 (not null)
      */
     @Column(name = "pt_name", nullable = false, length = 100)
+    @JsonProperty("ptName")
     private String ptName;
 
     /**
      * 시작날짜 (not null)
      */
     @Column(name = "start_date", nullable = false)
+    @JsonProperty("startDate")
     private LocalDate startDate;
 
     /**
      * 종료날짜 (not null)
      */
     @Column(name = "end_date", nullable = false)
+    @JsonProperty("endDate")
     private LocalDate endDate;
 
     /**
@@ -73,6 +83,7 @@ public class PtInfo {
      */
     @Column(name = "pt_total_count", nullable = false)
     @Builder.Default
+    @JsonProperty("ptTotalCount")
     private Integer ptTotalCount = 0;
 
     /**
@@ -80,12 +91,14 @@ public class PtInfo {
      */
     @Column(name = "status")
     @Builder.Default
+    @JsonProperty("status")
     private Boolean status = true;
 
     /**
      * 가격 (not null)
      */
     @Column(name = "price", nullable = false)
+    @JsonProperty("price")
     private BigDecimal price;
 
     /**
@@ -93,6 +106,7 @@ public class PtInfo {
      */
     @Column(name = "sale_price", nullable = false)
     @Builder.Default
+    @JsonProperty("salePrice")
     private BigDecimal salePrice = BigDecimal.ZERO;
 
     /**
@@ -100,15 +114,18 @@ public class PtInfo {
      */
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
+    @JsonProperty("createdAt")
     private LocalDateTime createdAt;
 
     // === 관계 매핑 (LAZY) ===
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", insertable = false, updatable = false)
+    @JsonIgnore
     private Users users;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "t_id", insertable = false, updatable = false)
+    @JsonIgnore
     private TrainerInfo trainer;
 
     // ✅ 추가: 남은 PT 횟수 필드

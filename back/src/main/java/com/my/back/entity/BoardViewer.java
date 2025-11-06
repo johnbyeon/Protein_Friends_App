@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -27,6 +28,7 @@ public class BoardViewer {
      */
     @Id
     @Column(name = "p_id", nullable = false)
+    @JsonProperty("pId")
     private Long pId;
 
     /**
@@ -35,6 +37,7 @@ public class BoardViewer {
      */
     @Id
     @Column(name = "u_id", nullable = false)
+    @JsonProperty("uId")
     private Long uId;
 
     /**
@@ -44,6 +47,7 @@ public class BoardViewer {
     @Id
     @CreatedDate
     @Column(name = "date", nullable = false)
+    @JsonProperty("date")
     private LocalDateTime date;
 
     // === 관계 매핑 (LAZY) ===

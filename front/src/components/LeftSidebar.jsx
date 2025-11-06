@@ -1,5 +1,6 @@
 import { useLocation, Link } from 'react-router-dom'
 import { useBoardTypeStore } from '../stores/boardTypeStore'
+import { useAuthStore } from '../stores/authStore'
 import { menuConfig, getMenuCategoryFromPath } from '../config/menuConfig'
 import { useEffect } from 'react'
 
@@ -7,8 +8,10 @@ import { useEffect } from 'react'
  * 왼쪽 사이드바 컴포넌트
  * - 현재 경로에 따라 해당하는 메뉴 카테고리의 하위 항목들을 표시
  * - 홈 페이지에서는 표시되지 않음
+ * - 접히는 기능 지원 (전역 상태 관리)
  */
 const LeftSidebar = () => {
+    const { sidebarCollapsed, setSidebarCollapsed } = useAuthStore()
     const location = useLocation()
     const { boardTypes, fetchBoardTypes } = useBoardTypeStore()
 
@@ -46,6 +49,26 @@ const LeftSidebar = () => {
         }
     }
 
+    // 트레이너 게시판인 경우 동적으로 메뉴 생성
+    if (category === 'trainer-boards' && boardTypes.length > 0) {
+        const staticItems = menuConfig['trainer-boards'].items || []
+        const dynamicBoardItems = boardTypes.map(type => {
+            const typeName = type.ptypename
+            return {
+                label: typeName,
+                path: `/trainer/boards/${type.ptypeaddressName}`,
+                icon: typeName.includes('공지') ? 'campaign' : 
+                     typeName.includes('이벤트') ? 'celebration' :
+                     typeName.includes('혜택') ? 'redeem' : 'article'
+            }
+        })
+        
+        menuData = {
+            ...menuConfig['trainer-boards'],
+            items: [...staticItems, ...dynamicBoardItems]
+        }
+    }
+
     // 메뉴 데이터가 없으면 사이드바 표시 안 함
     if (!menuData || !menuData.items || menuData.items.length === 0) {
         return null
@@ -62,15 +85,21 @@ const LeftSidebar = () => {
     }
 
     return (
-        <aside className="w-64 bg-background-dark text-white border-r border-primary/20 flex-shrink-0">
+        <aside className={`${sidebarCollapsed ? 'w-20' : 'w-64'} bg-background-dark text-white border-r border-primary/20 flex-shrink-0 transition-all duration-300`}>
             {/* 헤더 */}
-            <div className="border-b border-primary/20 p-6 text-center">
-                <div className="flex items-center justify-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-3xl">
+            <div className="border-b border-primary/20 p-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-2xl">
                         {menuData.icon}
                     </span>
-                    <h1 className="text-2xl font-bold text-primary">{menuData.title}</h1>
+                    {!sidebarCollapsed && <h1 className="text-xl font-bold text-primary">{menuData.title}</h1>}
                 </div>
+                <button
+                    onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                    className="text-white/70 hover:text-white transition-colors"
+                >
+                    <span className="material-symbols-outlined">{sidebarCollapsed ? 'menu' : 'menu_open'}</span>
+                </button>
             </div>
 
             {/* 메뉴 항목들 */}
@@ -79,14 +108,14 @@ const LeftSidebar = () => {
                     <Link
                         key={index}
                         to={item.path}
-                        className={`flex items-center rounded-lg px-4 py-2 transition-colors ${
+                        className={`flex items-center rounded-lg px-3 py-2 transition-colors ${
                             isActive(item.path)
                                 ? 'font-semibold text-primary bg-primary/10'
                                 : 'text-gray-300 hover:bg-primary/10 hover:text-primary'
                         }`}
                     >
-                        <span className="material-symbols-outlined mr-3">{item.icon}</span>
-                        {item.label}
+                        <span className="material-symbols-outlined text-lg">{item.icon}</span>
+                        {!sidebarCollapsed && <span className="ml-3">{item.label}</span>}
                     </Link>
                 ))}
             </nav>

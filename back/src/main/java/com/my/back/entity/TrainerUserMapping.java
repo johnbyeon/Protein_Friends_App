@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -28,6 +29,7 @@ public class TrainerUserMapping {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "maping_id", nullable = false)
+    @JsonProperty("mappingId")
     private Long mappingId;
 
     /** 유저아이디 (user 테이블 FK, not null, number) */
@@ -43,14 +45,17 @@ public class TrainerUserMapping {
     /** 등록일 (not null, date time) */
     @CreatedDate
     @Column(name = "date", nullable = false)
+    @JsonProperty("date")
     private LocalDateTime date;
 
     /** 트레이너 배정 종료일 (트레이너 퇴사 또는 회원 변경 요청 시) */
     @Column(name = "expired_date")
+    @JsonProperty("expiredDate")
     private LocalDateTime expiredDate;
 
     /** 현재 트레이너가 유효한지 (default true, not null, boolean) */
     @Column(name = "is_active", nullable = false)
     @Builder.Default
+    @JsonProperty("isActive")
     private Boolean isActive = true;
 }

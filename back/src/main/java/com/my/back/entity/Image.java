@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -25,43 +26,53 @@ public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "image_id")
+    @JsonProperty("imageId")
     private Long imageId;
 
     /** S3 저장 키 (예: uploads/123/uuid_filename.jpg) */
     @Column(nullable = false, unique = true, length = 500)
+    @JsonProperty("s3Key")
     private String s3Key;
 
     /** 원본 파일명 */
     @Column(nullable = false, length = 255)
+    @JsonProperty("originalFilename")
     private String originalFilename;
 
     /** 파일 타입 (예: image/jpeg) */
     @Column(nullable = false, length = 100)
+    @JsonProperty("contentType")
     private String contentType;
 
     /** 파일 크기 (bytes) */
     @Column(nullable = false)
+    @JsonProperty("fileSize")
     private Long fileSize;
 
     /** 업로드한 사용자 ID */
     @Column(name = "u_id", nullable = false)
+    @JsonProperty("userId")
     private Long userId;
 
     /** 이미지 설명 (선택) */
     @Column(length = 500)
+    @JsonProperty("description")
     private String description;
 
     /** 이미지 용도/타입 (PROFILE, MEAL, INBODY, etc.) */
     @Column(length = 50)
+    @JsonProperty("imageType")
     private String imageType;
 
     /** 업로드 일시 */
     @CreatedDate
     @Column(name = "uploaded_at", nullable = false, updatable = false)
+    @JsonProperty("uploadedAt")
     private LocalDateTime uploadedAt;
 
     /** 삭제 여부 */
     @Column(nullable = false)
     @Builder.Default
+    @JsonProperty("deleted")
     private boolean deleted = false;
 }

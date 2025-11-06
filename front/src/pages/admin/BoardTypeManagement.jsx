@@ -104,8 +104,7 @@ export default function BoardTypeManagement() {
   const [editTypeName, setEditTypeName] = useState('')
   const [editTypeAddress, setEditTypeAddress] = useState('')
 
-  // 사이드바 토글 상태
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+
 
   // 드래그 앤 드롭 센서 설정
   const sensors = useSensors(
@@ -243,48 +242,7 @@ export default function BoardTypeManagement() {
   }
 
   return (
-    <div className="flex min-h-screen bg-surface-light dark:bg-surface">
-      {/* 사이드바 */}
-      <aside
-        className={`${
-          isSidebarCollapsed ? 'w-20' : 'w-64'
-        } bg-background-light dark:bg-background-dark flex flex-col transition-all duration-300 border-r border-border-light`}
-      >
-        {/* 사이드바 헤더 */}
-        <div className="flex items-center justify-between p-4 h-16 border-b border-border-light">
-          {!isSidebarCollapsed && <h1 className="text-xl font-bold text-white">게시판 관리</h1>}
-          <button
-            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="text-white/70 hover:text-white transition-colors"
-          >
-            <span className="material-symbols-outlined">{isSidebarCollapsed ? 'menu' : 'menu_open'}</span>
-          </button>
-        </div>
-
-        {/* 사이드바 메뉴 */}
-        <nav className="flex-1 p-4 space-y-2">
-          {/* 동적으로 불러온 게시글 타입들 */}
-          {boardTypes.map((boardType) => (
-            <a
-              key={boardType.ptypeid}
-              href={`/board/${boardType.ptypeaddressName}`}
-              className="flex items-center gap-3 px-4 py-2 rounded-lg text-white/70 hover:bg-white/10 transition-colors"
-            >
-              <span className="material-symbols-outlined">article</span>
-              {!isSidebarCollapsed && <span>{boardType.ptypename}</span>}
-            </a>
-          ))}
-
-          {/* 게시글 타입 설정 (현재 페이지) */}
-          <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-primary/20 text-primary font-semibold">
-            <span className="material-symbols-outlined">settings</span>
-            {!isSidebarCollapsed && <span>게시글 타입 설정</span>}
-          </div>
-        </nav>
-      </aside>
-
-      {/* 메인 컨텐츠 */}
-      <main className="flex-1 p-8 bg-surface-light dark:bg-surface">
+    <main className="p-8 bg-surface-light dark:bg-surface min-h-screen">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold text-text-light dark:text-text-dark mb-8">게시글 타입 설정</h1>
 
@@ -395,74 +353,73 @@ export default function BoardTypeManagement() {
             </div>
           </div>
         </div>
-      </main>
 
-      {/* 수정 모달 */}
-      {isEditModalOpen && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-          <div className="bg-surface-light dark:bg-surface rounded-lg shadow-xl w-full max-w-md border border-border-light">
-            <div className="p-6">
-              <h3 className="text-xl font-semibold text-text-light dark:text-text-dark mb-4">게시글 타입 수정</h3>
-              <form onSubmit={handleUpdate} className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="edit-post-type-name"
-                    className="block text-sm font-medium text-subtle-text-light dark:text-white/80 mb-2"
-                  >
-                    게시글 타입명 (한글)
-                  </label>
-                  <input
-                    id="edit-post-type-name"
-                    type="text"
-                    value={editTypeName}
-                    onChange={(e) => setEditTypeName(e.target.value)}
-                    className="w-full bg-surface-light dark:bg-background-light border border-border-light rounded-md px-4 py-2 text-text-light dark:text-white focus:ring-primary focus:border-primary"
-                    disabled={loading}
-                  />
-                </div>
+        {/* 수정 모달 */}
+        {isEditModalOpen && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+            <div className="bg-surface-light dark:bg-surface rounded-lg shadow-xl w-full max-w-md border border-border-light">
+              <div className="p-6">
+                <h3 className="text-xl font-semibold text-text-light dark:text-text-dark mb-4">게시글 타입 수정</h3>
+                <form onSubmit={handleUpdate} className="space-y-4">
+                  <div>
+                    <label
+                      htmlFor="edit-post-type-name"
+                      className="block text-sm font-medium text-subtle-text-light dark:text-white/80 mb-2"
+                    >
+                      게시글 타입명 (한글)
+                    </label>
+                    <input
+                      id="edit-post-type-name"
+                      type="text"
+                      value={editTypeName}
+                      onChange={(e) => setEditTypeName(e.target.value)}
+                      className="w-full bg-surface-light dark:bg-background-light border border-border-light rounded-md px-4 py-2 text-text-light dark:text-white focus:ring-primary focus:border-primary"
+                      disabled={loading}
+                    />
+                  </div>
 
-                <div>
-                  <label
-                    htmlFor="edit-post-type-address"
-                    className="block text-sm font-medium text-subtle-text-light dark:text-white/80 mb-2"
-                  >
-                    URL 주소 (영문)
-                  </label>
-                  <input
-                    id="edit-post-type-address"
-                    type="text"
-                    value={editTypeAddress}
-                    onChange={(e) => setEditTypeAddress(e.target.value)}
-                    className="w-full bg-surface-light dark:bg-background-light border border-border-light rounded-md px-4 py-2 text-text-light dark:text-white focus:ring-primary focus:border-primary"
-                    disabled={loading}
-                  />
-                  <p className="mt-1 text-xs text-subtle-text-light dark:text-white/50">
-                    게시판 URL에 사용됩니다 (예: /board/{editTypeAddress})
-                  </p>
-                </div>
+                  <div>
+                    <label
+                      htmlFor="edit-post-type-address"
+                      className="block text-sm font-medium text-subtle-text-light dark:text-white/80 mb-2"
+                    >
+                      URL 주소 (영문)
+                    </label>
+                    <input
+                      id="edit-post-type-address"
+                      type="text"
+                      value={editTypeAddress}
+                      onChange={(e) => setEditTypeAddress(e.target.value)}
+                      className="w-full bg-surface-light dark:bg-background-light border border-border-light rounded-md px-4 py-2 text-text-light dark:text-white focus:ring-primary focus:border-primary"
+                      disabled={loading}
+                    />
+                    <p className="mt-1 text-xs text-subtle-text-light dark:text-white/50">
+                      게시판 URL에 사용됩니다 (예: /board/{editTypeAddress})
+                    </p>
+                  </div>
 
-                <div className="flex justify-end gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={closeEditModal}
-                    disabled={loading}
-                    className="px-4 py-2 rounded-md text-subtle-text-light dark:text-white/80 hover:bg-white/10 transition-colors disabled:opacity-50"
-                  >
-                    취소
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="px-4 py-2 bg-primary text-white rounded-md font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    저장
-                  </button>
-                </div>
-              </form>
+                  <div className="flex justify-end gap-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={closeEditModal}
+                      disabled={loading}
+                      className="px-4 py-2 rounded-md text-subtle-text-light dark:text-white/80 hover:bg-white/10 transition-colors disabled:opacity-50"
+                    >
+                      취소
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="px-4 py-2 bg-primary text-white rounded-md font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      저장
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+    </main>
   )
 }

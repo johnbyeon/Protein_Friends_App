@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -29,36 +30,42 @@ public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "p_id", nullable = false)
+    @JsonProperty("pId")
     private Long pId;
 
     /**
      * 게시글 타입 번호 (not null)
      */
     @Column(name = "p_type_id", nullable = false)
+    @JsonProperty("pTypeId")
     private Long pTypeId;
 
     /**
      * 트레이너 등록번호 (not null)
      */
     @Column(name = "t_id", nullable = false)
+    @JsonProperty("tId")
     private Long tId;
 
     /**
      * 게시글 제목 (not null)
      */
     @Column(name = "p_title", nullable = false, length = 200)
+    @JsonProperty("pTitle")
     private String pTitle;
 
     /**
      * 게시글 내용 (not null)
      */
     @Column(name = "p_content", nullable = false, length = 5000)
+    @JsonProperty("pContent")
     private String pContent;
 
     /**
      * 게시글 사진 URL (nullable)
      */
     @Column(name = "p_image_url", length = 500)
+    @JsonProperty("pImageUrl")
     private String pImageUrl;
 
     /**
@@ -66,6 +73,7 @@ public class Board {
      */
     @Column(name = "p_is_popup", nullable = false)
     @Builder.Default
+    @JsonProperty("pIsPopup")
     private Boolean pIsPopup = false;
 
     /**
@@ -73,24 +81,28 @@ public class Board {
      */
     @Column(name = "is_always_popup", nullable = false)
     @Builder.Default
+    @JsonProperty("isAlwaysPopup")
     private Boolean isAlwaysPopup = false;
 
     /**
      * 팝업 시작 기간 (nullable)
      */
     @Column(name = "p_popup_start_date")
+    @JsonProperty("pPopupStartDate")
     private LocalDate pPopupStartDate;
 
     /**
      * 팝업 종료 기간 (nullable)
      */
     @Column(name = "p_popup_end_date")
+    @JsonProperty("pPopupEndDate")
     private LocalDate pPopupEndDate;
 
     /**
      * 링크 URL (nullable)
      */
     @Column(name = "p_link", length = 500)
+    @JsonProperty("pLink")
     private String pLink;
 
     /**
@@ -98,6 +110,7 @@ public class Board {
      */
     @Column(name = "is_unlimited", nullable = false)
     @Builder.Default
+    @JsonProperty("isUnlimited")
     private Boolean isUnlimited = false;
 
     /**
@@ -105,6 +118,7 @@ public class Board {
      */
     @CreatedDate
     @Column(name = "p_create_date", nullable = false, updatable = false)
+    @JsonProperty("pCreateDate")
     private LocalDateTime pCreateDate;
 
     /**
@@ -112,6 +126,7 @@ public class Board {
      */
     @LastModifiedDate
     @Column(name = "p_update_date", nullable = false)
+    @JsonProperty("pUpdateDate")
     private LocalDateTime pUpdateDate;
 
     /**
@@ -119,6 +134,7 @@ public class Board {
      */
     @Column(name = "p_set_visible", nullable = false)
     @Builder.Default
+    @JsonProperty("pSetVisible")
     private Boolean pSetVisible = true;
 
     // === 관계 매핑 (LAZY) ===

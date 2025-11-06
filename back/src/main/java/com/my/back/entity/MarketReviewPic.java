@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,6 +24,7 @@ public class MarketReviewPic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pic_id")
+    @JsonProperty("picId")
     private Long picId;
 
     /**
@@ -30,6 +32,7 @@ public class MarketReviewPic {
      * - market_review.p_r_id 참조
      */
     @Column(name = "p_r_id", nullable = false)
+    @JsonProperty("pRId")
     private Long pRId;
 
     /**
@@ -37,6 +40,7 @@ public class MarketReviewPic {
      * - 예: "https://s3.amazonaws.com/review/123.jpg"
      */
     @Column(name = "pic_url", nullable = false, length = 500)
+    @JsonProperty("picUrl")
     private String picUrl;
 
     // === 관계 매핑 (LAZY) ===

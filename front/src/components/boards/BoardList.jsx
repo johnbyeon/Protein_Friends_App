@@ -24,8 +24,13 @@ export default function BoardList() {
   // 게시글 타입 정보 찾기
   useEffect(() => {
     const loadBoardTypes = async () => {
+      console.log('🔍 [BoardList] loadBoardTypes 호출됨')
+      console.log('🔍 [BoardList] 현재 boardTypes 길이:', boardTypes.length)
+      
       if (boardTypes.length === 0) {
+        console.log('🔍 [BoardList] fetchBoardTypes 호출')
         await fetchBoardTypes()
+        console.log('🔍 [BoardList] fetchBoardTypes 완료 후 boardTypes:', boardTypes)
       }
     }
     loadBoardTypes()
@@ -34,9 +39,16 @@ export default function BoardList() {
 
   // 현재 타입 설정
   useEffect(() => {
+    console.log('🔍 [BoardList] useEffect 호출됨')
+    console.log('🔍 [BoardList] boardTypes:', boardTypes)
+    console.log('🔍 [BoardList] typeAddressName:', typeAddressName)
+    
     if (boardTypes.length > 0 && typeAddressName) {
-      const type = boardTypes.find(t => (t.ptypeaddressname || t.ptypeaddressName) === typeAddressName)
+      const type = boardTypes.find(t => t.ptypeaddressName === typeAddressName)
+      console.log('🔍 [BoardList] 찾은 타입:', type)
       setCurrentType(type)
+    } else {
+      console.log('🔍 [BoardList] boardTypes가 없거나 typeAddressName이 없음')
     }
   }, [boardTypes, typeAddressName])
 
@@ -66,9 +78,15 @@ export default function BoardList() {
           headers['Authorization'] = `Bearer ${token}`
         }
 
-        const response = await fetch(`${SERVER_ORIGIN}/api/boards/type/${currentType.ptypeid}`, {
+        const typeId = currentType.ptypeid
+        console.log('🔍 [BoardList] API 호출 - typeId:', typeId)
+        console.log('🔍 [BoardList] API 호출 - currentType:', currentType)
+        
+        const response = await fetch(`${SERVER_ORIGIN}/api/boards/type/${typeId}`, {
           headers
         })
+
+        console.log('🔍 [BoardList] API 응답 상태:', response.status)
 
         if (response.status === 401) {
           console.log('인증이 필요합니다. 로그인 페이지로 이동합니다.')
@@ -77,10 +95,12 @@ export default function BoardList() {
         }
 
         if (!response.ok) {
+          console.error('🔍 [BoardList] API 응답 에러:', response.statusText)
           throw new Error('게시글 목록을 불러오는데 실패했습니다.')
         }
 
         const data = await response.json()
+        console.log('🔍 [BoardList] API 응답 데이터:', data)
         setBoards(data)
       } catch (err) {
         console.error('게시글 목록 조회 에러:', err)
@@ -115,7 +135,7 @@ export default function BoardList() {
         headers['Authorization'] = `Bearer ${token}`
       }
 
-      const response = await fetch(`${SERVER_ORIGIN}/api/boards/${board.pid}`, {
+      const response = await fetch(`${SERVER_ORIGIN}/api/boards/${board.pid || board.pId}`, {
         headers
       })
 
@@ -146,6 +166,7 @@ export default function BoardList() {
 
   // 아이콘 매핑
   const getIconForType = (typeName) => {
+    if (!typeName) return 'article'
     if (typeName.includes('공지')) return 'campaign'
     if (typeName.includes('이벤트')) return 'celebration'
     if (typeName.includes('혜택')) return 'redeem'
@@ -161,42 +182,12 @@ export default function BoardList() {
   }
 
   return (
-    <div className="relative flex min-h-screen w-full bg-background-dark">
-      {/* 왼쪽 사이드바 */}
-      <aside className="flex w-64 flex-col bg-background-dark text-white border-r border-primary/20">
-        <div className="border-b border-primary/20 p-6 text-center">
-          <h1 className="text-2xl font-bold text-primary">게시판</h1>
-        </div>
-        <nav className="flex-1 space-y-2 p-4">
-          {boardTypes.map((type) => {
-            const isActive = (type.ptypeaddressname) === typeAddressName
-            return (
-              <Link
-                // key=type.ptypeId = type.ptypeid 소문자로 넘어옴
-                key={type.ptypeid}
-                to={`/boards/${type.ptypeaddressname || type.ptypeaddressName}`}
-                className={`flex items-center rounded-lg px-4 py-2 font-semibold ${
-                  isActive
-                    ? 'bg-primary/20 text-primary'
-                    : 'text-gray-300 hover:bg-primary/10 hover:text-primary'
-                }`}
-              >
-                <span className="material-symbols-outlined mr-3">
-                  {getIconForType(type.ptypename)}
-                </span>
-                {type.ptypename}
-              </Link>
-            )
-          })}
-        </nav>
-      </aside>
-
-      {/* 메인 콘텐츠 */}
-      <main className="flex-1 bg-background-dark p-10">
+    <>
+      <div className="min-h-screen w-full bg-background-dark p-10">
         {/* 헤더 + 검색 */}
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-4xl font-bold tracking-tight text-white">
-            {currentType.ptypename}
+            {currentType.pTypeName}
           </h2>
           <div className="flex flex-1 items-center gap-4 md:flex-initial">
             <div className="relative w-full max-w-sm">
@@ -267,59 +258,59 @@ export default function BoardList() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10 bg-black/20">
-                  {filteredBoards.map((board, index) => {
-                    const createDate = new Date(board.pcreateDate).toLocaleDateString('ko-KR')
-                    const updateDate = new Date(board.pupdateDate).toLocaleDateString('ko-KR')
-                    const isModified = createDate !== updateDate
-                    console.log('board:', JSON.stringify(board))
-                    return (
-                      <tr
-                        key={board.pid}
-                        onClick={() => handlePostClick(board)}
-                        className="cursor-pointer hover:bg-primary/5"
-                      >
-                        <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-300">
-                          {filteredBoards.length - index}
-                        </td>
-                        <td className="px-6 py-4">
-                          {(board.pimageUrl) ? (
-                            <img
-                              alt={board.ptitle}
-                              className="h-16 w-16 rounded-md object-cover"
-                              src={board.pimageUrl}
-                            />
-                          ) : (
-                            <div className="h-16 w-16 rounded-md bg-gray-700 flex items-center justify-center">
-                              <span className="material-symbols-outlined text-gray-500">image</span>
-                            </div>
-                          )}
-                        </td>
-                        <td className="whitespace-nowrap px-6 py-4 text-sm text-white">
-                          {board.ptitle}
-                          {(board.pisPopup) && (
-                            <span className="ml-2 text-xs bg-error text-white px-2 py-1 rounded">팝업</span>
-                          )}
-                        </td>
-                        <td className="whitespace-nowrap px-6 py-4 text-sm text-white">
-                          {board.trainername || '관리자'}
-                        </td>
-                        <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-300 text-center">
-                          {board.viewCount || 0}
-                        </td>
-                        <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-300">
-                          {createDate}
-                        </td>
-                        <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-300">
-                          {updateDate}
-                          {isModified && (
-                            <span className="ml-2 inline-block rounded-full bg-primary/20 px-2 py-0.5 text-xs font-medium text-primary">
-                              수정됨
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    )
-                  })}
+                   {filteredBoards.map((board, index) => {
+                      const createDate = new Date(board.pcreateDate || board.pCreateDate).toLocaleDateString('ko-KR')
+                      const updateDate = new Date(board.pupdateDate || board.pUpdateDate).toLocaleDateString('ko-KR')
+                      const isModified = createDate !== updateDate
+                      console.log('board:', JSON.stringify(board))
+                      return (
+                        <tr
+                          key={board.pid || board.pId}
+                          onClick={() => handlePostClick(board)}
+                          className="cursor-pointer hover:bg-primary/5"
+                        >
+                          <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-300">
+                            {filteredBoards.length - index}
+                          </td>
+                          <td className="px-6 py-4">
+                            {(board.pimageUrl || board.pImageUrl) ? (
+                              <img
+                                alt={board.ptitle || board.pTitle}
+                                className="h-16 w-16 rounded-md object-cover"
+                                src={board.pimageUrl || board.pImageUrl}
+                              />
+                            ) : (
+                              <div className="h-16 w-16 rounded-md bg-gray-700 flex items-center justify-center">
+                                <span className="material-symbols-outlined text-gray-500">image</span>
+                              </div>
+                            )}
+                          </td>
+                          <td className="whitespace-nowrap px-6 py-4 text-sm text-white">
+                            {board.ptitle || board.pTitle}
+                            {(board.pisPopup || board.pIsPopup) && (
+                              <span className="ml-2 text-xs bg-error text-white px-2 py-1 rounded">팝업</span>
+                            )}
+                          </td>
+                          <td className="whitespace-nowrap px-6 py-4 text-sm text-white">
+                            {board.trainerName || '관리자'}
+                          </td>
+                          <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-300 text-center">
+                            {board.viewCount || 0}
+                          </td>
+                          <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-300">
+                            {createDate}
+                          </td>
+                          <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-300">
+                            {updateDate}
+                            {isModified && (
+                              <span className="ml-2 inline-block rounded-full bg-primary/20 px-2 py-0.5 text-xs font-medium text-primary">
+                                수정됨
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })}
                 </tbody>
               </table>
             </div>
@@ -332,7 +323,7 @@ export default function BoardList() {
             </div> */}
           </>
         )}
-      </main>
+      </div>
 
       {/* 게시글 상세 모달 팝업 */}
       {showPostPopup && selectedPost && (
@@ -351,11 +342,11 @@ export default function BoardList() {
             </button>
             <div className="max-h-[80vh] overflow-y-auto custom-scrollbar p-10">
               <h2 className="mb-4 text-3xl font-bold text-primary">
-                {selectedPost.ptitle}
+                {selectedPost.ptitle || selectedPost.pTitle}
               </h2>
               <div className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-400">
                 <p>
-                  작성자: <span className="font-medium text-white">{selectedPost.trainername || '관리자'}</span>
+                  작성자: <span className="font-medium text-white">{selectedPost.trainerName || '관리자'}</span>
                 </p>
                 <span>|</span>
                 <p>
@@ -364,26 +355,26 @@ export default function BoardList() {
                 <span>|</span>
                 <p>
                   작성일: <span className="font-medium text-white">
-                    {new Date(selectedPost.pcreatedate || selectedPost.pcreateDate).toLocaleDateString('ko-KR')}
+                    {new Date(selectedPost.pcreateDate || selectedPost.pCreateDate).toLocaleDateString('ko-KR')}
                   </span>
                 </p>
-                {new Date(selectedPost.pcreatedate || selectedPost.pcreateDate).toLocaleDateString('ko-KR') !==
-                  new Date(selectedPost.pupdatedate || selectedPost.pupdateDate).toLocaleDateString('ko-KR') && (
+                {new Date(selectedPost.pcreateDate || selectedPost.pCreateDate).toLocaleDateString('ko-KR') !==
+                  new Date(selectedPost.pupdateDate || selectedPost.pUpdateDate).toLocaleDateString('ko-KR') && (
                   <>
                     <span>|</span>
                     <p>
                       수정일: <span className="font-medium text-white">
-                        {new Date(selectedPost.pupdatedate || selectedPost.pupdateDate).toLocaleDateString('ko-KR')}
+                        {new Date(selectedPost.pupdateDate || selectedPost.pUpdateDate).toLocaleDateString('ko-KR')}
                       </span>
                     </p>
                   </>
                 )}
               </div>
               <div className="prose prose-invert max-w-none text-gray-300">
-                {(selectedPost.pimageUrl) && (
+                {(selectedPost.pimageUrl || selectedPost.pImageUrl) && (
                   <img
-                    alt={selectedPost.ptitle}
-                    src={selectedPost.pimageUrl}
+                    alt={selectedPost.ptitle || selectedPost.pTitle}
+                    src={selectedPost.pimageUrl || selectedPost.pImageUrl}
                     className="mb-6 h-auto w-full rounded-lg object-cover"
                   />
                 )}
@@ -401,6 +392,6 @@ export default function BoardList() {
           </div>
         </div>
       )}
-    </div>
+    </>
   )
 }

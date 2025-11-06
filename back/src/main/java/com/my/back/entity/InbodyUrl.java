@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -29,6 +30,7 @@ public class InbodyUrl {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "inbody_record_id", nullable = false)
+    @JsonProperty("inbodyRecordId")
     private Long inbodyRecordId;
 
     /** 트레이너 등록번호 (trainer_info 테이블 FK, not null, number) */
@@ -43,15 +45,18 @@ public class InbodyUrl {
 
     /** 인바디 사진 URL (not null, string) */
     @Column(name = "inbody_pic_url", nullable = false)
+    @JsonProperty("inbodyPicUrl")
     private String inbodyPicUrl;
 
     /** 사진등록일 (not null, date time) */
     @CreatedDate
     @Column(name = "create_date", nullable = false)
+    @JsonProperty("createDate")
     private LocalDateTime createDate;
 
     /** 사진수정일 (not null, date time) */
     @LastModifiedDate
     @Column(name = "update_date", nullable = false)
+    @JsonProperty("updateDate")
     private LocalDateTime updateDate;
 }

@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -22,51 +23,62 @@ public class Products {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "prod_id")
+    @JsonProperty("id")
     private Long id;
 
     /** 상품이름 */
     @Column(name = "prod_name", nullable = false, length = 255)
+    @JsonProperty("name")
     private String name;
 
     /** 상품코드 (Unique) */
     @Column(name = "prod_sku", nullable = false, unique = true, length = 100)
+    @JsonProperty("sku")
     private String sku;
 
     /** 상품정상가 */
     @Column(name = "prod_price", nullable = false)
+    @JsonProperty("price")
     private Double price;
 
     /** 상품할인가 */
     @Column(name = "prod_sale_price")
+    @JsonProperty("salePrice")
     private Double salePrice;
 
     /** 재고수량 (기본값 0) */
     @Column(name = "stock_qty", nullable = false)
     @Builder.Default
+    @JsonProperty("stockQty")
     private Integer stockQty = 0;
 
     /** 상품상태 (active / inactive) */
     @Enumerated(EnumType.STRING)
     @Column(name = "prod_status", nullable = false)
     @Builder.Default
+    @JsonProperty("status")
     private ProductStatus status = ProductStatus.ACTIVE;
 
     /** 상품등록일 (자동 기록) */
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
+    @JsonProperty("createdAt")
     private LocalDateTime createdAt;
 
     /** 상품수정일 (자동 갱신) */
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
+    @JsonProperty("updatedAt")
     private LocalDateTime updatedAt;
 
     /** 상품제목 */
     @Column(name = "prod_subtitle", length = 255)
+    @JsonProperty("subtitle")
     private String subtitle;
 
     /** 본문 (HTML 내용 저장) */
     @Lob
     @Column(name = "detail_html", nullable = false)
+    @JsonProperty("detailHtml")
     private String detailHtml;
 }

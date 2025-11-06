@@ -1,6 +1,7 @@
 package com.my.back.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -29,6 +30,7 @@ public class SocialAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "social_id")
+    @JsonProperty("id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,27 +39,36 @@ public class SocialAccount {
     private Users users;
 
     @Column(length = 20, nullable = false)
+    @JsonProperty("provider")
     private String provider;
 
     @Column(name = "provider_user_id", length = 191, nullable = false)
+    @JsonProperty("providerUserId")
     private String providerUserId;
 
     @Column(name = "social_code", length = 64, unique = true)
+    @JsonProperty("socialCode")
     private String socialCode;
 
     @Column(length = 1024)
+    @JsonIgnore
     private String accessToken;
 
     @Column(length = 1024)
+    @JsonIgnore
     private String refreshToken;
 
+    @JsonProperty("tokenExpiresAt")
     private LocalDateTime tokenExpiresAt;
 
     @Column(nullable = false)
     @Builder.Default
+    @JsonProperty("active")
     private Boolean active = true;
 
+    @JsonProperty("connectedAt")
     private LocalDateTime connectedAt;
+    @JsonProperty("disconnectedAt")
     private LocalDateTime disconnectedAt;
 
     @PrePersist

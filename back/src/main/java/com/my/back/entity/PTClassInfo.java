@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -25,14 +26,17 @@ public class PTClassInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pt_class_id", nullable = false)
+    @JsonProperty("ptClassId")
     private Long ptClassId;
 
     /** 클래스 이름 (not null, string) */
     @Column(name = "class_name", nullable = false)
+    @JsonProperty("className")
     private String className;
 
     /** 클래스 내용 (not null, string) */
     @Column(name = "class_content", nullable = false)
+    @JsonProperty("classContent")
     private String classContent;
 
     /** 트레이너 등록번호 (trainer_info 테이블 FK, not null, number) */
@@ -42,18 +46,22 @@ public class PTClassInfo {
 
     /** 수업시작일시 (not null, date time) */
     @Column(name = "start_datetime", nullable = false)
+    @JsonProperty("startDatetime")
     private LocalDateTime startDatetime;
 
     /** 수업종료일시 (not null, date time) */
     @Column(name = "end_datetime", nullable = false)
+    @JsonProperty("endDatetime")
     private LocalDateTime endDatetime;
 
     /** 최대 정원 (not null, number) */
     @Column(name = "max_capacity", nullable = false)
+    @JsonProperty("maxCapacity")
     private Integer maxCapacity;
 
     /** 차감횟수 (not null, number) */
     @Column(name = "pt_minus_count", nullable = false)
+    @JsonProperty("ptMinusCount")
     private Integer ptMinusCount;
 
     // ✅ 추가: 수업 시작/종료 여부 판단 메서드

@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -25,6 +26,7 @@ public class GymReview {
      */
     @Id
     @Column(name = "g_id", nullable = false)
+    @JsonProperty("gId")
     private Long gId;
 
     /**
@@ -32,6 +34,7 @@ public class GymReview {
      */
     @Id
     @Column(name = "u_id", nullable = false)
+    @JsonProperty("uId")
     private Long uId;
 
     /**
@@ -39,12 +42,14 @@ public class GymReview {
      */
     @Column(name = "g_rating")
     @Builder.Default
+    @JsonProperty("gRating")
     private Integer gRating = 5;
 
     /**
      * 리뷰내용 (not null)
      */
     @Column(name = "g_review", nullable = false, length = 1000)
+    @JsonProperty("gReview")
     private String gReview;
 
     /**
@@ -52,6 +57,7 @@ public class GymReview {
      */
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
+    @JsonProperty("createdAt")
     private LocalDateTime createdAt;
 
     // === 관계 매핑 (LAZY) ===

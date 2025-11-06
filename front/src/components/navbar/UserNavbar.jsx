@@ -134,8 +134,9 @@ const UserNavbar = () => {
                               group-hover:opacity-80 group-hover:scale-100 group-hover:block transform transition-all duration-200 ease-out origin-top
                               before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2 before:block"
                 >
-                    <Link to="/support/inquiries" className="block px-4 py-2 text-lg hover:bg-primary/20">1:1문의</Link>
                     <Link to="/support/faqs" className="block px-4 py-2 text-lg hover:bg-primary/20">자주하는질문</Link>
+                    <Link to="/support/inquiries" className="block px-4 py-2 text-lg hover:bg-primary/20">1:1문의</Link>
+                    
                 </div>
             </div>
         </>

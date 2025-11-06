@@ -111,21 +111,21 @@ export default function BoardForm() {
         console.log('📝 수정 모드 - 불러온 데이터:', data)
         
         setFormData({
-          pTitle: data.ptitle || '',
-          pContent: data.pcontent || '',
-          pImageUrl: data.pimageUrl || '',
-          pLink: data.plink || '',
-          pIsPopup: data.pisPopup || false,
+          pTitle: data.pTitle || '',
+          pContent: data.pContent || '',
+          pImageUrl: data.pImageUrl || '',
+          pLink: data.pLink || '',
+          pIsPopup: data.pIsPopup || false,
           isAlwaysPopup: data.isAlwaysPopup || false,
-          pPopupStartDate: data.ppopupStartDate || '',
-          pPopupEndDate: data.ppopupEndDate || '',
+          pPopupStartDate: data.pPopupStartDate || '',
+          pPopupEndDate: data.pPopupEndDate || '',
           isUnlimited: data.isUnlimited || false,
-          pSetVisible: data.psetVisible !== undefined ? data.psetVisible : true
+          pSetVisible: data.pSetVisible !== undefined ? data.pSetVisible : true
         })
 
         // 기존 이미지가 있으면 미리보기 설정
-        if (data.pimageUrl) {
-          setImagePreview(data.pimageUrl)
+        if (data.pImageUrl) {
+          setImagePreview(data.pImageUrl)
         }
       } catch (err) {
         console.error('게시글 로드 에러:', err)
@@ -187,12 +187,13 @@ export default function BoardForm() {
       setUploadStatus('S3에 업로드 중...')
       await putWithProgress(putUrl, file, file.type, setUploadProgress)
 
-      // 3. View URL 발급
-      setUploadStatus('이미지 URL 발급 중...')
-      const url = await getViewUrl(key)
+      // 3. S3 Key 저장 (백엔드가 자동으로 Presigned URL로 변환)
+      setFormData(prev => ({ ...prev, pImageUrl: key }))
 
-      // 4. 폼 데이터에 URL 저장
-      setFormData(prev => ({ ...prev, pImageUrl: url }))
+      // 4. 미리보기용 Presigned URL 생성
+      const viewUrl = await getViewUrl(key)
+      setImagePreview(viewUrl)
+
       setUploadStatus('이미지 업로드 완료 ✓')
     } catch (err) {
       console.error('이미지 업로드 에러:', err)
@@ -295,7 +296,7 @@ export default function BoardForm() {
         throw new Error(errorText || '게시글 저장에 실패했습니다.')
       }
 
-      // 응답 데이터에서 게시글 ID 추출 (소문자 pid)
+      // 응답 데이터에서 게시글 ID 추출
       const savedBoard = await response.json()
       console.log('✅ 저장된 게시글:', savedBoard)
       
@@ -304,9 +305,9 @@ export default function BoardForm() {
       // role에 따라 동적 경로 이동
       const basePath = getBasePath()
       
-      // 생성/수정된 게시글의 상세 페이지로 이동 (pid는 소문자)
-      if (savedBoard && savedBoard.pid) {
-        navigate(`${basePath}/boards/${typeAddressName}/${savedBoard.pid}`)
+      // 생성/수정된 게시글의 상세 페이지로 이동
+      if (savedBoard && savedBoard.pId) {
+        navigate(`${basePath}/boards/${typeAddressName}/${savedBoard.pId}`)
       } else {
         // ID가 없으면 목록으로 이동
         navigate(`${basePath}/boards/${typeAddressName}`)

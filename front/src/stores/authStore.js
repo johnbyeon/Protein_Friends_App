@@ -25,9 +25,11 @@ export const useAuthStore = create(
       expiresAt: null,
       profileRequired: false,
       authError: null,
+      sidebarCollapsed: false,
       setProfileRequired: (v) => set({ profileRequired: !!v }),
       setAuthError: (msg) => set({ authError: msg || null }),
       clearAuthError: () => set({ authError: null }),
+      setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
 
       // ✅ 수정된 버전
       // make this async so callers can await user-fetch when needed
@@ -81,10 +83,10 @@ export const useAuthStore = create(
             console.warn('⚠️ JWT 저장 실패:', e)
           }
 
-          // 항상 /api/users/me를 호출하여 최신 정보 (profilePicture 포함) 가져오기
+          // 항상 /api/users/me/detail을 호출하여 최신 정보 (gId 포함) 가져오기
           try {
             const base = import.meta.env.VITE_API_BASE ?? '';
-            const res = await fetch(`${base}/api/users/me`, {
+            const res = await fetch(`${base}/api/users/me/detail`, {
               headers: { Authorization: `Bearer ${token}` },
             })
             if (res.ok) {
@@ -92,15 +94,15 @@ export const useAuthStore = create(
               u = me
               set({ user: me, profileRequired: !(me?.name && me?.phone) })
               applyRoleTheme(me?.role)
-              console.log('✅ /api/users/me에서 사용자 정보 로드됨 (profilePicture 포함)', me)
+              console.log('✅ /api/users/me/detail에서 사용자 정보 로드됨 (gId 포함)', me)
             } else {
               const errText = await res.text().catch(() => '')
-              console.warn('⚠️ /api/users/me 응답 실패', res.status, errText)
+              console.warn('⚠️ /api/users/me/detail 응답 실패', res.status, errText)
               // If server explicitly said need_profile=false, respect it
               if (serverNeed === false) set({ profileRequired: false })
             }
           } catch (e) {
-            console.error('❌ /api/users/me 호출 중 에러', e)
+            console.error('❌ /api/users/me/detail 호출 중 에러', e)
           }
 
           console.log('✅ loginFromResponse 성공:', { user: u, expiresAt })

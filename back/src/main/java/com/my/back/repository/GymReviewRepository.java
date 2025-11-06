@@ -34,4 +34,12 @@ public interface GymReviewRepository extends JpaRepository<GymReview, GymReviewI
         order by r.createdAt desc
     """)
     Page<GymReviewView> findReviewsByGymId(@Param("gId") Long gId, Pageable pageable);
+
+    /** 지점 평균 별점 조회 */
+    @Query("select avg(r.gRating) from GymReview r where r.gId = :gId")
+    Double getAverageRating(@Param("gId") Long gId);
+
+    /** 지점 리뷰 총 개수 조회 */
+    @Query("SELECT COUNT(r) FROM GymReview r WHERE r.gId = :gId")
+    Long countByGId(@Param("gId") Long gId);
 }

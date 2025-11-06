@@ -198,25 +198,7 @@ export default function AdminBoardList() {
   }
 
   return (
-    <div className="flex-1 p-8 bg-background-dark min-h-screen">
-      {/* 게시판 타입 탭 */}
-      <div className="mb-6 border-b border-white/10">
-        <div className="flex gap-2">
-          {boardTypes.map((type) => (
-            <Link
-              key={type.ptypeid}
-              to={`${getBasePath()}/boards/${type.ptypeaddressName}`}
-              className={`px-6 py-3 font-medium transition-colors relative ${
-                type.ptypeaddressName === typeAddressName
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-white/60 hover:text-white/80'
-              }`}
-            >
-              {type.ptypename}
-            </Link>
-          ))}
-        </div>
-      </div>
+    <div className="min-h-screen w-full bg-background-dark p-8">
 
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-8">

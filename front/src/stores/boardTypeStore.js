@@ -61,6 +61,14 @@ export const useBoardTypeStore = create(
 
           console.log('🔍 [boardTypeStore] 받은 데이터:', data)
           console.log('🔍 [boardTypeStore] 데이터 타입:', typeof data, 'isArray:', Array.isArray(data))
+          
+          // 각 아이템의 필드명 확인
+          if (Array.isArray(data)) {
+            data.forEach((item, index) => {
+              console.log(`🔍 [boardTypeStore] 아이템 ${index}:`, item)
+              console.log(`🔍 [boardTypeStore] 아이템 ${index} 필드:`, Object.keys(item))
+            })
+          }
 
           set({
             boardTypes: data,

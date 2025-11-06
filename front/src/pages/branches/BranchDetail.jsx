@@ -1,27 +1,24 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
 import { useBranchStore } from '../../stores/branchStore'
+import { post } from '../../lib/api'
 
 const BranchDetail = () => {
-  const { id } = useParams()
   const {
     branches,
     loading: branchesLoading,
     error,
-    fetchBranches,
-    fetchBranchTrainers
+    fetchBranches
   } = useBranchStore()
 
-  const [selectedBranch, setSelectedBranch] = useState(null)
-  const [showModal, setShowModal] = useState(false)
-  const [modalTrainers, setModalTrainers] = useState([])
-  const [loading, setLoading] = useState(false)
+    const [selectedBranch, setSelectedBranch] = useState(null)
+    const [showReviewModal, setShowReviewModal] = useState(false)
+   const [reviewForm, setReviewForm] = useState({ rating: 5, reviewText: '' })
 
   // 지점 목록 가져오기 (Zustand store 사용)
   useEffect(() => {
     console.log('🔍 [BranchDetail] 컴포넌트 마운트, 지점 데이터 fetch 시작')
     fetchBranches()
-  }, [])
+  }, [fetchBranches])
 
   // 지점 데이터 변경 감지
   useEffect(() => {
@@ -39,29 +36,46 @@ const BranchDetail = () => {
     }
   }, [branches, branchesLoading, error])
 
-  // 트레이너 정보 모달 열기
-  const openModal = async (branch) => {
-    setSelectedBranch(branch)
-    setShowModal(true)
-    setLoading(true)
+   // 리뷰 작성 모달 열기
+   const openReviewModal = (branch) => {
+     setSelectedBranch(branch)
+     setShowReviewModal(true)
+     setReviewForm({ rating: 5, reviewText: '' })
+   }
 
-    try {
-      const trainers = await fetchBranchTrainers(branch.gid)
-      setModalTrainers(trainers)
-    } catch (error) {
-      console.error('트레이너 정보 조회 중 오류:', error)
-      setModalTrainers([])
-    } finally {
-      setLoading(false)
+
+
+    // 리뷰 제출
+    const submitReview = async () => {
+      if (!selectedBranch || !reviewForm.reviewText.trim()) {
+        alert('리뷰 내용을 입력해주세요.')
+        return
+      }
+
+      if (reviewForm.reviewText.trim().length < 10) {
+        alert('리뷰는 최소 10자 이상 입력해주세요.')
+        return
+      }
+
+      try {
+         await post(`/api/gyms/${selectedBranch.gId}/reviews`, {
+          gRating: reviewForm.rating,
+          gReview: reviewForm.reviewText.trim()
+        })
+        alert('리뷰가 성공적으로 등록되었습니다!')
+        setShowReviewModal(false)
+        setSelectedBranch(null)
+        setReviewForm({ rating: 5, reviewText: '' })
+      } catch (error) {
+        console.error('리뷰 등록 중 오류:', error)
+        alert('리뷰 등록에 실패했습니다. 다시 시도해주세요.')
+      }
     }
-  }
 
-  // 모달 닫기
-  const closeModal = () => {
-    setShowModal(false)
-    setSelectedBranch(null)
-    setModalTrainers([])
-  }
+    const closeReviewModal = () => {
+      setShowReviewModal(false)
+      setSelectedBranch(null)
+    }
 
   // 지하철 노선 색상 매핑
   const getLineColor = (line) => {
@@ -93,16 +107,16 @@ const BranchDetail = () => {
           <div className="space-y-6">
             {branches && branches.length > 0 ? (
               branches.map((branch) => (
-                <div
-                  key={branch.gid}
-                  className="bg-surface rounded-lg border border-primary/50 flex overflow-hidden cursor-pointer hover:border-primary transition-colors"
-                  onClick={() => openModal(branch)}
-                >
+                 <div
+                   key={branch.gId}
+                   className="bg-surface rounded-lg border border-primary/50 flex overflow-hidden cursor-pointer hover:border-primary transition-colors"
+                   onClick={() => openReviewModal(branch)}
+                 >
                 {/* 지점 이미지 */}
                 <img
-                  alt={`${branch.gname} 외관`}
+                   alt={`${branch.gName} 외관`}
                   className="w-1/3 object-cover"
-                  src={branch.gimageUrl || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect width="400" height="300" fill="%23111827"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="18" fill="%233DFA2F"%3ENo Image%3C/text%3E%3C/svg%3E'}
+                   src={branch.gImageUrl || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect width="400" height="300" fill="%23111827"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="18" fill="%233DFA2F"%3ENo Image%3C/text%3E%3C/svg%3E'}
                   onError={(e) => {
                     e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect width="400" height="300" fill="%23111827"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="18" fill="%233DFA2F"%3ENo Image%3C/text%3E%3C/svg%3E'
                   }}
@@ -111,14 +125,14 @@ const BranchDetail = () => {
                 {/* 지점 정보 */}
                 <div className="w-2/3 p-6 flex flex-col justify-between">
                   <div>
-                    <h2 className="text-2xl font-bold text-white mb-2">{branch.gname}</h2>
+                    <h2 className="text-2xl font-bold text-white mb-2">{branch.gName}</h2>
                     <p className="text-white/70 mb-1 flex items-center gap-2">
                       <span className="material-symbols-outlined text-base">location_on</span>
-                      {branch.gaddress}
+                      {branch.gAddress}
                     </p>
                     <p className="text-white/70 mb-4 flex items-center gap-2">
                       <span className="material-symbols-outlined text-base">call</span>
-                      {branch.gtel}
+                      {branch.gTel}
                     </p>
 
                     <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm text-white/80">
@@ -127,7 +141,7 @@ const BranchDetail = () => {
                         <span className="material-symbols-outlined text-lg mt-0.5">schedule</span>
                         <div>
                           <h3 className="font-semibold text-white/90">이용 시간</h3>
-                          <p className="whitespace-pre-line">{branch.gworkoutDuration}</p>
+                           <p className="whitespace-pre-line">{branch.gWorkoutDuration}</p>
                         </div>
                       </div>
 
@@ -136,7 +150,7 @@ const BranchDetail = () => {
                         <span className="material-symbols-outlined text-lg mt-0.5">local_parking</span>
                         <div>
                           <h3 className="font-semibold text-white/90">주차 안내</h3>
-                          <p>{branch.gparking}</p>
+                           <p>{branch.gParking}</p>
                         </div>
                       </div>
 
@@ -178,63 +192,76 @@ const BranchDetail = () => {
         </div>
       </main>
 
-      {/* 트레이너 정보 모달 */}
-      {showModal && selectedBranch && (
+
+
+      {/* 리뷰 작성 모달 */}
+      {showReviewModal && selectedBranch && (
         <div
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
-              closeModal()
+              closeReviewModal()
             }
           }}
         >
-          <div className="bg-surface rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 relative">
+          <div className="bg-surface rounded-lg shadow-xl w-full max-w-md p-8 relative">
             <button
               className="absolute top-4 right-4 text-white/70 hover:text-white"
-              onClick={closeModal}
+              onClick={closeReviewModal}
             >
               <span className="material-symbols-outlined">close</span>
             </button>
 
-            <h2 className="text-3xl font-bold text-white mb-6">
-              {selectedBranch.gname} 트레이너 정보
+            <h2 className="text-2xl font-bold text-white mb-6">
+              {selectedBranch.gName} 리뷰 작성
             </h2>
 
-            {loading ? (
-              <div key="modal-loading" className="text-center text-white/70 py-8">로딩 중...</div>
-            ) : modalTrainers.length > 0 ? (
-              <div key="modal-trainers" className="space-y-6">
-                {modalTrainers.map((trainer, index) => (
-                  <div key={trainer.tid || index}>
-                    <div className="flex items-start gap-6">
-                      <img
-                        alt={`${trainer.tname} 트레이너`}
-                        className="w-32 h-32 rounded-full object-cover border-2 border-primary"
-                        src={trainer.timageUrl || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="150"%3E%3Ccircle cx="75" cy="75" r="75" fill="%23111827"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="%233DFA2F"%3ETrainer%3C/text%3E%3C/svg%3E'}
-                        onError={(e) => {
-                          e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="150"%3E%3Ccircle cx="75" cy="75" r="75" fill="%23111827"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="%233DFA2F"%3ETrainer%3C/text%3E%3C/svg%3E'
-                        }}
-                      />
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold text-white">{trainer.tname} 트레이너</h3>
-                        <div className="mt-4 space-y-2 text-white/90">
-                          <p>{trainer.tbio || '전문 트레이너입니다.'}</p>
-                          {trainer.tcareer && <p>{trainer.tcareer}</p>}
-                          {trainer.tspecialty && <p>전문 분야: {trainer.tspecialty}</p>}
-                        </div>
-                      </div>
-                    </div>
-                    {index < modalTrainers.length - 1 && (
-                      <div className="border-t border-white/10 my-4"></div>
-                    )}
-                  </div>
-                ))}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-white/90 mb-2">별점</label>
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setReviewForm(prev => ({ ...prev, rating: star }))}
+                      className={`text-2xl ${star <= reviewForm.rating ? 'text-yellow-400' : 'text-gray-400'}`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
               </div>
-            ) : (
-              <div key="modal-empty" className="text-center text-white/70 py-8">
-                등록된 트레이너가 없습니다.
+
+               <div>
+                 <label className="block text-sm font-medium text-white/90 mb-2">리뷰 내용</label>
+                 <textarea
+                   value={reviewForm.reviewText}
+                   onChange={(e) => setReviewForm(prev => ({ ...prev, reviewText: e.target.value }))}
+                   placeholder="이 지점에 대한 솔직한 리뷰를 작성해주세요. (최소 10자)"
+                   rows={4}
+                   className="w-full px-3 py-2 bg-background-dark border border-primary/50 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary"
+                 />
+                 <div className="text-xs text-white/60 mt-1">
+                   {reviewForm.reviewText.length}/10자 (최소 10자 이상)
+                 </div>
+               </div>
+
+              <div className="flex justify-end gap-3 pt-4">
+                <button
+                  onClick={closeReviewModal}
+                  className="px-4 py-2 text-sm text-white/70 hover:text-white"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={submitReview}
+                  className="px-4 py-2 bg-primary text-black font-semibold rounded-md hover:opacity-90"
+                >
+                  리뷰 등록
+                </button>
               </div>
-            )}
+            </div>
           </div>
         </div>
       )}

@@ -1,5 +1,7 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -35,21 +37,25 @@ public class ClassUserInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @JsonProperty("id")
     private Long id;
 
     /** PT클래스 번호 (pt_class_info 테이블 FK, not null, number) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pt_class_id", nullable = false)
+    @JsonIgnore
     private PTClassInfo ptClassInfo;
 
     /** 유저 id (user 테이블 FK, not null, number) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "u_id", nullable = false)
+    @JsonIgnore
     private Users users;
 
     /** 신청 날짜 (not null, date time) */
     @Column(name = "datetime", nullable = false)
     @CreatedDate
     @Builder.Default
+    @JsonProperty("datetime")
     private LocalDateTime datetime = LocalDateTime.now(); // ⚙️ 개선: 기본값 지정 (Auditing 미작동 대비)
 }

@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,6 +22,7 @@ public class MealLogList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @JsonProperty("id")
     private Long id;   // ✅ 새 PK
 
     /** FK: 어느 meal_log 에 속하는지 */
@@ -30,17 +32,21 @@ public class MealLogList {
 
     /** 식사 타입 */
     @Column(name = "meal_type", nullable = false)
+    @JsonProperty("mealType")
     private String mealType;
 
     /** 섭취 음식과 섭취량 기록용 */
     @Column(name = "food_note")
+    @JsonProperty("foodNote")
     private String foodNote;
 
     /** 트레이너의 코멘트 */
     @Column(name = "t_comment")
+    @JsonProperty("trainerComment")
     private String trainerComment;
 
     /** 식단 사진 URL */
     @Column(name = "t_pic_url")
+    @JsonProperty("pictureUrl")
     private String pictureUrl;
 }

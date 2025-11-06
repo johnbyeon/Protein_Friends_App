@@ -85,6 +85,7 @@ public class SecurityConfig {
                         // 비인증 허용
                         .requestMatchers(HttpMethod.POST, "/api/auth/oauth2/login", "/api/auth/login", "/api/auth/join").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/board-types", "/api/board-types/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/boards", "/api/boards/*", "/api/boards/type/*", "/api/boards/popups").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/branches", "/api/branches/*", "/api/branches/*/trainers").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/search").permitAll()
                         .requestMatchers(

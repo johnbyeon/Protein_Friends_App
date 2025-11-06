@@ -171,31 +171,31 @@ export default function BoardDetail() {
 
             {/* 제목 */}
             <h1 className="text-3xl font-bold text-text-light mb-4">
-              {board.pTitle}
+              {board.ptitle}
             </h1>
 
             {/* 메타 정보 */}
             <div className="flex items-center gap-4 text-sm text-gray-400">
               <span>작성자: {board.trainerName}</span>
               <span>•</span>
-              <span>{new Date(board.pCreateDate).toLocaleDateString('ko-KR')}</span>
+              <span>{new Date(board.pcreateDate).toLocaleDateString('ko-KR')}</span>
               <span>•</span>
               <span>조회 {board.viewCount}</span>
-              {board.pUpdateDate && board.pUpdateDate !== board.pCreateDate && (
+              {board.pupdateDate && board.pupdateDate !== board.pcreateDate && (
                 <>
                   <span>•</span>
-                  <span>수정: {new Date(board.pUpdateDate).toLocaleDateString('ko-KR')}</span>
+                  <span>수정: {new Date(board.pupdateDate).toLocaleDateString('ko-KR')}</span>
                 </>
               )}
             </div>
           </div>
 
           {/* 이미지 (있는 경우) */}
-          {board.pImageUrl && (
+          {board.pimageUrl && (
             <div className="mb-6">
               <img
-                src={board.pImageUrl}
-                alt={board.pTitle}
+                src={board.pimageUrl}
+                alt={board.ptitle}
                 className="w-full rounded-lg"
               />
             </div>
@@ -203,14 +203,14 @@ export default function BoardDetail() {
 
           {/* 내용 */}
           <div className="text-gray-300 leading-relaxed whitespace-pre-wrap mb-6">
-            {board.pContent}
+            {board.pcontent}
           </div>
 
           {/* 링크 (있는 경우) */}
-          {board.pLink && (
+          {board.plink && (
             <div className="mt-6 pt-6 border-t border-border-light">
               <a
-                href={board.pLink}
+                href={board.plink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary hover:underline flex items-center gap-2"

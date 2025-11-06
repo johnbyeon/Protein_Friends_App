@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,6 +23,7 @@ public class GymInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "g_id")
+    @JsonProperty("gId")
     private Long gId;
 
     /**
@@ -29,6 +31,7 @@ public class GymInfo {
      * - 예: "강남 헬스장"
      */
     @Column(name = "g_name", nullable = false, length = 100)
+    @JsonProperty("gName")
     private String gName;
 
     /**
@@ -36,6 +39,7 @@ public class GymInfo {
      * - 예: "서울특별시 강남구 테헤란로 123"
      */
     @Column(name = "g_address", nullable = false, length = 200)
+    @JsonProperty("gAddress")
     private String gAddress;
 
     /**
@@ -43,6 +47,7 @@ public class GymInfo {
      * - 예: "02-1234-5678"
      */
     @Column(name = "g_tel", nullable = false, length = 20)
+    @JsonProperty("gTel")
     private String gTel;
 
     /**
@@ -50,6 +55,7 @@ public class GymInfo {
      * - 예: "06:00 ~ 23:00"
      */
     @Column(name = "g_workout_duration", nullable = false, length = 100)
+    @JsonProperty("gWorkoutDuration")
     private String gWorkoutDuration;
 
     /**
@@ -57,6 +63,7 @@ public class GymInfo {
      * - 예: "무료 주차 2시간", "주차 불가"
      */
     @Column(name = "g_parking", nullable = false, length = 200)
+    @JsonProperty("gParking")
     private String gParking;
 
     /**
@@ -64,6 +71,7 @@ public class GymInfo {
      * - 예: 37.4979
      */
     @Column(name = "g_latitude", nullable = false)
+    @JsonProperty("gLatitude")
     private Double gLatitude;
 
     /**
@@ -71,6 +79,7 @@ public class GymInfo {
      * - 예: 127.0276
      */
     @Column(name = "g_longitude", nullable = false)
+    @JsonProperty("gLongitude")
     private Double gLongitude;
 
     /**
@@ -78,5 +87,6 @@ public class GymInfo {
      * - 예: "https://s3.amazonaws.com/gym/1.jpg"
      */
     @Column(name = "g_image_url", length = 500)
+    @JsonProperty("gImageUrl")
     private String gImageUrl;
 }

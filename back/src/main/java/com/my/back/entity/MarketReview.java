@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -29,6 +30,7 @@ public class MarketReview {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "p_r_id", nullable = false)
+    @JsonProperty("pRId")
     private Long pRId;
 
     /**
@@ -36,6 +38,7 @@ public class MarketReview {
      * - market_product.p_id 참조 (가정)
      */
     @Column(name = "p_id", nullable = false)
+    @JsonProperty("pId")
     private Long pId;
 
     /**
@@ -43,6 +46,7 @@ public class MarketReview {
      * - user.u_id 참조
      */
     @Column(name = "u_id", nullable = false)
+    @JsonProperty("uId")
     private Long uId;
 
     /**
@@ -51,6 +55,7 @@ public class MarketReview {
      */
     @Column(name = "p_rating")
     @Builder.Default
+    @JsonProperty("pRating")
     private Integer pRating = 5;
 
     /**
@@ -58,6 +63,7 @@ public class MarketReview {
      * - 예: "배송 빠르고 좋음"
      */
     @Column(name = "p_review_subtitle", nullable = false, length = 200)
+    @JsonProperty("pReviewSubtitle")
     private String pReviewSubtitle;
 
     /**
@@ -65,6 +71,7 @@ public class MarketReview {
      * - 최대 1000자
      */
     @Column(name = "p_review", nullable = false, length = 1000)
+    @JsonProperty("pReview")
     private String pReview;
 
     /**
@@ -72,6 +79,7 @@ public class MarketReview {
      */
     @CreatedDate
     @Column(name = "p_datetime")
+    @JsonProperty("pDatetime")
     private LocalDateTime pDatetime;
 
     // === 관계 매핑 (LAZY) ===

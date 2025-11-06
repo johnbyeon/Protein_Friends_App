@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -26,6 +27,7 @@ public class TrainerInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "t_id")
+    @JsonProperty("tId")
     private Long tId;
 
     /**
@@ -33,6 +35,7 @@ public class TrainerInfo {
      * - gym_info.g_id 참조
      */
     @Column(name = "g_id", nullable = false)
+    @JsonProperty("gId")
     private Long gId;
 
     /**
@@ -40,6 +43,7 @@ public class TrainerInfo {
      * - user.u_id 참조
      */
     @Column(name = "u_id", nullable = false)
+    @JsonProperty("uId")
     private Long uId;
 
     /**
@@ -47,6 +51,7 @@ public class TrainerInfo {
      * - 예: "김트레이너"
      */
     @Column(name = "t_name", nullable = false, length = 50)
+    @JsonProperty("tName")
     private String tName;
 
     /**
@@ -54,6 +59,7 @@ public class TrainerInfo {
      * - 예: 1990-05-15
      */
     @Column(name = "t_birth_day", nullable = false)
+    @JsonProperty("tBirthDay")
     private LocalDate tBirthDay;
 
     /**
@@ -61,6 +67,7 @@ public class TrainerInfo {
      * - 예: "010-1234-5678"
      */
     @Column(name = "t_phone_number", nullable = false, length = 20)
+    @JsonProperty("tPhoneNumber")
     private String tPhoneNumber;
 
     /**
@@ -68,6 +75,7 @@ public class TrainerInfo {
      * - 예: "2023 전국 피트니스 대회 1위"
      */
     @Column(name = "t_award_title", length = 500)
+    @JsonProperty("tAwardTitle")
     private String tAwardTitle;
 
     /**
@@ -75,6 +83,7 @@ public class TrainerInfo {
      * - 최대 1000자
      */
     @Column(name = "t_about_me", length = 1000)
+    @JsonProperty("tAboutMe")
     private String tAboutMe;
 
     /**
@@ -83,6 +92,7 @@ public class TrainerInfo {
      */
     @Column(name = "t_is_employed")
     @Builder.Default
+    @JsonProperty("isEmployed")
     private Boolean isEmployed = true;
 
     /**
@@ -90,6 +100,7 @@ public class TrainerInfo {
      * - 예: "https://s3.amazonaws.com/trainer/123.jpg"
      */
     @Column(name = "t_image_url", nullable = false, length = 500)
+    @JsonProperty("tImageUrl")
     private String tImageUrl;
 
     // === 관계 매핑 (LAZY) ===

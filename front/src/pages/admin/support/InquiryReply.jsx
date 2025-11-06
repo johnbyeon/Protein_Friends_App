@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getInquiry, createAnswer, updateAnswer } from '../../../lib/api'
-import LeftSidebar from '../../../components/LeftSidebar'
 
 export default function InquiryReply() {
   const navigate = useNavigate()
@@ -100,30 +99,22 @@ export default function InquiryReply() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background-dark">
-        <LeftSidebar />
-        <main className="flex-1 px-4 sm:px-6 lg:px-8 py-8 bg-background-dark font-display text-text-light">
-          <div className="text-center py-12 text-gray-400">로딩 중...</div>
-        </main>
-      </div>
+      <main className="px-4 sm:px-6 lg:px-8 py-8 bg-background-dark font-display text-text-light min-h-screen">
+        <div className="text-center py-12 text-gray-400">로딩 중...</div>
+      </main>
     )
   }
 
   if (!inquiry) {
     return (
-      <div className="flex min-h-screen bg-background-dark">
-        <LeftSidebar />
-        <main className="flex-1 px-4 sm:px-6 lg:px-8 py-8 bg-background-dark font-display text-text-light">
-          <div className="text-center py-12 text-gray-400">문의를 찾을 수 없습니다.</div>
-        </main>
-      </div>
+      <main className="px-4 sm:px-6 lg:px-8 py-8 bg-background-dark font-display text-text-light min-h-screen">
+        <div className="text-center py-12 text-gray-400">문의를 찾을 수 없습니다.</div>
+      </main>
     )
   }
 
   return (
-    <div className="flex min-h-screen bg-background-dark">
-      <LeftSidebar />
-      <main className="flex-1 px-4 sm:px-6 lg:px-8 py-8 bg-background-dark font-display text-text-light">
+    <main className="px-4 sm:px-6 lg:px-8 py-8 bg-background-dark font-display text-text-light min-h-screen">
         <div className="flex flex-col max-w-2xl mx-auto gap-8">
           {/* 헤더 */}
           <div className="flex flex-col gap-2 items-center">
@@ -216,8 +207,7 @@ export default function InquiryReply() {
             </div>
           </form>
         </div>
-      </main>
-    </div>
+  </main>
   )
 }
 

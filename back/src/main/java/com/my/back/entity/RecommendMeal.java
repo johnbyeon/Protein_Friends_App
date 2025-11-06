@@ -1,5 +1,6 @@
 package com.my.back.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -19,18 +20,22 @@ public class RecommendMeal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "rec_id")
+    @JsonProperty("id")
     private Long id;
 
     /** 트레이너 등록번호 (Trainer ID) */
     @Column(name = "t_id", nullable = false)
+    @JsonProperty("trainerId")
     private Long trainerId;
 
     /** 유저 ID */
     @Column(name = "u_id", nullable = false)
+    @JsonProperty("userId")
     private Long userId;
 
     /** 식단등록 해당 날짜 */
     @Column(name = "date", nullable = false)
+    @JsonProperty("date")
     private LocalDate date;
 
     /** 추천 식단 상세 목록 (1:N 관계 매핑) */

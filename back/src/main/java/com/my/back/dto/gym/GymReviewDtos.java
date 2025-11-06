@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 지점 리뷰 전용 DTO 묶음
@@ -19,6 +20,13 @@ public class GymReviewDtos {
             int gRating,
             String gReview,
             LocalDateTime createdAt
+    ) { }
+
+    /** 지점 리뷰 목록 응답 DTO */
+    public record GymReviewListRes(
+            Double averageRating,
+            Long totalCount,
+            List<GymReviewItem> reviews
     ) { }
 
     /** 지점 리뷰 작성 요청 DTO */
