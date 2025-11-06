@@ -9,18 +9,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * 관리자용 PT 클래스 서비스
- * - 수업 스케줄 관리
- * - 수업 생성/수정
- * - 회원 수업 예약 및 취소
- * - PT 횟수 차감/복구 처리
- * - PT 사용 로그 기록
+ * 관리자용 PT 클래스 서비스 (최종 리팩토링 버전)
+ * - 클래스 스케줄 관리
+ * - 회원 예약 / 취소
+ * - PT 이용권 차감 / 복구
+ * - 사용 로그 기록 위임 (PtUsedLogService)
  */
 @Service
 @RequiredArgsConstructor
@@ -31,10 +29,12 @@ public class AdminPtClassService {
     private final TrainerInfoRepository trainerInfoRepository;
     private final UserRepository userRepository;
     private final ClassUserInfoRepository classUserInfoRepository;
-    private final PtInfoRepository ptInfoRepository;
-    private final PtUsedLogRepository ptUsedLogRepository;
 
-    /** 관리자용: 전체 수업 스케줄 조회 */
+    // ✅ 새로 추가된 서비스 주입
+    private final PtInfoService ptInfoService;
+    private final PtUsedLogService ptUsedLogService;
+
+    /** 전체 수업 스케줄 조회 */
     public List<AdminPtClassDtos.ScheduleItem> getSchedule() {
         return ptClassInfoRepository.findAllByOrderByStartDatetimeAsc()
                 .stream()
@@ -42,13 +42,13 @@ public class AdminPtClassService {
                 .toList();
     }
 
-    /** 관리자용: 단일 수업 상세 조회 */
+    /** 단일 수업 상세 조회 */
     public AdminPtClassDtos.ClassDetail getClassDetail(Long classId) {
         PTClassInfo classInfo = getClassWithTrainer(classId);
         return buildClassDetail(classInfo);
     }
 
-    /** 관리자: 수업 생성 */
+    /** 수업 생성 */
     @Transactional
     public AdminPtClassDtos.ClassDetail createClass(AdminPtClassDtos.CreateClassRequest req) {
         validateSchedule(req.startDatetime(), req.endDatetime());
@@ -69,22 +69,17 @@ public class AdminPtClassService {
         return buildClassDetail(getClassWithTrainer(saved.getPtClassId()));
     }
 
-    /** 관리자: 수업 수정 */
+    /** 수업 수정 */
     @Transactional
     public AdminPtClassDtos.ClassDetail updateClass(Long classId, AdminPtClassDtos.UpdateClassRequest req) {
-
         PTClassInfo classInfo = getClassWithTrainer(classId);
 
-        if (classInfo.getStartDatetime().isBefore(LocalDateTime.now())) {
-            throw new ApiException(ErrorCode.PT_CLASS_ALREADY_STARTED);
-        }
-
+        if (classInfo.isStarted()) throw new ApiException(ErrorCode.PT_CLASS_ALREADY_STARTED);
         validateSchedule(req.startDatetime(), req.endDatetime());
 
         long reservedCount = classUserInfoRepository.countByClassId(classId);
-        if (req.maxCapacity() < reservedCount) {
+        if (req.maxCapacity() < reservedCount)
             throw new ApiException(ErrorCode.INVALID_REQUEST);
-        }
 
         TrainerInfo trainer = getTrainer(req.trainerId());
 
@@ -99,140 +94,81 @@ public class AdminPtClassService {
         return buildClassDetail(classInfo);
     }
 
-    /** 관리자: 수업에 회원 예약 추가 */
+    /** 회원 예약 추가 (PT 차감 포함) */
     @Transactional
     public AdminPtClassDtos.ClassDetail addUserToClass(Long classId, AdminPtClassDtos.BookingRequest req) {
 
         PTClassInfo classInfo = getClassWithTrainer(classId);
         Users user = getUser(req.userId());
 
-        if (classInfo.getEndDatetime().isBefore(LocalDateTime.now())) {
-            throw new ApiException(ErrorCode.PT_CLASS_ALREADY_ENDED);
-        }
+        if (classInfo.isEnded()) throw new ApiException(ErrorCode.PT_CLASS_ALREADY_ENDED);
 
         long reserved = classUserInfoRepository.countByClassId(classId);
-        if (reserved >= classInfo.getMaxCapacity()) {
+        if (reserved >= classInfo.getMaxCapacity())
             throw new ApiException(ErrorCode.PT_CLASS_FULL);
-        }
 
-        if (classUserInfoRepository.existsByClassIdAndUserId(classId, user.getUId())) {
+        if (classUserInfoRepository.existsByClassIdAndUserId(classId, user.getUId()))
             throw new ApiException(ErrorCode.PT_CLASS_ALREADY_RESERVED);
-        }
 
-        PtInfo ptInfo = findEligiblePtInfo(
-                user,
-                classInfo.getTrainer(),
-                classInfo.getPtMinusCount(),
-                classInfo.getEndDatetime()
-        );
+        // ✅ 이용권 검증 + 차감
+        PtInfo ptInfo = ptInfoService.findEligibleTicket(user, classInfo.getTrainer(), classInfo.getPtMinusCount());
+        ptInfoService.usePt(ptInfo, classInfo.getPtMinusCount());
 
-        int minus = classInfo.getPtMinusCount();
-        int nowCount = Optional.ofNullable(ptInfo.getPtTotalCount()).orElse(0);
-        if (nowCount < minus) {
-            throw new ApiException(ErrorCode.INSUFFICIENT_PT_COUNT);
-        }
-
-        ptInfo.setPtTotalCount(nowCount - minus);
-
+        // ✅ 예약 추가
         classUserInfoRepository.insertBooking(classId, user.getUId(), LocalDateTime.now());
 
-        ptUsedLogRepository.save(
-                PtUsedLog.builder()
-                        .users(user)
-                        .trainer(classInfo.getTrainer())
-                        .date(LocalDateTime.now())
-                        .totalCount(ptInfo.getPtTotalCount())
-                        .usedCount(minus)
-                        .status(true)
-                        .ptClass(classInfo)
-                        .build()
+        // ✅ 사용 로그 기록
+        ptUsedLogService.logUsage(
+                user,
+                classInfo.getTrainer(),
+                classInfo,
+                classInfo.getPtMinusCount(),
+                ptInfo.getRemainingCount()
         );
 
         return buildClassDetail(classInfo);
     }
 
-    /** 관리자: 수업 예약 취소 */
+    /** 예약 취소 (PT 복구 포함) */
     @Transactional
     public void removeUserFromClass(Long classId, Long userId) {
 
         PTClassInfo classInfo = getClassWithTrainer(classId);
 
         int deleted = classUserInfoRepository.deleteByClassIdAndUserId(classId, userId);
-        if (deleted == 0) {
+        if (deleted == 0)
             throw new ApiException(ErrorCode.PT_CLASS_RESERVATION_NOT_FOUND);
-        }
 
-        int recover = classInfo.getPtMinusCount();
-        PtInfo ptInfo = findPtInfoForRestoration(userId, classInfo.getTrainer());
+        // ✅ 복구 처리
+        PtInfo ptInfo = ptInfoService.findLatestTicketForRestore(userId, classInfo.getTrainer());
+        ptInfoService.restorePt(ptInfo, classInfo.getPtMinusCount());
 
-        ptInfo.setPtTotalCount(ptInfo.getPtTotalCount() + recover);
-
-        ptUsedLogRepository
-                .findTopByUsers_uIdAndPtClass_PtClassIdAndStatusTrueOrderByDateDesc(userId, classId)
-                .ifPresent(log -> {
-                    log.setStatus(false);
-                    ptUsedLogRepository.save(log);
-                });
+        // ✅ 사용 로그 취소
+        ptUsedLogService.cancelLastUsage(userId, classId);
     }
 
-    /** 수업 + 트레이너 조회 */
+    // === 내부 유틸 메서드 ===
+
     private PTClassInfo getClassWithTrainer(Long id) {
         return ptClassInfoRepository.findWithTrainerByPtClassId(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.PT_CLASS_NOT_FOUND));
     }
 
-    /** 트레이너 조회 */
     private TrainerInfo getTrainer(Long id) {
         return trainerInfoRepository.findById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.TRAINER_NOT_FOUND));
     }
 
-    /** 회원 조회 */
     private Users getUser(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
     }
 
-    /** 날짜 유효성 검증 */
     private void validateSchedule(LocalDateTime start, LocalDateTime end) {
-        if (start == null || end == null) {
+        if (start == null || end == null || !start.isBefore(end) || start.isBefore(LocalDateTime.now()))
             throw new ApiException(ErrorCode.INVALID_REQUEST);
-        }
-        if (!start.isBefore(end)) {
-            throw new ApiException(ErrorCode.INVALID_REQUEST);
-        }
-        if (start.isBefore(LocalDateTime.now())) {
-            throw new ApiException(ErrorCode.INVALID_REQUEST);
-        }
     }
 
-    /** 예약 시: 남은 PT가 충분하고 기간 내 이용권 선택 */
-    private PtInfo findEligiblePtInfo(Users user, TrainerInfo trainer, Integer minus, LocalDateTime end) {
-        int need = Optional.ofNullable(minus).orElse(0);
-        if (need <= 0) {
-            throw new ApiException(ErrorCode.INVALID_REQUEST);
-        }
-
-        LocalDate target = end != null ? end.toLocalDate() : LocalDate.now();
-
-        return ptInfoRepository.findAvailableTickets(user.getUId(), trainer.getTId())
-                .stream()
-                .filter(i -> i.getPtTotalCount() != null && i.getPtTotalCount() >= need)
-                .filter(i -> i.getStartDate() == null || !i.getStartDate().isAfter(target))
-                .filter(i -> i.getEndDate() == null || !i.getEndDate().isBefore(target))
-                .findFirst()
-                .orElseThrow(() -> new ApiException(ErrorCode.PT_TICKET_NOT_FOUND));
-    }
-
-    /** 취소 시: 가장 최근 PT 이용권 찾아 복구 */
-    private PtInfo findPtInfoForRestoration(Long userId, TrainerInfo trainer) {
-        return ptInfoRepository.findTicketsForRestore(userId, trainer.getTId())
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new ApiException(ErrorCode.PT_TICKET_RESTORE_NOT_FOUND));
-    }
-
-    /** 스케줄 DTO 변환 */
     private AdminPtClassDtos.ScheduleItem toScheduleItem(PTClassInfo c) {
         long reserved = classUserInfoRepository.countByClassId(c.getPtClassId());
         int capacity = Optional.ofNullable(c.getMaxCapacity()).orElse(0);
@@ -247,18 +183,15 @@ public class AdminPtClassService {
                 c.getMaxCapacity(),
                 (int) reserved,
                 remaining,
-                toTrainerSummary(c.getTrainer()),
+                new AdminPtClassDtos.TrainerSummary(c.getTrainer().getTId(), c.getTrainer().getTName()),
                 c.getPtMinusCount()
         );
     }
 
-    /** 상세 DTO 변환 */
     private AdminPtClassDtos.ClassDetail buildClassDetail(PTClassInfo c) {
         List<ClassUserInfo> bookings = classUserInfoRepository.findByClassId(c.getPtClassId());
-
         int reserved = bookings.size();
-        int capacity = Optional.ofNullable(c.getMaxCapacity()).orElse(0);
-        int remaining = Math.max(0, capacity - reserved);
+        int remaining = Math.max(0, c.getMaxCapacity() - reserved);
 
         return new AdminPtClassDtos.ClassDetail(
                 c.getPtClassId(),
@@ -270,7 +203,7 @@ public class AdminPtClassService {
                 c.getPtMinusCount(),
                 reserved,
                 remaining,
-                toTrainerSummary(c.getTrainer()),
+                new AdminPtClassDtos.TrainerSummary(c.getTrainer().getTId(), c.getTrainer().getTName()),
                 bookings.stream().map(this::toBookedUser).toList()
         );
     }
@@ -284,12 +217,5 @@ public class AdminPtClassService {
                 u.getPhone(),
                 b.getDatetime()
         );
-    }
-
-    private AdminPtClassDtos.TrainerSummary toTrainerSummary(TrainerInfo t) {
-        if (t == null) {
-            return new AdminPtClassDtos.TrainerSummary(null, null);
-        }
-        return new AdminPtClassDtos.TrainerSummary(t.getTId(), t.getTName());
     }
 }

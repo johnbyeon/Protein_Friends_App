@@ -26,4 +26,18 @@ public class UserPtClassController {
     public ResponseEntity<List<UserPtClassDtos.MyClassItem>> getMyClasses() {
         return ResponseEntity.ok(service.getMyClasses());
     }
+
+    /** 예약 */
+    @PostMapping("/{classId}")
+    public ResponseEntity<Void> reserve(@PathVariable Long classId) {
+        service.reserveClass(classId);
+        return ResponseEntity.ok().build();
+    }
+
+    /** 예약 취소 */
+    @DeleteMapping("/{classId}")
+    public ResponseEntity<Void> cancel(@PathVariable Long classId) {
+        service.cancelReservation(classId);
+        return ResponseEntity.noContent().build();
+    }
 }

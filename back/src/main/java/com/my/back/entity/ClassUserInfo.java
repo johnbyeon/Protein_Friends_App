@@ -3,7 +3,7 @@ package com.my.back.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
-
+import org.springframework.data.jpa.domain.support.AuditingEntityListener; // ✅ 추가
 import java.time.LocalDateTime;
 
 /**
@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class) // ✅ 추가: @CreatedDate 작동시키기 위한 설정
 public class ClassUserInfo {
 
     /** 내부 PK (추가됨) */
@@ -49,5 +50,6 @@ public class ClassUserInfo {
     /** 신청 날짜 (not null, date time) */
     @Column(name = "datetime", nullable = false)
     @CreatedDate
-    private LocalDateTime datetime;
+    @Builder.Default
+    private LocalDateTime datetime = LocalDateTime.now(); // ⚙️ 개선: 기본값 지정 (Auditing 미작동 대비)
 }

@@ -55,4 +55,14 @@ public class PTClassInfo {
     /** 차감횟수 (not null, number) */
     @Column(name = "pt_minus_count", nullable = false)
     private Integer ptMinusCount;
+
+    // ✅ 추가: 수업 시작/종료 여부 판단 메서드
+    public boolean isStarted() {
+        return LocalDateTime.now().isAfter(startDatetime);
+    }
+
+    // ✅ 추가: 수업 종료 여부 판단 메서드
+    public boolean isEnded() {
+        return LocalDateTime.now().isAfter(endDatetime);
+    }
 }
