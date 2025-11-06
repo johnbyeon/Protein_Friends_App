@@ -98,7 +98,12 @@ spring:
   config:
     activate:
       on-profile: prod
-
+      
+cloud:
+  aws:
+    s3:
+      bucket: protein-friends-s3
+      
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${SPRING_DATASOURCE_URL}
