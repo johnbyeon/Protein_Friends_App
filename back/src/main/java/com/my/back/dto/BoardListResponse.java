@@ -1,0 +1,114 @@
+package com.my.back.dto;
+
+import com.my.back.entity.Board;
+import lombok.Builder;
+import lombok.Data;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+/**
+ * 게시글 목록 응답 DTO (간소화 버전)
+ * - 게시글 목록 조회 시 사용 (상세 내용 제외)
+ */
+@Data
+@Builder
+public class BoardListResponse {
+    /**
+     * 게시글 ID
+     */
+    private Long pId;
+
+    /**
+     * 게시글 타입 ID
+     */
+    private Long pTypeId;
+
+    /**
+     * 게시글 타입 이름
+     */
+    private String pTypeName;
+
+    /**
+     * 작성 트레이너 이름
+     */
+    private String trainerName;
+
+    /**
+     * 게시글 제목
+     */
+    private String pTitle;
+
+    /**
+     * 게시글 썸네일 이미지 URL
+     */
+    private String pImageUrl;
+
+    /**
+     * 팝업 여부
+     */
+    private Boolean pIsPopup;
+
+    /**
+     * 상시 팝업 여부
+     */
+    private Boolean isAlwaysPopup;
+
+    /**
+     * 팝업 시작 날짜
+     */
+    private LocalDate pPopupStartDate;
+
+    /**
+     * 팝업 종료 날짜
+     */
+    private LocalDate pPopupEndDate;
+
+    /**
+     * 기간 제한 없음 여부
+     */
+    private Boolean isUnlimited;
+
+    /**
+     * 게시글 노출 여부
+     */
+    private Boolean pSetVisible;
+
+    /**
+     * 게시글 작성일시
+     */
+    private LocalDateTime pCreateDate;
+
+    /**
+     * 게시글 수정일시
+     */
+    private LocalDateTime pUpdateDate;
+
+    /**
+     * 조회수
+     */
+    private Long viewCount;
+
+    /**
+     * Entity -> DTO 변환
+     */
+    public static BoardListResponse from(Board entity, String typeName, String trainerName, Long viewCount) {
+        return BoardListResponse.builder()
+                .pId(entity.getPId())
+                .pTypeId(entity.getPTypeId())
+                .pTypeName(typeName)
+                .trainerName(trainerName)
+                .pTitle(entity.getPTitle())
+                .pImageUrl(entity.getPImageUrl())
+                .pIsPopup(entity.getPIsPopup())
+                .isAlwaysPopup(entity.getIsAlwaysPopup())
+                .pPopupStartDate(entity.getPPopupStartDate())
+                .pPopupEndDate(entity.getPPopupEndDate())
+                .isUnlimited(entity.getIsUnlimited())
+                .pSetVisible(entity.getPSetVisible())
+                .pCreateDate(entity.getPCreateDate())
+                .pUpdateDate(entity.getPUpdateDate())
+                .viewCount(viewCount != null ? viewCount : 0L)
+                .build();
+    }
+}

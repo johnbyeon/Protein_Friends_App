@@ -1,0 +1,207 @@
+/* =========================
+   BG3 Neon Beam — Stable Sheet (FULL DROP-IN)
+   상단: 원래 페이드 유지(그림자/마스크 제거)
+   하단: 기존 유기적 페이드 유지
+   나머지 고정값 보존
+   ========================= */
+
+/* 공통 스코프 */
+:root { --bg3-line-w: 2px; }  /* 짝수 권장(2/4px) */
+
+.bg3-wrap { width: 100%; }
+.bg3-img  { display: block; pointer-events: none; }
+
+.bg3-neon{
+  position: absolute; inset: 0; pointer-events: none;
+  z-index: 1; display: flex; align-items: center; justify-content: center;
+  isolation: isolate; will-change: transform;
+}
+
+/* ========== 페이드(상/하) ========== */
+.bg3-fade-top,
+.bg3-fade-bottom{
+  position: absolute; left: 0; width: 100%;
+  pointer-events: none; z-index: 3;
+}
+
+/* ▶ 상단: 페이드 강도 완화(검은 띠 줄이기, 그림자/마스크 없음) */
+.bg3-fade-top{
+  top: 0;
+  /* 기존 min(30vh, 480px) → 조금 더 얕게 */
+  height: min(24vh, 320px);
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,.92) 0%,   /* 바로 위쪽만 살짝 어둡게 */
+    rgba(0,0,0,.55) 22%,  /* 빠르게 밝아짐 */
+    rgba(0,0,0,.18) 52%,  /* 스펙트럼 시작쯤엔 거의 영향 없음 */
+    transparent 100%
+  );
+  -webkit-mask: none; 
+  mask: none;
+}
+
+/* ▶ 하단: 기존 그대로 */
+.bg3-fade-bottom{
+  bottom: 0; height: 320px;
+  background: linear-gradient(
+    to top,
+    #000 0%,
+    rgba(0,0,0,.90) 30%,
+    rgba(0,0,0,.60) 70%,
+    transparent 100%
+  );
+}
+
+/* 상단에는 유기적 오버레이를 적용하지 않는다 */
+.bg3-fade-top.bg3-fade--organic::after{ content: none; }
+
+/* 하단만 유기적 흔들림 그림자 유지 */
+.bg3-fade-bottom.bg3-fade--organic::after{
+  content: ""; position: absolute; inset: -20% 0 -10% 0; pointer-events: none;
+  background:
+    radial-gradient(1200px 600px at 20% 110%, rgba(0,0,0,.65), transparent 62%),
+    radial-gradient(900px  520px at 80% 120%, rgba(0,0,0,.55), transparent 60%),
+    radial-gradient(700px  420px at 45% 105%, rgba(0,0,0,.45), transparent 58%);
+  mix-blend-mode: multiply; opacity: .85;
+  animation: bg3Drift 22s linear infinite; will-change: transform;
+}
+@keyframes bg3Drift{
+  0%{transform: translateY(0)}
+  50%{transform: translateY(12px)}
+  100%{transform: translateY(0)}
+}
+
+/* ========== 네온 스테이지(고정값 유지) ========== */
+.bg3-stage{
+  position: relative; height: 100%;
+  width: var(--bg3-line-w, 2px); z-index: 2;
+  transform-style: preserve-3d;
+  animation: bg3Sway 18s ease-in-out infinite, bg3XDrift 20s linear infinite;
+}
+@keyframes bg3Sway{ 0%,100%{ transform: rotateY(.3deg) } 50%{ transform: rotateY(-.3deg) } }
+@keyframes bg3XDrift{ 0%{transform: translateX(-1.2%) rotateY(.3deg)} 50%{transform: translateX(1.2%) rotateY(-.3deg)} 100%{transform: translateX(-1.2%) rotateY(.3deg)} }
+
+/* 팔레트(고정) */
+[data-bg3="on"][data-bg3-palette="emerald"]{
+  --c1:#a3ff57; --c2:#7aff73; --c3:#4cff98; --c4:#22ffc1;
+  --c5:#00e6ff; --c6:#8aff37; --c7:#3cff8a; --c8:#00b7ff;
+}
+
+/* 라인 레이어 공통(위치/크기) */
+.bg3-core,
+.bg3-colorflow,
+.bg3-fringe,
+.bg3-shimmer{
+  position: absolute; left: 50%; transform: translateX(-50%);
+  width: var(--bg3-line-w, 2px); height: 128%; top: -14%;
+}
+
+/* 바닥 꼬리(테일) 차단 — 모든 레이어 공통 */
+.bg3-stage > *{
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 86%, rgba(0,0,0,.4) 94%, transparent 100%);
+          mask-image: linear-gradient(to bottom, black 0%, black 86%, rgba(0,0,0,.4) 94%, transparent 100%);
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+}
+
+/* 코어(중앙 광원) */
+.bg3-core{
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    #fff 38%,
+    #fff5cc 50%,
+    #ffd980 60%,
+    transparent 74%
+  );
+  box-shadow: none; filter: blur(.3px); mix-blend-mode: screen;
+}
+
+/* 컬러 흐름(2트랙 루프 + 얕은 Hue 변조) */
+.bg3-colorflow{ mix-blend-mode: screen; overflow: visible; animation: bg3Hue 24s ease-in-out infinite; }
+.bg3-colorflow::before,
+.bg3-colorflow::after{
+  content:""; position: absolute; top:0; left:0; width:100%; height:200%;
+  background: linear-gradient(to bottom,
+    var(--c1) 0%, var(--c2) 12%, var(--c3) 26%, var(--c4) 40%,
+    var(--c5) 54%, var(--c6) 70%, var(--c7) 84%, var(--c8) 100%);
+  filter: blur(min(0.7vw, 7px));
+  animation: bg3LineFlow var(--bg3-flow-ms, 9000ms) linear infinite;
+}
+.bg3-colorflow::after{ animation-delay: calc(var(--bg3-flow-ms, 9000ms)/-2); }
+@keyframes bg3LineFlow{ 0%{ transform: translateY(-100%) } 100%{ transform: translateY(0%) } }
+@keyframes bg3Hue{ 0%,100%{ filter: hue-rotate(0deg) } 50%{ filter: hue-rotate(8deg) } }
+
+/* 색수차 프린지 */
+.bg3-fringe{ width: calc(var(--bg3-line-w, 2px) + 6px); }
+.bg3-fringe::before,
+.bg3-fringe::after{
+  content:""; position:absolute; top:0; height:100%; width:1px;
+  filter: blur(min(0.12vw, 1.2px)); mix-blend-mode: screen;
+}
+.bg3-fringe::before{ right: calc(50% + 1px); background: linear-gradient(to bottom, transparent 0%, rgba(0,255,255,.75) 50%, transparent 100%); }
+.bg3-fringe::after { left:  calc(50% + 1px); background: linear-gradient(to bottom, transparent 0%, rgba(100,255,160,.70) 50%, transparent 100%); }
+
+/* 세로 쉬머(하이라이트) — 가로/세로 마스크 결합 + 스캔 */
+.bg3-shimmer{
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, black 50%, transparent 100%),
+    linear-gradient(to bottom, black 0%, black 78%, transparent 100%);
+          mask-image:
+    linear-gradient(to right, transparent 0%, black 50%, transparent 100%),
+    linear-gradient(to bottom, black 0%, black 78%, transparent 100%);
+  -webkit-mask-composite: source-in; mask-composite: intersect;
+  background: repeating-linear-gradient(to bottom, rgba(255,255,255,.35) 0 2px, rgba(255,255,255,0) 3px 9px);
+  mix-blend-mode: screen; opacity: .42;
+  animation: bg3Shimmer var(--bg3-shimmer-ms, 4800ms) linear infinite, bg3Scan 9s ease-in-out infinite;
+}
+@keyframes bg3Shimmer{ to{ transform: translateY(18%) } }
+@keyframes bg3Scan{ 0%,100%{ opacity:.36 } 50%{ opacity:.56 } }
+
+/* 패럴랙스 변수 반영(백그라운드/네온) */
+.bg3-img  { transform: translate3d(0, calc(var(--bg3-parallax, 0px) * -1), 0); will-change: transform; }
+.bg3-neon { transform: translate3d(0, calc(var(--bg3-parallax-neon, 0px) * -1), 0); will-change: transform; }
+
+/* 섹션 하단 보호: 네온 자체도 바닥에서 점진 소실 (컷오프 완화) */
+.bg3-neon{
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black calc(100% - 420px),
+    rgba(0,0,0,.75) calc(100% - 260px),
+    rgba(0,0,0,.35) calc(100% - 120px),
+    transparent 100%
+  );
+          mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black calc(100% - 420px),
+    rgba(0,0,0,.75) calc(100% - 260px),
+    rgba(0,0,0,.35) calc(100% - 120px),
+    transparent 100%
+  );
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+}
+
+/* === Bg3 전용 시접(Seam) 레이어 === */
+.bg3-seams{ position: absolute; inset: 0; z-index: 5; pointer-events: none; } /* 최상단에서 봉합 */
+.bg3-seam-top, .bg3-seam-bottom{
+  position: absolute; left: 0; right: 0;
+  --k1: rgba(0,0,0,1); --k2: rgba(0,0,0,.90); --k3: rgba(0,0,0,.70); --k4: rgba(0,0,0,.45); --k5: rgba(0,0,0,.20);
+}
+/* 상단: 위쪽이 더 어두워서 '붙게' */
+.bg3-seam-top{
+  top: 0; height: min(32vh, 520px);
+  background: linear-gradient(to bottom, var(--k1) 0%, var(--k2) 22%, var(--k3) 38%, var(--k4) 58%, var(--k5) 74%, transparent 100%);
+}
+/* 하단: 아래쪽으로 자연스럽게 소실 */
+.bg3-seam-bottom{
+  bottom: 0; height: min(38vh, 620px);
+  background: linear-gradient(to top, var(--k1) 0%, var(--k2) 22%, var(--k3) 38%, var(--k4) 58%, var(--k5) 74%, transparent 100%);
+}
+
+/* 아주 옅은 그레인으로 경계 밴딩 방지 (Bg3 전용) */
+.bg3-grain{
+  position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: .035; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCI+PGZpbHRlciBpZD0ibiI+PGZlVHVyYnVsZW5jZSBiYXNlRnJlcXVlbmN5PSIwLjg1IiBudW1PY3RhdmVzPSIyIiBzZWVkPSI1Ii8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI25pKSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=");
+}

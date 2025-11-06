@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import LeftSidebar from '../components/LeftSidebar'
 
 export default function MyCoupons() {
   const [coupons] = useState([
@@ -29,134 +30,102 @@ export default function MyCoupons() {
     }
   ])
 
-  const [expiredCoupons] = useState([
-    {
-      id: '#000098',
-      title: '프로틴바 1+1 증정',
-      type: '마켓',
-      discount: '1+1',
-      startDate: '2024.05.01',
-      endDate: '2024.05.31',
-      minAmount: '10,000원',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBsM55txNS1u1bsVR20N_YcWkF9aviivV4DLyg597Ry5UvkjA3oky6_tTucGdXReYyz4jS9G0HqSFugcNsE8GITyXBwDPexKg3KygvGG_-chmryEs1MvXltndG0BU1aeLqk-kF5ypfYF5fLK_YVgjVqYsGIKLOmhwNdKYZ3uXbTAJDeU48miHzn-YPihANrZp1FgWFk3IZnA48TtaB0ZBoIETUI1gXHWhxv2iIFMZJGAWTAbGdr1qZ_huhylfhOWmUusk1ls7Bsww1u',
-      status: 'expired'
-    },
-    {
-      id: '#000081',
-      title: 'PT 10회 10% 할인',
-      type: 'PT',
-      discount: '10%',
-      startDate: '2024.04.01',
-      endDate: '2024.04.30',
-      minAmount: '500,000원',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB7kM_e56qZxnjc93vJBJDBiUqeKEagKT7rBpOjGC8Ckdw5kagkAgZI2F6rW4VpSwdHDc2so8v84hmUaTvnJxOUXToJfKuim8kEfGdNiHH2YrGfqrODZSjNE41kMILuD0iwJSj-bZScGqY0bOru5xRACq4qJCwgyG_G2XVsqGqTSeNwa88AyRbk4M8zRs7IhBugql4HVyP9y7Nk7fTSjJsAcE0NiXWyySQlBizN5lj0uCrqZ-WawgIK6OJiYBBhXM7SbghxM-w0Yp-2',
-      status: 'expired'
-    }
-  ])
-
-  return (
-    <div className="flex min-h-screen w-full flex-col">
-      <main className="flex-1 bg-background-dark">
-        <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="mb-10 text-center">
-            <div className="flex items-center justify-between">
-              <h2 className="text-4xl font-bold tracking-tight text-white">내 할인권</h2>
-              <button className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-lg font-bold text-black transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background-dark">
-                할인권 받기
-              </button>
-            </div>
-          </div>
+   return (
+    <div className="flex min-h-screen bg-background-dark">
+      <LeftSidebar />
+      <main className="flex-1 bg-background-dark text-text-light">
+        <div className="mx-auto max-w-4xl px-6 py-16">
           
-          <div className="space-y-12">
-            {/* 보유한 할인권 */}
-            <div>
-              <h3 className="mb-4 text-xl font-bold text-white">보유한 할인권</h3>
-              <div className="space-y-6">
-                {coupons.map((coupon) => (
-                  <div key={coupon.id} className="overflow-hidden rounded-lg border border-primary/50 bg-primary/10 shadow-sm dark:bg-primary/20">
-                    <div className="flex items-start gap-6 p-6">
-                      <img 
-                        alt="할인권 이미지" 
-                        className="h-20 w-20 flex-shrink-0 rounded-md object-cover" 
-                        src={coupon.image}
-                      />
-                      <div className="flex-grow">
-                        <p className="mb-1 text-sm text-gray-400">{coupon.id}</p>
-                        <p className="mb-2 text-2xl font-bold text-white">{coupon.title}</p>
-                        <div className="grid grid-cols-1 gap-x-6 gap-y-2 md:grid-cols-2">
-                          <div className="flex items-center gap-2">
-                            <p className="text-lg text-gray-300">
-                              시작 기간: <span className="font-bold text-white">{coupon.startDate}</span>
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <p className="text-lg text-gray-300">
-                              종료 기간: <span className="font-bold text-white">{coupon.endDate} (D-{coupon.daysLeft})</span>
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2 md:col-span-2">
-                            <p className="text-lg text-gray-300">
-                              최소 적용 금액: <span className="font-bold text-white">{coupon.minAmount}</span>
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end justify-between self-stretch">
-                        <span className="inline-block rounded-full bg-primary/20 px-3 py-1 text-sm font-semibold text-primary">
-                          {coupon.type}
-                        </span>
-                        <p className="text-3xl font-bold text-primary">{coupon.discount}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {/* 헤더 */}
+          <div className="mb-12 flex items-center justify-between">
+            <h2 className="text-4xl font-extrabold tracking-tight text-primary">
+              내 할인권
+            </h2>
+            <button className="rounded-lg bg-[var(--color-primary)] px-6 py-3 text-lg font-bold text-black shadow-[0_0_20px_var(--color-primary)] transition-all hover:scale-105">
+              할인권 받기
+            </button>
+          </div>
 
-            {/* 만료/사용한 할인권 */}
-            <div>
-              <h3 className="mb-4 text-xl font-bold text-white">만료/사용한 할인권</h3>
+          <div className="space-y-14">
+            {/* 보유한 할인권 */}
+            <section>
+              <h3 className="mb-6 text-xl font-bold text-primary/90">
+                보유한 할인권
+              </h3>
               <div className="space-y-6">
-                {expiredCoupons.map((coupon) => (
-                  <div key={coupon.id} className="overflow-hidden rounded-lg border border-white/10 bg-black/20 shadow-sm opacity-60">
-                    <div className="flex items-start gap-6 p-6">
-                      <img 
-                        alt="만료된 할인권 이미지" 
-                        className="h-20 w-20 flex-shrink-0 rounded-md object-cover" 
-                        src={coupon.image}
-                      />
-                      <div className="flex-grow">
-                        <p className="mb-1 text-sm text-gray-500">{coupon.id}</p>
-                        <p className="mb-2 text-2xl font-bold text-gray-400">{coupon.title}</p>
-                        <div className="grid grid-cols-1 gap-x-6 gap-y-2 md:grid-cols-2">
-                          <div className="flex items-center gap-2">
-                            <p className="text-lg text-gray-400">
-                              시작 기간: <span className="font-bold">{coupon.startDate}</span>
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <p className="text-lg text-gray-400">
-                              종료 기간: <span className="font-bold">{coupon.endDate}</span>
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2 md:col-span-2">
-                            <p className="text-lg text-gray-400">
-                              최소 적용 금액: <span className="font-bold">{coupon.minAmount}</span>
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end justify-between self-stretch">
-                        <span className="inline-block rounded-full bg-gray-500/20 px-3 py-1 text-sm font-semibold text-gray-400">
-                          {coupon.type}
-                        </span>
-                        <p className="text-3xl font-bold text-gray-400">{coupon.discount}</p>
-                      </div>
+                {coupons.map(coupon => (
+                  <div
+                    key={coupon.id}
+                    className="flex flex-col sm:flex-row items-start sm:items-center gap-6 rounded-xl border border-primary/40 bg-surface-dark/60 shadow-[0_0_25px_-5px_var(--color-primary)] p-6 transition-all hover:shadow-[0_0_40px_-5px_var(--color-primary)]"
+                  >
+                    <img
+                      src={coupon.image}
+                      alt={coupon.title}
+                      className="h-24 w-24 flex-shrink-0 rounded-lg object-cover"
+                    />
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-400">{coupon.id}</p>
+                      <p className="text-2xl font-bold text-text-light mt-1">{coupon.title}</p>
+                      <p className="text-gray-400 mt-2">
+                        사용기간: <span className="text-white">{coupon.startDate}</span> ~{' '}
+                        <span className="text-white">{coupon.endDate}</span> (D-{coupon.daysLeft})
+                      </p>
+                      <p className="text-gray-400">
+                        최소 금액: <span className="text-white">{coupon.minAmount}</span>
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <span className="inline-block rounded-full bg-primary/20 px-3 py-1 text-sm font-semibold text-primary">
+                        {coupon.type}
+                      </span>
+                      <p className="text-3xl font-bold text-primary mt-2">
+                        {coupon.discount}
+                      </p>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
+
+            {/* 만료된 할인권 */}
+            <section>
+              <h3 className="mb-6 text-xl font-bold text-gray-400">
+                만료된 할인권
+              </h3>
+              <div className="space-y-6">
+                {expiredCoupons.map(coupon => (
+                  <div
+                    key={coupon.id}
+                    className="flex flex-col sm:flex-row items-start sm:items-center gap-6 rounded-xl border border-border-dark bg-surface-dark/40 p-6 opacity-60"
+                  >
+                    <img
+                      src={coupon.image}
+                      alt={coupon.title}
+                      className="h-24 w-24 flex-shrink-0 rounded-lg object-cover"
+                    />
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-500">{coupon.id}</p>
+                      <p className="text-2xl font-bold text-gray-400 mt-1">{coupon.title}</p>
+                      <p className="text-gray-500 mt-2">
+                        사용기간: <span>{coupon.startDate}</span> ~{' '}
+                        <span>{coupon.endDate}</span>
+                      </p>
+                      <p className="text-gray-500">
+                        최소 금액: <span>{coupon.minAmount}</span>
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <span className="inline-block rounded-full bg-gray-600/20 px-3 py-1 text-sm font-semibold text-gray-400">
+                        {coupon.type}
+                      </span>
+                      <p className="text-3xl font-bold text-gray-500 mt-2">
+                        {coupon.discount}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
           </div>
         </div>
       </main>

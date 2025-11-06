@@ -1,0 +1,148 @@
+/* =========================
+   Hero3 – Neon Beam (Core + Halo + Fringe + Bloom + Shimmer)
+   ========================= */
+
+:root { --beam-extra: 0px; }
+
+.neon-beam-bg {
+  position: relative;
+  width: 100%;
+  height: calc(920px + var(--beam-extra, 0px));
+  background: #000;
+  overflow: hidden;
+  isolation: isolate; /* 레이어 블렌딩 격리 */
+}
+
+/* ── Dust(서사감) 유지: 너무 과하면 0.2 이하로 낮춰도 됨 */
+.neon-beam-bg::before,
+.neon-beam-bg::after {
+  content: "";
+  position: absolute;
+  left: 0; top: -25%;
+  width: 100%; height: 150%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  z-index: 1; /* 코어(2) 아래 */
+  opacity: 0.28;
+}
+.neon-beam-bg::before {
+  background-image:
+    radial-gradient(circle at 12% 8%,  rgba(255,230,170,0.10) 0.7px, transparent 2px),
+    radial-gradient(circle at 68% 18%, rgba(255,220,150,0.12) 1.2px, transparent 3px),
+    radial-gradient(circle at 40% 60%, rgba(255,210,130,0.10) 1px,   transparent 3px),
+    radial-gradient(circle at 82% 72%, rgba(255,235,180,0.08) 1.2px, transparent 3px);
+  background-size: 220px 380px, 260px 420px, 240px 360px, 300px 480px;
+  animation: dustA 18s linear infinite;
+  filter: blur(0.3px);
+}
+.neon-beam-bg::after {
+  background-image:
+    radial-gradient(circle, rgba(255,230,170,0.08) 0.7px, transparent 2px),
+    radial-gradient(circle, rgba(255,200,120,0.06) 0.6px, transparent 2px);
+  background-size: 160px 260px, 200px 320px;
+  animation: dustB 12s linear infinite;
+}
+@keyframes dustA { to { transform: translateY(26%); } }
+@keyframes dustB { from { transform: translateY(-8%); } to { transform: translateY(26%); } }
+
+/* ── 1) Core (하얀 뜨거운 선) */
+.neon-beam-core {
+  --core-w: 2px;
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  width: var(--core-w);
+  height: 140%;
+  transform: translateX(-50%);
+  z-index: 2;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0%,
+    #fff 44%,
+    #fff9e6 50%,
+    #ffe6a8 58%,
+    rgba(255,204,120,0.45) 75%,
+    rgba(0,0,0,0) 100%
+  );
+  box-shadow:
+    0 0 14px rgba(255,230,170,0.55),
+    0 0 46px rgba(255,210,120,0.28);
+  filter: blur(0.6px);
+  opacity: 0.98;
+  animation: coreBreath 5.6s ease-in-out infinite;
+}
+@keyframes coreBreath {
+  0%,100% { opacity: .94; box-shadow:
+    0 0 14px rgba(255,230,170,.5),
+    0 0 46px rgba(255,210,120,.26); }
+  50%     { opacity: 1; box-shadow:
+    0 0 20px rgba(255,240,190,.7),
+    0 0 80px rgba(255,220,140,.38); }
+}
+
+/* ── 2) Bloom (넓게 퍼지는 광량층) */
+.neon-bloom {
+  position: absolute;
+  top: -15%; left: 50%;
+  width: 40px; height: 130%;
+  transform: translateX(-50%);
+  z-index: 2;
+  background: radial-gradient(ellipse at center,
+    rgba(255,235,180,.20) 0%,
+    rgba(255,200,120,.12) 35%,
+    rgba(0,0,0,0) 70%);
+  filter: blur(28px);
+  opacity: .65;
+  animation: bloomPulse 7.5s ease-in-out infinite;
+}
+@keyframes bloomPulse {
+  0%,100% { opacity: .55; filter: blur(24px); }
+  50%     { opacity: .75; filter: blur(34px); }
+}
+
+/* ── 3) Fringe (시안/마젠타 얇은 색 수차) */
+.neon-fringe {
+  position: absolute;
+  top: -20%; left: 50%;
+  width: 10px; height: 140%;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
+}
+.neon-fringe::before,
+.neon-fringe::after {
+  content: "";
+  position: absolute;
+  top: 0; height: 100%;
+  width: 2px;
+  filter: blur(2px);
+  mix-blend-mode: screen;
+  opacity: .55;
+}
+.neon-fringe::before {
+  right: 50%;
+  background: linear-gradient(to bottom, transparent 0%, rgba(0,255,255,.45) 50%, transparent 100%);
+  transform: translateX(-3px);
+}
+.neon-fringe::after {
+  left: 50%;
+  background: linear-gradient(to bottom, transparent 0%, rgba(255,0,170,.35) 50%, transparent 100%);
+  transform: translateX(3px);
+}
+
+/* ── Fades (시작/끝 자연스러운 연결) */
+.neon-fade-top,
+.neon-fade-bottom {
+  position: absolute;
+  left: 0; width: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+.neon-fade-top {
+  top: 0; height: 160px;
+  background: linear-gradient(to bottom,#000 0%,rgba(0,0,0,.85) 25%,rgba(0,0,0,.4) 65%,rgba(0,0,0,0) 100%);
+}
+.neon-fade-bottom {
+  bottom: 0; height: 220px;
+  background: linear-gradient(to top,#000 0%,rgba(0,0,0,.8) 35%,rgba(0,0,0,.3) 80%,rgba(0,0,0,0) 100%);
+}

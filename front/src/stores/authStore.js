@@ -81,28 +81,26 @@ export const useAuthStore = create(
             console.warn('⚠️ JWT 저장 실패:', e)
           }
 
-          // If server didn't include full user info, try to fetch /api/users/me (항상 role까지 보장)
-          if (!u || !u.role) {
-            try {
-              const base = import.meta.env.VITE_API_BASE ?? '';
-              const res = await fetch(`${base}/api/users/me`, {
-                headers: { Authorization: `Bearer ${token}` },
-              })
-              if (res.ok) {
-                const me = await res.json()
-                u = me
-                set({ user: me, profileRequired: !(me?.name && me?.phone) })
-                applyRoleTheme(me?.role)
-                console.log('✅ /api/users/me에서 사용자 정보 로드됨', me)
-              } else {
-                const errText = await res.text().catch(() => '')
-                console.warn('⚠️ /api/users/me 응답 실패', res.status, errText)
-                // If server explicitly said need_profile=false, respect it
-                if (serverNeed === false) set({ profileRequired: false })
-              }
-            } catch (e) {
-              console.error('❌ /api/users/me 호출 중 에러', e)
+          // 항상 /api/users/me를 호출하여 최신 정보 (profilePicture 포함) 가져오기
+          try {
+            const base = import.meta.env.VITE_API_BASE ?? '';
+            const res = await fetch(`${base}/api/users/me`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            if (res.ok) {
+              const me = await res.json()
+              u = me
+              set({ user: me, profileRequired: !(me?.name && me?.phone) })
+              applyRoleTheme(me?.role)
+              console.log('✅ /api/users/me에서 사용자 정보 로드됨 (profilePicture 포함)', me)
+            } else {
+              const errText = await res.text().catch(() => '')
+              console.warn('⚠️ /api/users/me 응답 실패', res.status, errText)
+              // If server explicitly said need_profile=false, respect it
+              if (serverNeed === false) set({ profileRequired: false })
             }
+          } catch (e) {
+            console.error('❌ /api/users/me 호출 중 에러', e)
           }
 
           console.log('✅ loginFromResponse 성공:', { user: u, expiresAt })

@@ -133,3 +133,308 @@ export const put = (url, body, init) => {
     headers
   })
 }
+
+// ===== S3 업로드 관련 API =====
+
+/**
+ * S3 Presigned Upload URL 발급 (인증 필수, DB 자동 저장)
+ * @param {Object} params - { filename, contentType, contentLength, description, imageType }
+ * @returns {Promise<{ key: string, putUrl: string, imageId: number }>}
+ */
+export async function presignUpload({ filename, contentType, contentLength, description = '', imageType = 'MEAL' }) {
+  const res = await post('/api/s3/upload', {
+    filename,
+    contentType,
+    contentLength,
+    description,
+    imageType
+  })
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || 'Presign upload 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * S3에서 파일 조회 URL 발급 (인증 필수, 본인 이미지만)
+ * @param {string} key - S3 객체 키
+ * @returns {Promise<string>} - Presigned GET URL
+ */
+export async function getViewUrl(key) {
+  const res = await get(`/api/s3/download?key=${encodeURIComponent(key)}`)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || 'View URL 발급 실패')
+  }
+
+  return res.text()
+}
+
+/**
+ * 내 이미지 목록 조회 (인증 필수)
+ * @returns {Promise<Array>} - 이미지 목록
+ */
+export async function getMyImages() {
+  const res = await get('/api/s3/my-images')
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || '이미지 목록 조회 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * 이미지 삭제 (인증 필수, 본인 이미지만)
+ * @param {number} imageId - 이미지 ID
+ * @returns {Promise<string>} - 성공 메시지
+ */
+export async function deleteImage(imageId) {
+  const res = await del(`/api/s3/images/${imageId}`)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || '이미지 삭제 실패')
+  }
+
+  return res.text()
+}
+
+/**
+ * 1:1 문의 목록 조회 (인증 필수 - ADMIN/TRAINER)
+ * @param {string} status - 'unanswered' | 'answered'
+ * @param {number} page - 페이지 번호
+ * @param {number} size - 페이지 크기
+ * @returns {Promise<Object>} - 페이징된 문의 목록
+ */
+export async function getInquiries(status = 'unanswered', page = 0, size = 10) {
+  const res = await get(`/api/support/inquiries?status=${status}&page=${page}&size=${size}`)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || '문의 목록 조회 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * 1:1 문의 상세 조회 (인증 필수 - ADMIN/TRAINER)
+ * @param {number} id - 문의 ID
+ * @returns {Promise<Object>} - 문의 상세 정보
+ */
+export async function getInquiry(id) {
+  const res = await get(`/api/support/inquiries/${id}`)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || '문의 조회 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * 답변 등록 (인증 필수 - ADMIN/TRAINER)
+ * @param {number} id - 문의 ID
+ * @param {string} answer - 답변 내용
+ * @returns {Promise<Object>} - 업데이트된 문의 정보
+ */
+export async function createAnswer(id, answer) {
+  const res = await post(`/api/support/inquiries/${id}/answer`, { answer })
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || '답변 등록 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * 답변 수정 (인증 필수 - ADMIN/TRAINER)
+ * @param {number} id - 문의 ID
+ * @param {string} answer - 답변 내용
+ * @returns {Promise<Object>} - 업데이트된 문의 정보
+ */
+export async function updateAnswer(id, answer) {
+  const res = await put(`/api/support/inquiries/${id}/answer`, { answer })
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || '답변 수정 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * 미답변 문의 개수 조회 (인증 필수 - ADMIN/TRAINER)
+ * @returns {Promise<number>} - 미답변 문의 개수
+ */
+export async function getUnansweredCount() {
+  const res = await get('/api/support/inquiries/count/unanswered')
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || '미답변 문의 개수 조회 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * 답변완료 문의 개수 조회 (인증 필수 - ADMIN/TRAINER)
+ * @returns {Promise<number>} - 답변완료 문의 개수
+ */
+export async function getAnsweredCount() {
+  const res = await get('/api/support/inquiries/count/answered')
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || '답변완료 문의 개수 조회 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * 내 문의 목록 조회 (인증 필수 - USER)
+ * @param {number} page - 페이지 번호
+ * @param {number} size - 페이지 크기
+ * @returns {Promise<Object>} - 페이징된 내 문의 목록
+ */
+export async function getMyInquiries(page = 0, size = 10) {
+  const res = await get(`/api/support/inquiries/my-inquiries?page=${page}&size=${size}`)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || '내 문의 목록 조회 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * 문의 등록 (인증 필수 - USER)
+ * @param {Object} data - { qtitle, qcontent, qissecret }
+ * @returns {Promise<Object>} - 생성된 문의 정보
+ */
+export async function createInquiry(data) {
+  const res = await post('/api/support/inquiries/my-inquiries', data)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || '문의 등록 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * FAQ 목록 조회 (공통)
+ * @param {string} category - 카테고리 (옵션)
+ * @param {string} keyword - 검색어 (옵션)
+ * @param {number} page - 페이지 번호
+ * @param {number} size - 페이지 크기
+ * @returns {Promise<Object>} - 페이징된 FAQ 목록
+ */
+export async function getFaqs(category = null, keyword = null, page = 0, size = 10) {
+  let url = `/api/faqs?page=${page}&size=${size}`
+  if (category) url += `&category=${encodeURIComponent(category)}`
+  if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`
+  
+  const res = await get(url)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || 'FAQ 목록 조회 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * FAQ 상세 조회 (공통)
+ * @param {number} id - FAQ ID
+ * @returns {Promise<Object>} - FAQ 상세 정보
+ */
+export async function getFaq(id) {
+  const res = await get(`/api/faqs/${id}`)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || 'FAQ 조회 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * FAQ 카테고리 목록 조회 (공통)
+ * @returns {Promise<Array>} - 카테고리 목록
+ */
+export async function getFaqCategories() {
+  const res = await get('/api/faqs/categories')
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || '카테고리 목록 조회 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * FAQ 등록 (관리자만)
+ * @param {Object} data - { faqtitle, faqquestion, faqanswer, faqcategory }
+ * @returns {Promise<Object>} - 생성된 FAQ 정보
+ */
+export async function createFaq(data) {
+  const res = await post('/api/faqs', data)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || 'FAQ 등록 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * FAQ 수정 (관리자만)
+ * @param {number} id - FAQ ID
+ * @param {Object} data - { faqtitle, faqquestion, faqanswer, faqcategory }
+ * @returns {Promise<Object>} - 수정된 FAQ 정보
+ */
+export async function updateFaq(id, data) {
+  const res = await put(`/api/faqs/${id}`, data)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || 'FAQ 수정 실패')
+  }
+
+  return res.json()
+}
+
+/**
+ * FAQ 삭제 (관리자만)
+ * @param {number} id - FAQ ID
+ * @returns {Promise<string>} - 성공 메시지
+ */
+export async function deleteFaq(id) {
+  const res = await del(`/api/faqs/${id}`)
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(err || 'FAQ 삭제 실패')
+  }
+
+  return res.text()
+}

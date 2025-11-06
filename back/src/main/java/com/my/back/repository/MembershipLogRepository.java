@@ -4,7 +4,8 @@ import com.my.back.entity.MembershipLog;
 import com.my.back.entity.MembershipStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 /**
@@ -27,4 +28,19 @@ public interface MembershipLogRepository extends JpaRepository<MembershipLog, Lo
 
     /** 회원의 상태별 회원권 목록 조회 (예: ACTIVE, EXPIRED 등) */
     List<MembershipLog> findAllByUsers_uIdAndStatusOrderByCreateDateDesc(Long userId, MembershipStatus status);
+
+
+    /**
+     * 해당 유저가 해당 지점의 트레이너에게 회원권 이용 기록이 있는가?
+     * - 리뷰 작성 자격 체크용
+     */
+    @Query("""
+            select (count(ml) > 0)
+            from MembershipLog ml
+            join ml.trainer t
+            join t.gymInfo g
+            where ml.users.uId = :userId
+              and g.gId = :gId
+            """)
+    boolean hasUsageHistory(@Param("userId") Long userId, @Param("gId") Long gId);
 }

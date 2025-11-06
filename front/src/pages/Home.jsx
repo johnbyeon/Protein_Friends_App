@@ -1,102 +1,193 @@
-import React from "react"
+// src/pages/Home.jsx
+import React from "react";
+import ProgramsSection from "./ProgramsSection";
+import { maskTopUltra } from "../utils/maskUtils";
+import BackgroundSection from "../components/BackgroundSection";
+import "../styles/neonIllusion.css";
+import "../styles/neonEdgeJitter.css";
 
+const SHELL_W = 1440;
+
+/* =========================
+   Copy Band (기존 유지)
+   ========================= */
+function CopyBand({
+  title,
+  titleLines,
+  subtitle,
+  align = "center",
+  maxContentWidth = 1040,
+  lineGap = 6,
+  nowrap = true,
+  featherTop = 90,
+  pullUp = 52,
+}) {
+  const isCenter = align === "center";
+  const lines =
+    Array.isArray(titleLines) && titleLines.length
+      ? titleLines
+      : title
+      ? [title]
+      : [];
+
+  return (
+    <section
+      className="w-full"
+      style={{ position: "relative", zIndex: 2, marginTop: -pullUp }}
+    >
+      <div className="mx-auto" style={{ width: SHELL_W, minWidth: SHELL_W }}>
+        <div
+          style={{
+            margin: "56px 0",
+            padding: "56px 56px",
+            borderRadius: 34,
+            background: "rgba(0,0,0,.76)",
+            boxShadow: "0 14px 48px rgba(0,0,0,.42)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: isCenter ? "center" : "flex-start",
+            textAlign: isCenter ? "center" : "left",
+            ...maskTopUltra(featherTop),
+          }}
+        >
+          <div style={{ width: "100%", maxWidth: maxContentWidth }}>
+            {!!lines.length && (
+              <h2
+                className="font-headline"
+                style={{
+                  margin: 0,
+                  fontWeight: 800,
+                  fontSize: 97,
+                  lineHeight: 1.3,
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                {lines.map((ln, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      display: "block",
+                      marginTop: i ? lineGap : 0,
+                      whiteSpace: nowrap ? "nowrap" : undefined,
+                      wordBreak: "keep-all",
+                    }}
+                  >
+                    {ln}
+                  </span>
+                ))}
+              </h2>
+            )}
+            {subtitle && (
+              <p
+                className="font-subtext"
+                style={{
+                  marginTop: 16,
+                  fontSize: 29,
+                  lineHeight: 1.6,
+                  color: "rgba(255,255,255,.86)",
+                }}
+              >
+                {subtitle}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================
+   Main
+   ========================= */
 export default function Home() {
   return (
-    <div className="bg-black text-white font-display overflow-x-hidden">
+    <div className="bg-black text-white font-display min-h-screen overflow-x-auto">
       <main className="w-full">
-        {/* 섹션 1 */}
-        <section className="h-screen w-full">
-          <div
-            className="h-full w-full bg-cover bg-center"
-            style={{
-              backgroundImage:
-                'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCfcdFy_ve1VkkcRHnd8VsV-gXNYWDds94bYKTndBKDN4ElaBKkXywPR6pn0QVsfNCXgkN24U3pMr5SDzfRlLlLOhon1Kmr34F4AXwm8LW6dx876ayr1SU4z5jR42GhF8dEzgiDZCQ5vtJdo75jH9hxkUOyHd82RJK2-fs8JjFH1Ub7TG8IB5a2lM5Ufa9Iu_w0Iubimn8XpeLD-XC_eSpV9daUWkjUQEFThWX7G42gIvUiF5ibjOzA_xHoSqNH-fg1mbyDVuqlGJg")',
-            }}
-          ></div>
-        </section>
+        {/* HERO 1 */}
+        <BackgroundSection
+          name="hero1"
+          alt="Hero 1"
+          feather={180}
+          overlapNext={84}
+          bridge
+        />
+        <CopyBand
+          titleLines={["운동의 시작,", "변화의 '첫 걸음'"]}
+          subtitle="당신의 결심 하나가 건강한 평생을 만듭니다."
+          featherTop={96}
+          pullUp={60}
+        />
 
-        <section className="h-[33vh] w-full flex flex-col justify-center items-start text-left px-4 sm:px-12">
-          <div>
-            <h1 className="font-headline font-bold text-5xl sm:text-7xl">
-              운동의 시작, 변화의 첫 걸음
-            </h1>
-            <p className="font-subtext text-base sm:text-xl mt-4 max-w-2xl font-light">
-              당신의 결심 하나가 건강한 내일을 만듭니다
-            </p>
+        {/* 프로그램(카드) */}
+        <section
+          className="w-full"
+          style={{ position: "relative", zIndex: 1, marginTop: -16 }}
+        >
+          <div className="mx-auto" style={{ width: SHELL_W, minWidth: SHELL_W }}>
+            <ProgramsSection />
           </div>
         </section>
 
-        {/* 섹션 2 */}
-        <section className="h-screen w-full">
-          <div
-            className="h-full w-full bg-cover bg-center"
-            style={{
-              backgroundImage:
-                'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDgAmQkY0HIYALYxC_D1-pN0cbin9jrXtm1Vn5zQnZVD8jZwyg2pAZGzeNkR2sJ3F7dxozxUURTEPqL9GpoYZ4_S5-BcUiwxAh_4F8kPWvfiAP941bX8m4zDAg9aIWH5cTY6dqzx8v8MgWQnuLNia_YRBLOBaf9RLLQ6OgPvR_65e4XCvvvlJb7rXbkPECJfqSXY7pp6cNuOQ8ALHmMyhvXily7Nouw6yXQR5fJsnLWcgVeYJkADC1FE9hMNUY0TOQmKlHbRdtBgMU")',
-            }}
-          ></div>
-        </section>
+        {/* HERO 2 */}
+        <BackgroundSection
+          name="hero2"
+          alt="Hero 2"
+          feather={170}
+          overlapNext={78}
+          bridge
+        />
+        <CopyBand
+          titleLines={["두려움은,", "자연스러운 시작입니다"]}
+          featherTop={90}
+          pullUp={54}
+        />
 
-        <section className="h-[33vh] w-full flex flex-col justify-center items-start text-left px-4 sm:px-12">
-          <div>
-            <h1 className="font-headline font-bold text-5xl sm:text-7xl">
-              모든 변화에는 좋은 환경이 필요합니다
-            </h1>
-            <p className="font-subtext text-base sm:text-xl mt-4 max-w-2xl font-light">
-              프리미엄 시설과 전문 코칭으로, 목표를 현실로 만드는 여정을 함께합니다
-            </p>
-          </div>
-        </section>
+        {/* ===== HERO 3 (BG3) : 네온 한 줄기 =====
+            - 효과/팔레트/애니메이션 등은 그대로
+            - 오직 '세로 길이'만 아래로 더 연장
+              → extendBottom + CopyBand pullUp 조정 */}
+        <BackgroundSection
+          name="hero3"
+          alt="Neon Beam"
+          feather={170}
+          overlapNext={0}      // 다른 섹션과의 기본 겹침은 그대로
+          bridge={false}       // 브릿지 비활성 (고정)
+          extendBottom={420}   // ★ BG3 구간을 아래로 더 길게 확보
+        />
 
-        {/* 섹션 3 */}
-        <section className="h-screen w-full">
-          <div
-            className="h-full w-full bg-cover bg-center"
-            style={{
-              backgroundImage:
-                'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDgAmQkY0HIYALYxC_D1-pN0cbin9jrXtm1Vn5zQnZVD8jZwyg2pAZGzeNkR2sJ3F7dxozxUURTEPqL9GpoYZ4_S5-BcUiwxAh_4F8kPWvfiAP941bX8m4zDAg9aIWH5cTY6dqzx8v8MgWQnuLNia_YRBLOBaf9RLLQ6OgPvR_65e4XCvvvlJb7rXbkPECJfqSXY7pp6cNuOQ8ALHmMyhvXily7Nouw6yXQR5fJsnLWcgVeYJkADC1FE9hMNUY0TOQmKlHbRdtBgMU")',
-            }}
-          ></div>
-        </section>
+        {/* BG3 아래 텍스트: BG3 안쪽을 더 깊게 파고 들어가도록 위로 끌어올림 */}
+        <CopyBand
+          titleLines={["시작은 작아도", "비로소,", "지속이 거름이 될 때"]}
+          subtitle="내일은 결국 성장합니다."
+          featherTop={90}
+          pullUp={220}         // ★ 위로 더 당겨서 BG3 스펙트럼 위에 올라가게
+        />
 
-        <section className="h-[33vh] w-full flex flex-col justify-center items-start text-left px-4 sm:px-12">
-          <div>
-            <h1 className="font-headline font-bold text-5xl sm:text-7xl">
-              매일의 루틴이 나를 바꾼다
-            </h1>
-            <p className="font-subtext text-base sm:text-xl mt-4 max-w-2xl font-light">
-              작은 시작이 큰 변화를 만듭니다. 지금, 당신의 건강한 일상이 완성됩니다
-            </p>
-          </div>
-        </section>
-
-        {/* 섹션 4 */}
-        <section className="h-screen w-full">
-          <div
-            className="h-full w-full bg-cover bg-center"
-            style={{
-              backgroundImage:
-                'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAhYG32DC9RQGeq0diVlt8R9JoEIlnJQdASHkP0RYsv0q57Zfr_ZJoPiYsnhQ-MJgbEDrCrQQSq9Udv3s8zop1U6hFff8ONC-cV_Wiw4ZXqNb4oa7Dwk2Rn7tOXpo3rE1rsqR-MAfvwA8-7zuqTW2gfvvQz848EApmgbP5fL9mxk5hWyoi2IcZoq-l0OYb6qIhAPQydMuVXq7A-Q00Wyi76R4GQtki6xo8rsV0SkMBG3xJ3us9exzVSRi-7XFYcjNSGhnshMtIBdNw")',
-            }}
-          ></div>
-        </section>
-
-        <section className="h-[33vh] w-full flex flex-col justify-center items-start text-left px-4 sm:px-12">
-          <div>
-            <h1 className="font-headline font-bold text-5xl sm:text-7xl">
-              새로운 당신을 만나보세요
-            </h1>
-            <p className="font-subtext text-base sm:text-xl mt-4 max-w-2xl font-light">
-              도전을 통해 성장하는 당신을 응원합니다
-            </p>
-          </div>
-        </section>
+        {/* HERO 4 */}
+        <BackgroundSection
+          name="hero4"
+          alt="Hero 4"
+          feather={160}
+          overlapNext={0}
+          bridge={false}
+        />
       </main>
 
-      {/* 푸터 */}
-      <footer className="bg-black py-12 px-4 sm:px-12">
-        <div className="container mx-auto flex flex-col items-center">
-          <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+      {/* 푸터(현행 유지) */}
+      <footer
+        className="border-t border-[#2A2A2A] bg-black"
+        style={{ width: SHELL_W, padding: "48px 48px 64px", margin: "0 auto" }}
+      >
+        <div style={{ width: SHELL_W - 96, margin: "0 auto" }}>
+          <div
+            className="flex items-center gap-4"
+            style={{
+              width: "100%",
+              justifyContent: "space-between",
+              marginBottom: 32,
+            }}
+          >
             {[
               { icon: "corporate_fare", text: "회사소개" },
               { icon: "description", text: "이용약관" },
@@ -107,7 +198,24 @@ export default function Home() {
               <a
                 key={i}
                 href="#"
-                className="flex-1 w-full text-center bg-black text-neon-green py-3 px-4 border border-neon-green hover:bg-neon-green hover:text-black transition-colors duration-300 flex items-center justify-center gap-2"
+                className="flex items-center justify-center transition-colors duration-300"
+                style={{
+                  width: 248,
+                  height: 52,
+                  border: "1px solid #D6A84F",
+                  color: "#D6A84F",
+                  background: "black",
+                  gap: 8,
+                  textAlign: "center",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#D6A84F";
+                  e.currentTarget.style.color = "#000";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "black";
+                  e.currentTarget.style.color = "#D6A84F";
+                }}
               >
                 <span className="material-symbols-outlined">{item.icon}</span>
                 {item.text}
@@ -115,22 +223,31 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="text-center text-gray-400 text-sm space-y-1">
+          <div
+            style={{
+              textAlign: "center",
+              color: "#9ca3af",
+              fontSize: 14,
+              lineHeight: "22px",
+            }}
+          >
             <p>
-              <span className="text-white font-semibold">주식회사 스티치</span> | 대표:
-              홍길동 | 사업자등록번호: 123-45-67890 | 통신판매업신고번호:
-              제2024-서울강남-00000호
+              <span style={{ color: "#fff", fontWeight: 600 }}>
+                주식회사 스티치
+              </span>{" "}
+              | 대표: 홍길동 | 사업자등록번호: 123-45-67890 |
+              통신판매업신고번호: 제2024-서울강남-00000호
             </p>
             <p>
-              주소: 서울특별시 강남구 테헤란로 123, 4층 | TEL: 02-1234-5678 | E-MAIL:
-              contact@stitchdesign.com
+              주소: 서울특별시 강남구 테헤란로 123, 4층 | TEL: 02-1234-5678 |
+              E-MAIL: contact@stitchdesign.com
             </p>
-            <p className="pt-4 text-gray-500">
+            <p style={{ paddingTop: 16, color: "#6b7280" }}>
               COPYRIGHT © STITCH DESIGN ALL RIGHTS RESERVED.
             </p>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }

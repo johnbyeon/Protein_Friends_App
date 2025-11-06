@@ -1,0 +1,70 @@
+/* ==== BG3 하단만 유기적으로 '편집'하는 얇은 오버레이 ==== */
+
+section[data-bg3="on"].bg3-wrap { position: relative; }
+
+/* 네온/페이드 레이어 관계는 유지, 조각 오버레이는 이미지 위·페이드 아래 */
+section[data-bg3="on"].bg3-wrap .bg3-neon { z-index: 3; }     /* 네온 */
+section[data-bg3="on"].bg3-wrap .bg3-fade-bottom { z-index: 4; } /* 기존 하단 페이드가 최상단 */
+
+section[data-bg3="on"].bg3-wrap::after{
+  content:"";
+  position:absolute;
+  left:0; right:0; bottom:0;
+  height: 26vh;                 /* 하단 조각 범위 */
+  z-index:2;                    /* 이미지(0) 위, 네온(3)/페이드(4) 아래 */
+  pointer-events:none;
+  /* 검은 오버레이를 살짝 올려 덮어 자르는 느낌 + 위쪽으로 부드럽게 사라짐 */
+  background:
+    linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.0) 75%);
+
+  /* 들쑥날쑥 컷: clip-path를 약하게 애니메이션 (지그재그 아님, 유기적 곡선) */
+  clip-path: polygon(
+    0% 100%, 100% 100%,
+    100% calc(48% + 0px),
+     92% calc(48% + 8px),
+     84% calc(48% - 6px),
+     76% calc(48% + 10px),
+     68% calc(48% - 8px),
+     60% calc(48% + 6px),
+     52% calc(48% - 6px),
+     44% calc(48% + 8px),
+     36% calc(48% - 8px),
+     28% calc(48% + 6px),
+     20% calc(48% - 4px),
+     12% calc(48% + 8px),
+      0% calc(48% - 0px)
+  );
+
+  animation: bg3BottomSculpt 11s ease-in-out infinite alternate;
+  will-change: clip-path, opacity, transform;
+}
+
+/* 유기적, 저진폭(시각적 혼란은 만들되 이질감은 최소화) */
+@keyframes bg3BottomSculpt{
+  0%{
+    clip-path: polygon(
+      0% 100%,100% 100%,
+      100% 48%,92% calc(48% + 8px),84% calc(48% - 6px),
+      76% calc(48% + 10px),68% calc(48% - 8px),60% calc(48% + 6px),
+      52% calc(48% - 6px),44% calc(48% + 8px),36% calc(48% - 8px),
+      28% calc(48% + 6px),20% calc(48% - 4px),12% calc(48% + 8px),0% 48%
+    );
+  }
+  100%{
+    clip-path: polygon(
+      0% 100%,100% 100%,
+      100% 48%,92% calc(48% - 6px),84% calc(48% + 8px),
+      76% calc(48% - 10px),68% calc(48% + 6px),60% calc(48% - 8px),
+      52% calc(48% + 6px),44% calc(48% - 8px),36% calc(48% + 6px),
+      28% calc(48% - 6px),20% calc(48% + 4px),12% calc(48% - 6px),0% 48%
+    );
+  }
+}
+
+/* (선택) 미세한 숨쉬기 – 전반적 텐션만 아주 약하게, 모바일도 안전 */
+@media (prefers-reduced-motion: no-preference){
+  section[data-bg3="on"].bg3-wrap::after{
+    animation-name: bg3BottomSculpt;
+    animation-duration: 10.5s;
+  }
+}

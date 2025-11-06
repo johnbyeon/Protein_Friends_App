@@ -1,0 +1,118 @@
+/* =========================
+   TypoDraw – 선이 그려지고 네온이 피어나는 타이포
+   ========================= */
+.tdraw {
+  position: relative;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  padding: 48px 0 56px;
+  isolation: isolate;             /* 네온 번짐 고립 */
+  --td-neon: #3DFA2F;
+}
+
+.tdraw--center { text-align: center; }
+.tdraw--left   { text-align: left;  }
+
+.tdraw__svg {
+  width: min(1200px, 92vw);
+  height: auto;
+  line-height: 0;
+  overflow: visible;
+}
+
+/* 공통 타이포 설정 */
+.tdraw__svg text {
+  font-family: "Pretendard", "Apple SD Gothic Neo", system-ui, -apple-system, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  /* 반응형 크기: 데스크탑 크게, 모바일 자동 축소 */
+  font-size: clamp(44px, 8.6vw, 140px);
+}
+
+/* 1) Stroke: 선 그려지는 효과 */
+.tdraw__stroke {
+  fill: none;
+  stroke: #EAFEE9;
+  stroke-width: 6.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  /* dash를 크게 잡아서 → 0으로 줄이며 드로잉 */
+  stroke-dasharray: 2200;
+  stroke-dashoffset: 2200;
+  filter: drop-shadow(0 0 6px rgba(0,0,0,.85));
+  opacity: 0.95;
+  transition: stroke .2s linear;
+}
+
+/* 2) Fill: 선 뒤에 서서히 채움 */
+.tdraw__fill {
+  fill: #EAFEE9;
+  opacity: 0;
+}
+
+/* 3) Glow: 네온은 별도 레이어 */
+.tdraw__glow {
+  fill: var(--td-neon);
+  opacity: 0;
+  filter:
+    blur(10px)
+    drop-shadow(0 0 14px color-mix(in srgb, var(--td-neon) 85%, transparent))
+    drop-shadow(0 0 26px color-mix(in srgb, var(--td-neon) 55%, transparent));
+  mix-blend-mode: screen;     /* 배경에만 살짝 빛 스며듦 */
+}
+
+/* 재생 상태 */
+.tdraw__svg.is-play .tdraw__stroke {
+  animation: tdraw-draw 1.6s ease-in-out forwards;
+}
+.tdraw__svg.is-play .tdraw__fill {
+  animation: tdraw-fill .6s ease-out forwards;
+  animation-delay: 1.25s;
+}
+.tdraw__svg.is-play .tdraw__glow {
+  animation: tdraw-glow .8s ease-out forwards;
+  animation-delay: 1.35s;
+}
+
+/* 서브(영문 보조) */
+.tdraw__sub {
+  margin-top: 18px;
+  font-family: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: var(--td-neon);
+  opacity: 0;
+  text-shadow:
+    0 0 10px color-mix(in srgb, var(--td-neon) 85%, transparent),
+    0 0 20px color-mix(in srgb, var(--td-neon) 65%, transparent);
+}
+.tdraw__sub.is-play {
+  animation: tdraw-sub .7s ease-out forwards;
+  animation-delay: 1.45s;
+}
+
+/* ===== 애니메이션 ===== */
+@keyframes tdraw-draw {
+  0%   { stroke-dashoffset: 2200; }
+  100% { stroke-dashoffset: 0; }
+}
+@keyframes tdraw-fill {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes tdraw-glow {
+  0%   { opacity: 0; transform: scale(0.98); }
+  100% { opacity: .95; transform: scale(1); }
+}
+@keyframes tdraw-sub {
+  0%   { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* 모바일 여백 */
+@media (max-width: 768px) {
+  .tdraw { padding: 36px 0 40px; }
+}

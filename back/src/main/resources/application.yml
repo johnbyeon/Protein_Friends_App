@@ -15,6 +15,11 @@ spring:
     activate:
       on-profile: common
 
+cloud:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET_NAME}
+
 ---
 spring:
   config:
@@ -29,7 +34,11 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
+
+    sql:
+      init:
+        mode: always
     properties:
       hibernate:
         show_sql: true
