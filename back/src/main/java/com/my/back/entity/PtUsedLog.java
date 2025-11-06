@@ -59,4 +59,22 @@ public class PtUsedLog {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pt_class_id", nullable = false)
     private PTClassInfo ptClass;
+
+    // ✅ 추가: 사용 로그 취소 (삭제 대신 status만 false로 변경)
+    public void cancel() {
+        this.status = false;
+    }
+
+    // ✅ 추가: 사용 로그 생성 (출석 시 1회 차감 기록용)
+    public static PtUsedLog create(Users u, TrainerInfo t, PTClassInfo cls, int usedCount, int totalCount) {
+        return PtUsedLog.builder()
+                .users(u)
+                .trainer(t)
+                .ptClass(cls)
+                .usedCount(usedCount)
+                .totalCount(totalCount)
+                .date(LocalDateTime.now())
+                .status(true)
+                .build();
+    }
 }
