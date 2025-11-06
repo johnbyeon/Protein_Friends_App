@@ -16,11 +16,15 @@ import lombok.*;
 @Builder
 public class GymStationInfo {
 
+    /** 고유 식별자 (PK) */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "station_id")
+    private Long stationId;
     /**
      * 지점 번호 (복합키 일부, not null)
      * - gym_info.g_id 참조
      */
-    @Id
     @Column(name = "g_id", nullable = false)
     private Long gId;
 
@@ -28,7 +32,6 @@ public class GymStationInfo {
      * 역이름 (복합키 일부, not null)
      * - 예: "강남역"
      */
-    @Id
     @Column(name = "g_station_name", nullable = false, length = 100)
     private String gStationName;
 
