@@ -45,6 +45,10 @@
   --color-accent: #FFB700;         /* 포인트 노랑 */
 }
 
+@import "./styles/neonBeamFlow.css";
+@import "./styles/neonIllusion.css";
+@import "./styles/neonEdgeJitter.css";
+
 /* === B3 Light Streaks ===================================== */
 
 /* 섹션 자체는 Home.jsx에서 marginBottom으로만 제어 */
@@ -368,3 +372,4 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #32c46e;
 }
+
