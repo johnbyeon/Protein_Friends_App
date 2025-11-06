@@ -11,11 +11,14 @@ import com.my.back.repository.BoardRepository;
 import com.my.back.repository.BoardTypeRepository;
 import com.my.back.repository.BoardViewerRepository;
 import com.my.back.repository.TrainerInfoRepository;
+import com.my.back.util.S3Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +37,10 @@ public class AdminBoardService {
     private final BoardTypeRepository boardTypeRepository;
     private final TrainerInfoRepository trainerInfoRepository;
     private final BoardViewerRepository boardViewerRepository;
+    private final S3PresignService s3PresignService;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
 
     /**
      * 게시글 타입별 목록 조회 (관리자용 - 숨김 게시글 포함)
@@ -53,7 +60,13 @@ public class AdminBoardService {
                 .map(board -> {
                     String trainerName = getTrainerName(board.getTId());
                     Long viewCount = boardViewerRepository.countByPId(board.getPId());
-                    return BoardListResponse.from(board, typeName, trainerName, viewCount);
+
+                    // 이미지 URL 처리: S3 Key → Presigned URL 변환
+                    String imageUrl = convertToPresignedUrl(board.getPImageUrl());
+
+                    BoardListResponse response = BoardListResponse.from(board, typeName, trainerName, viewCount);
+                    response.setPImageUrl(imageUrl);  // Presigned URL로 교체
+                    return response;
                 })
                 .collect(Collectors.toList());
     }
@@ -84,13 +97,16 @@ public class AdminBoardService {
             throw new IllegalArgumentException("존재하지 않는 게시글 타입입니다: " + request.getPTypeId());
         }
 
+        // 이미지 URL 처리: Presigned URL → S3 Key 추출
+        String imageS3Key = S3Util.extractS3Key(request.getPImageUrl());
+
         // Board 엔티티 생성
         Board board = Board.builder()
                 .pTypeId(request.getPTypeId())
                 .tId(trainerId)
                 .pTitle(request.getPTitle().trim())
                 .pContent(request.getPContent().trim())
-                .pImageUrl(request.getPImageUrl())
+                .pImageUrl(imageS3Key)  // S3 Key만 저장
                 .pLink(request.getPLink())
                 .pIsPopup(request.getPIsPopup() != null ? request.getPIsPopup() : false)
                 .isAlwaysPopup(request.getIsAlwaysPopup() != null ? request.getIsAlwaysPopup() : false)
@@ -138,7 +154,9 @@ public class AdminBoardService {
             board.setPContent(request.getPContent().trim());
         }
         if (request.getPImageUrl() != null) {
-            board.setPImageUrl(request.getPImageUrl());
+            // 이미지 URL 처리: Presigned URL → S3 Key 추출
+            String imageS3Key = S3Util.extractS3Key(request.getPImageUrl());
+            board.setPImageUrl(imageS3Key);  // S3 Key만 저장
         }
         if (request.getPLink() != null) {
             board.setPLink(request.getPLink());
@@ -209,5 +227,36 @@ public class AdminBoardService {
         }
         BoardType boardType = boardTypeRepository.findById(pTypeId).orElse(null);
         return boardType != null ? boardType.getPTypeName() : "알 수 없음";
+    }
+
+    /**
+     * S3 Key를 Presigned URL로 변환 (이미지 조회용)
+     * - S3 Key가 이미 URL 형태면 그대로 반환 (하위 호환성)
+     * - S3 Key 형태면 Presigned URL 생성 (24시간 유효)
+     *
+     * @param s3KeyOrUrl S3 Key 또는 URL
+     * @return Presigned URL
+     */
+    private String convertToPresignedUrl(String s3KeyOrUrl) {
+        if (s3KeyOrUrl == null || s3KeyOrUrl.trim().isEmpty()) {
+            return null;
+        }
+
+        // 이미 URL 형태면 그대로 반환 (하위 호환성)
+        if (S3Util.isS3Url(s3KeyOrUrl)) {
+            return s3KeyOrUrl;
+        }
+
+        // S3 Key 형태면 Presigned URL 생성
+        try {
+            return s3PresignService.getDownloadUrl(
+                    bucketName,
+                    s3KeyOrUrl,
+                    Duration.ofHours(24)  // 24시간 유효
+            );
+        } catch (Exception e) {
+            log.error("❌ Presigned URL 생성 실패 (Board.pImageUrl): key={}", s3KeyOrUrl, e);
+            return s3KeyOrUrl;  // 실패 시 원본 반환
+        }
     }
 }

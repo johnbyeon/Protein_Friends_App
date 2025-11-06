@@ -19,6 +19,8 @@ import MyCoupons from '../pages/MyCoupons'
 import MyMemberships from '../pages/MyMemberships'
 import MyPTPasses from '../pages/MyPTPasses'
 import MyInbody from '../pages/MyInbody'
+import MyInquiries from '../pages/user/support/MyInquiries'
+import FaqList from '../pages/user/support/FaqList'
 
 // Board Components
 import BoardList from '../components/boards/BoardList'
@@ -32,6 +34,9 @@ import AdminDashboard from '../pages/AdminDashboard'
 import UploadTest from '../pages/UploadTest'
 import TrainerCreate from '../pages/admin/trainers/TrainerCreate'
 import TrainerProfile from '../pages/trainer/TrainerProfile'
+import InquiryManagement from '../pages/admin/support/InquiryManagement'
+import InquiryReply from '../pages/admin/support/InquiryReply'
+import FaqManagement from '../pages/admin/support/FaqManagement'
 
 // Access & Branch Pages
 import AccessCheck from '../pages/access/AccessCheck'
@@ -58,7 +63,7 @@ export default function AppRoutes() {
 
         {/* 공통 페이지 (모든 로그인 유저) */}
         <Route path="home" element={<Home />} />
-        <Route path="me" element={<MyInfo />} />
+        <Route path="my/info" element={<MyInfo />} />
 
         {/* ==================== 게시판 (공통) ==================== */}
         <Route path="boards/:typeAddressName" element={<BoardList />} />
@@ -69,6 +74,10 @@ export default function AppRoutes() {
         {/* ==================== 공통 기능 ==================== */}
         <Route path="access" element={<AccessCheck />} />
         <Route path="branches" element={<BranchDetail />} />
+
+        {/* ==================== 고객센터 (유저용) ==================== */}
+        <Route path="support/inquiries" element={<MyInquiries />} />
+        <Route path="support/faqs" element={<FaqList />} />
 
         {/* ==================== USER 전용 ==================== */}
         <Route path="user">
@@ -200,6 +209,33 @@ export default function AppRoutes() {
               </RoleGuard>
             }
           />
+
+          {/* 고객센터 - 1:1 문의 관리 */}
+          <Route
+            path="support/inquiries"
+            element={
+              <RoleGuard allowedRoles={['TRAINER']}>
+                <InquiryManagement />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="support/inquiries/:id/reply"
+            element={
+              <RoleGuard allowedRoles={['TRAINER']}>
+                <InquiryReply />
+              </RoleGuard>
+            }
+          />
+                    {/* 고객센터 - FAQ 관리 (ADMIN 전용) */}
+          <Route
+            path="support/faqs"
+            element={
+              <RoleGuard allowedRoles={['TRAINER']}>
+                <FaqManagement />
+              </RoleGuard>
+            }
+          />
         </Route>
 
         {/* ==================== ADMIN 전용 ==================== */}
@@ -264,6 +300,34 @@ export default function AppRoutes() {
             element={
               <RoleGuard allowedRoles={['ADMIN']}>
                 <TrainerCreate />
+              </RoleGuard>
+            }
+          />
+
+          {/* 고객센터 - 1:1 문의 관리 */}
+          <Route
+            path="support/inquiries"
+            element={
+              <RoleGuard allowedRoles={['ADMIN']}>
+                <InquiryManagement />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="support/inquiries/:id/reply"
+            element={
+              <RoleGuard allowedRoles={['ADMIN', 'TRAINER']}>
+                <InquiryReply />
+              </RoleGuard>
+            }
+          />
+          
+          {/* 고객센터 - FAQ 관리 (ADMIN 전용) */}
+          <Route
+            path="support/faqs"
+            element={
+              <RoleGuard allowedRoles={['ADMIN']}>
+                <FaqManagement />
               </RoleGuard>
             }
           />

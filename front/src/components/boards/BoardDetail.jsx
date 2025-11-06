@@ -15,6 +15,13 @@ export default function BoardDetail() {
 
   // 게시글 상세 정보 불러오기
   useEffect(() => {
+    // pId가 없거나 undefined면 실행하지 않음
+    if (!pId || pId === 'undefined') {
+      setError('잘못된 게시글 ID입니다.')
+      setLoading(false)
+      return
+    }
+
     const loadBoard = async () => {
       setLoading(true)
       setError(null)
@@ -59,10 +66,8 @@ export default function BoardDetail() {
       }
     }
 
-    if (pId) {
-      loadBoard()
-    }
-  }, [pId])
+    loadBoard()
+  }, [pId, navigate])
 
   // 조회수 기록
   const recordView = async () => {
@@ -70,19 +75,33 @@ export default function BoardDetail() {
       const SERVER_ORIGIN = import.meta.env.VITE_SERVER_ORIGIN || ''
       const token = localStorage.getItem('jwt')
 
+      console.log('🔍 [BoardDetail] recordView 시작')
+      console.log('🔍 [BoardDetail] pId:', pId)
+      console.log('🔍 [BoardDetail] token exists:', !!token)
+      console.log('🔍 [BoardDetail] token:', token?.substring(0, 20) + '...')
+
       if (!token) {
-        console.log('조회수 기록 스킵: 로그인하지 않음')
+        console.log('❌ [BoardDetail] 조회수 기록 스킵: 로그인하지 않음')
         return
       }
 
-      await fetch(`${SERVER_ORIGIN}/api/boards/${pId}/view`, {
+      const response = await fetch(`${SERVER_ORIGIN}/api/boards/${pId}/view`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
         }
       })
 
-      console.log('✅ 조회수 기록 완료')
+      console.log('🔍 [BoardDetail] 조회수 기록 응답:', response.status)
+      console.log('🔍 [BoardDetail] 조회수 기록 ok:', response.ok)
+
+      if (response.ok) {
+        console.log('✅ [BoardDetail] 조회수 기록 완료')
+      } else {
+        console.log('❌ [BoardDetail] 조회수 기록 실패:', response.statusText)
+        const errorText = await response.text()
+        console.log('❌ [BoardDetail] 에러 내용:', errorText)
+      }
     } catch (err) {
       // 조회수 기록 실패해도 게시글 조회에는 영향 없음
       console.error('조회수 기록 실패:', err)

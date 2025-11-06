@@ -4,6 +4,7 @@ import { useBranchStore } from '../stores/branchStore'
 import { useAuthStore } from '../stores/authStore'
 import { openSocialPopup } from '../utils/openSocialPopup'
 import AddressSearchModal from '../components/AddressSearchModal'
+import LeftSidebar from '../components/LeftSidebar'
 import userprofile from '../assets/user_profile.svg'
 
 // S3 업로드 헬퍼
@@ -353,16 +354,22 @@ export default function MyInfo() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-background-dark">
-        <div className="text-gray-400 text-lg">정보를 불러오는 중...</div>
+      <div className="flex min-h-screen bg-background-dark">
+        <LeftSidebar />
+        <div className="flex-1 flex justify-center items-center">
+          <div className="text-gray-400 text-lg">정보를 불러오는 중...</div>
+        </div>
       </div>
     )
   }
 
   if (!userInfo) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-background-dark">
-        <div className="text-error text-lg">사용자 정보를 찾을 수 없습니다.</div>
+      <div className="flex min-h-screen bg-background-dark">
+        <LeftSidebar />
+        <div className="flex-1 flex justify-center items-center">
+          <div className="text-error text-lg">사용자 정보를 찾을 수 없습니다.</div>
+        </div>
       </div>
     )
   }
@@ -370,8 +377,10 @@ export default function MyInfo() {
   const hasSocialAccount = userInfo.googleLinked || userInfo.naverLinked || userInfo.kakaoLinked
 
   return (
-    <div className="flex justify-center w-full min-h-screen py-8 bg-background-dark">
-      <div className="w-full max-w-4xl px-4 md:px-8">
+    <div className="flex min-h-screen bg-background-dark">
+      <LeftSidebar />
+      <div className="flex-1 flex justify-center py-8">
+        <div className="w-full max-w-4xl px-4 md:px-8">
         <h1 className="text-3xl font-bold text-primary mb-4">내 정보 보기</h1>
         
         {/* 메시지 (상단 표시) */}
@@ -770,6 +779,7 @@ export default function MyInfo() {
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }

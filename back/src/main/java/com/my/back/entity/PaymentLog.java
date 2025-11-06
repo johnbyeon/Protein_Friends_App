@@ -2,7 +2,7 @@ package com.my.back.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "payment_log")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -42,21 +43,23 @@ public class PaymentLog {
     @Column(name = "customer_name", nullable = false, length = 50)
     private String customerName;
 
-    /** 결제 완료 시점 (not null) */
-    @CreatedDate
-    @Column(name = "payment_time", nullable = false)
+    /** 결제 완료 시점 (자동 생성) */
+    @CreationTimestamp
+    @Column(name = "payment_time", nullable = false, updatable = false)
     private LocalDateTime paymentTime;
 
     /** 영수증 URL (nullable) */
     @Column(name = "receipt_url", length = 500)
     private String receiptUrl;
 
-    /**
-     * 결제 상태 (not null, default DONE)
-     * - enum: DONE, CANCELED, PARTIAL_CANCELED 등
-     */
+    /** 결제 상태 (not null, default DONE) */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     @Builder.Default
     private PaymentStatus status = PaymentStatus.DONE;
+
+    /** 회원 정보 (N:1 관계) */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "u_id", nullable = false) // FK
+    private Users users;
 }

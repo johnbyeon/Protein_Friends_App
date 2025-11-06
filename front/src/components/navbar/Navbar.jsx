@@ -105,7 +105,15 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                {(hasUserAccess || hasTrainerAccess || hasAdminAccess) && <a href="/me" className="block px-4 py-2 text-lg hover:bg-primary/20">내 정보</a>}
+                {hasUserAccess && (
+                  <>
+                    <a href="/my/info" className="block px-4 py-2 text-lg hover:bg-primary/20">정보보기</a>
+                    <a href="/my/memberships" className="block px-4 py-2 text-lg hover:bg-primary/20">내 회원권 보기</a>
+                    <a href="/my/pt-passes" className="block px-4 py-2 text-lg hover:bg-primary/20">PT횟수 이용권 보기</a>
+                    <a href="/my/coupons" className="block px-4 py-2 text-lg hover:bg-primary/20">할인권 보기</a>
+                    <a href="/my/inbody" className="block px-4 py-2 text-lg hover:bg-primary/20">인바디 데이터</a>
+                  </>
+                )}
                 {hasTrainerAccess && <a href="/trainer/profile" className="block px-4 py-2 text-lg hover:bg-primary/20">트레이너 프로필 수정</a>}
                 {hasAdminAccess && <a href="/admin/dashboard" className="block px-4 py-2 text-lg hover:bg-primary/20">관리자용</a>}
                 <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-lg text-red-400 hover:bg-primary/20">로그아웃</button>

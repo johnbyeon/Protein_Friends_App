@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "answer")
+@EntityListeners(org.springframework.data.jpa.domain.support.AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor

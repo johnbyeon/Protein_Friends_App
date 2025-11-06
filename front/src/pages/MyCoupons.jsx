@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import LeftSidebar from '../components/LeftSidebar'
 
 export default function MyCoupons() {
   const [coupons] = useState([
@@ -30,8 +31,9 @@ export default function MyCoupons() {
   ])
 
    return (
-    <div className="flex min-h-screen w-full flex-col bg-background-dark text-text-light">
-      <main className="flex-1">
+    <div className="flex min-h-screen bg-background-dark">
+      <LeftSidebar />
+      <main className="flex-1 bg-background-dark text-text-light">
         <div className="mx-auto max-w-4xl px-6 py-16">
           
           {/* 헤더 */}

@@ -3,7 +3,7 @@ package com.my.back.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
-
+import org.springframework.data.jpa.domain.support.AuditingEntityListener; // ✅ 추가
 import java.time.LocalDateTime;
 
 /**
@@ -16,16 +16,28 @@ import java.time.LocalDateTime;
  *  - User (u_id)
  */
 @Entity
-@Table(name = "class_user_info")
+@Table(
+        name = "class_user_info",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_class_user",
+                columnNames = {"pt_class_id", "u_id"}
+        )
+)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class) // ✅ 추가: @CreatedDate 작동시키기 위한 설정
 public class ClassUserInfo {
 
-    /** PT클래스 번호 (pt_class_info 테이블 FK, not null, number) */
+    /** 내부 PK (추가됨) */
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    /** PT클래스 번호 (pt_class_info 테이블 FK, not null, number) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pt_class_id", nullable = false)
     private PTClassInfo ptClassInfo;
@@ -38,5 +50,6 @@ public class ClassUserInfo {
     /** 신청 날짜 (not null, date time) */
     @Column(name = "datetime", nullable = false)
     @CreatedDate
-    private LocalDateTime datetime;
+    @Builder.Default
+    private LocalDateTime datetime = LocalDateTime.now(); // ⚙️ 개선: 기본값 지정 (Auditing 미작동 대비)
 }

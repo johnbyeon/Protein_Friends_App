@@ -111,5 +111,25 @@ public class PtInfo {
     @JoinColumn(name = "t_id", insertable = false, updatable = false)
     private TrainerInfo trainer;
 
+    // ✅ 추가: 남은 PT 횟수 필드
+    @Column(name = "remaining_count", nullable = false)
+    @Builder.Default
+    private Integer remainingCount = 0;
     // pt_id 관계는 해당 테이블 정의될 때 추가
+
+    // ✅ 추가: 잔여 PT 확인
+    public boolean hasRemaining() {
+        return remainingCount > 0 && status;
+    }
+
+    // ✅ 추가: 사용 1회 차감
+    public void useOne() {
+        if (remainingCount <= 0) throw new IllegalStateException("PT 잔여 횟수 부족");
+        remainingCount--;
+    }
+
+    // ✅ 추가: 사용 1회 복구
+    public void restoreOne() {
+        remainingCount++;
+    }
 }
