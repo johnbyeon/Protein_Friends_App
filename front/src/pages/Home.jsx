@@ -3,12 +3,13 @@ import React from "react";
 import ProgramsSection from "./ProgramsSection";
 import { maskTopUltra } from "../utils/maskUtils";
 import BackgroundSection from "../components/BackgroundSection";
-import B3LightStreaks from "../components/B3LightStreaks";
+import "../styles/neonIllusion.css";
+import "../styles/neonEdgeJitter.css";
 
 const SHELL_W = 1440;
 
 /* =========================
-   Copy Band
+   Copy Band (기존 유지)
    ========================= */
 function CopyBand({
   title,
@@ -103,7 +104,7 @@ export default function Home() {
   return (
     <div className="bg-black text-white font-display min-h-screen overflow-x-auto">
       <main className="w-full">
-        {/* HERO 1 → CopyBand */}
+        {/* HERO 1 */}
         <BackgroundSection
           name="hero1"
           alt="Hero 1"
@@ -128,7 +129,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* hero2 + 카피 */}
+        {/* HERO 2 */}
         <BackgroundSection
           name="hero2"
           alt="Hero 2"
@@ -138,21 +139,32 @@ export default function Home() {
         />
         <CopyBand
           titleLines={["두려움은,", "자연스러운 시작입니다"]}
-          // subtitle="시작은 작아도 비로소 지속이 거름이 될 때, 내일은 성장합니다."
           featherTop={90}
           pullUp={54}
         />
 
-        {/* hero3: 코드로 만든 light streaks + 카피 */}
-        <B3LightStreaks feather={160} overlapNext={72} bridge />
-        <CopyBand
-          titleLines={["움직이면,", "달라집니다"]}
-          subtitle="지속이 거름이 될 때, 비로소 내일은 자랍니다."
-          featherTop={86}
-          pullUp={50}
+        {/* ===== HERO 3 (BG3) : 네온 한 줄기 =====
+            - 효과/팔레트/애니메이션 등은 그대로
+            - 오직 '세로 길이'만 아래로 더 연장
+              → extendBottom + CopyBand pullUp 조정 */}
+        <BackgroundSection
+          name="hero3"
+          alt="Neon Beam"
+          feather={170}
+          overlapNext={0}      // 다른 섹션과의 기본 겹침은 그대로
+          bridge={false}       // 브릿지 비활성 (고정)
+          extendBottom={420}   // ★ BG3 구간을 아래로 더 길게 확보
         />
 
-        {/* hero4: 기존 이미지 */}
+        {/* BG3 아래 텍스트: BG3 안쪽을 더 깊게 파고 들어가도록 위로 끌어올림 */}
+        <CopyBand
+          titleLines={["시작은 작아도", "비로소,", "지속이 거름이 될 때"]}
+          subtitle="내일은 결국 성장합니다."
+          featherTop={90}
+          pullUp={220}         // ★ 위로 더 당겨서 BG3 스펙트럼 위에 올라가게
+        />
+
+        {/* HERO 4 */}
         <BackgroundSection
           name="hero4"
           alt="Hero 4"
@@ -220,9 +232,11 @@ export default function Home() {
             }}
           >
             <p>
-              <span style={{ color: "#fff", fontWeight: 600 }}>주식회사 스티치</span>{" "}
-              | 대표: 홍길동 | 사업자등록번호: 123-45-67890 | 통신판매업신고번호:
-              제2024-서울강남-00000호
+              <span style={{ color: "#fff", fontWeight: 600 }}>
+                주식회사 스티치
+              </span>{" "}
+              | 대표: 홍길동 | 사업자등록번호: 123-45-67890 |
+              통신판매업신고번호: 제2024-서울강남-00000호
             </p>
             <p>
               주소: 서울특별시 강남구 테헤란로 123, 4층 | TEL: 02-1234-5678 |
