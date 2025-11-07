@@ -42,4 +42,10 @@ public interface GymReviewRepository extends JpaRepository<GymReview, GymReviewI
     /** 지점 리뷰 총 개수 조회 */
     @Query("SELECT COUNT(r) FROM GymReview r WHERE r.gId = :gId")
     Long countByGId(@Param("gId") Long gId);
+
+    @Query("SELECT AVG(r.gRating) FROM GymReview r WHERE r.gymInfo.gId = :gymId")
+    Double findAverageRatingByGymId(@Param("gymId") Long gymId);
+
+    // ✅ 여기 수정
+    Long countByGymInfo_gId(Long gymId);
 }

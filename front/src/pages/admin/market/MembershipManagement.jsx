@@ -2,6 +2,43 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { get, post, put, del, presignUpload, getViewUrl } from '../../../lib/api'
 
+// S3 이미지 컴포넌트 (PtTicketManagement와 동일)
+const S3Image = ({ imageKey, alt, className, onError }) => {
+  const [imageUrl, setImageUrl] = useState('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjQwIiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Mb2FkaW5nLi4uPC90ZXh0Pgo8L3N2Zz4=')
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadImage = async () => {
+      try {
+        setLoading(true)
+        const url = await getViewUrl(imageKey)
+        setImageUrl(url)
+      } catch (error) {
+        console.error('이미지 로드 실패:', error)
+        setImageUrl('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjQwIiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5ObyBJbWFnZTwvdGV4dD4KPC9zdmc+')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (imageKey) {
+      loadImage()
+    }
+  }, [imageKey])
+
+  return (
+    <img
+      src={imageUrl}
+      alt={alt}
+      className={className}
+      onError={(e) => {
+        console.error('이미지 로드 에러:', e.target.src)
+        if (onError) onError(e)
+      }}
+    />
+  )
+}
+
 const MembershipManagement = () => {
   const navigate = useNavigate()
   const [memberships, setMemberships] = useState([])
@@ -11,7 +48,6 @@ const MembershipManagement = () => {
   const [selectedMembership, setSelectedMembership] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [uploadingImage, setUploadingImage] = useState(false)
-  const [imageUrls, setImageUrls] = useState({})
 
   const [formData, setFormData] = useState({
     membershipName: '',
@@ -22,29 +58,12 @@ const MembershipManagement = () => {
     isActive: true
   })
 
-  const getImageUrl = async (key) => {
-    if (!key) return null
-    try {
-      const url = await getViewUrl(key)
-      return url
-    } catch {
-      return `https://protein-friends-s3.s3.ap-northeast-2.amazonaws.com/${key}`
-    }
-  }
-
   const fetchMemberships = async () => {
     try {
       const response = await get('/api/admin/memberships')
       if (response.ok) {
         const data = await response.json()
         setMemberships(data)
-        const urls = {}
-        for (const membership of data) {
-          if (membership.membershipPicUrl) {
-            urls[membership.membershipPicUrl] = await getImageUrl(membership.membershipPicUrl)
-          }
-        }
-        setImageUrls(urls)
       }
     } finally {
       setLoading(false)
@@ -76,8 +95,6 @@ const MembershipManagement = () => {
         body: file
       })
       if (!response.ok) throw new Error('이미지 업로드 실패')
-       const imageUrl = putUrl.split('?')[0]
-      setImageUrls(prev => ({ ...prev, [key]: imageUrl }))
       return key
     } catch (e) {
       alert('이미지 업로드 실패: ' + e.message)
@@ -200,9 +217,6 @@ const MembershipManagement = () => {
                 />
               </div>
               <div className="flex items-center gap-4">
-                <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg border border-border-dark/60 hover:bg-primary/20">
-                  <span className="material-symbols-outlined text-base">filter_list</span>필터
-                </button>
                 <button
                   onClick={() => setShowAddModal(true)}
                   className="bg-primary text-white flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-primary/90"
@@ -234,9 +248,21 @@ const MembershipManagement = () => {
                     <tr key={m.membershipId} className="hover:bg-background-dark/40">
                       <td className="px-6 py-4">{i + 1}</td>
                       <td className="px-6 py-4">
-                        {m.membershipPicUrl && imageUrls[m.membershipPicUrl]
-                          ? <img src={imageUrls[m.membershipPicUrl]} alt={m.membershipName} className="h-12 w-12 object-cover rounded-lg border border-border-dark/60" />
-                          : <div className="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center"><span className="text-gray-400">📷</span></div>}
+                        {m.membershipPicUrl ? (
+                          <S3Image
+                            key={m.membershipPicUrl}
+                            imageKey={m.membershipPicUrl}
+                            alt={m.membershipName}
+                            className="h-12 w-12 object-cover rounded-lg border border-border-dark/60"
+                            onError={(e) => {
+                              e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjI0IiB5PSIyOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjgiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk5vIEltYWdlPC90ZXh0Pgo8L3N2Zz4='
+                            }}
+                          />
+                        ) : (
+                          <div className="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center">
+                            <span className="text-gray-400">📷</span>
+                          </div>
+                        )}
                       </td>
                       <td className="px-6 py-4 font-medium">{m.membershipName}</td>
                       <td className="px-6 py-4">{m.membershipDurationDays}일</td>
@@ -269,8 +295,6 @@ const MembershipManagement = () => {
             formData={formData}
             setFormData={setFormData}
             uploadingImage={uploadingImage}
-            imageUrls={imageUrls}
-            setImageUrls={setImageUrls}
             onClose={() => { setShowAddModal(false); resetForm() }}
             onSubmit={handleAddMembership}
             handleImageUpload={handleImageUpload}
@@ -283,8 +307,6 @@ const MembershipManagement = () => {
             formData={formData}
             setFormData={setFormData}
             uploadingImage={uploadingImage}
-            imageUrls={imageUrls}
-            setImageUrls={setImageUrls}
             onClose={() => { setShowEditModal(false); resetForm() }}
             onSubmit={handleEditMembership}
             handleImageUpload={handleImageUpload}
@@ -296,125 +318,139 @@ const MembershipManagement = () => {
 }
 
 // 모달 컴포넌트 공통화
-const Modal = ({ title, formData, setFormData, uploadingImage, imageUrls, setImageUrls, onClose, onSubmit, handleImageUpload }) => {
-  const getImageUrl = async (key) => {
-    if (!key) return null
-    try {
-      const { getViewUrl } = await import('../../../lib/api')
-      const url = await getViewUrl(key)
-      return url
-    } catch {
-      return `https://protein-friends-s3.s3.ap-northeast-2.amazonaws.com/${key}`
-    }
-  }
+const Modal = ({ title, formData, setFormData, uploadingImage, onClose, onSubmit, handleImageUpload }) => {
+  const finalPrice = parseFloat(formData.membershipPrice || 0) - parseFloat(formData.membershipSalePrice || 0)
 
   return (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
-    <div className="bg-background-dark/90 rounded-xl shadow-xl w-full max-w-2xl p-8 m-4 border border-border-dark/60">
-      <h3 className="text-2xl font-bold mb-6">{title}</h3>
-      <form onSubmit={onSubmit}>
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="space-y-4">
-            <div>
-  <label className="block text-sm font-medium text-gray-400 mb-2">회원권 이미지</label>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
+      <div className="bg-background-dark/90 rounded-xl shadow-xl w-full max-w-2xl p-8 m-4 border border-border-dark/60">
+        <h3 className="text-2xl font-bold text-text-light mb-6">{title}</h3>
+        <form onSubmit={onSubmit}>
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* 왼쪽 컬럼 */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">회원권 이름</label>
+                <input
+                  type="text"
+                  value={formData.membershipName}
+                  onChange={(e) => setFormData({ ...formData, membershipName: e.target.value })}
+                  className="w-full rounded-lg border border-border-dark/60 bg-background-dark/60 px-4 py-2.5 text-base text-text-light focus:border-primary focus:ring-primary"
+                  placeholder="예: 1개월 회원권"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">유효 기간 (일)</label>
+                <input
+                  type="number"
+                  value={formData.membershipDurationDays}
+                  onChange={(e) => setFormData({ ...formData, membershipDurationDays: e.target.value })}
+                  className="w-full rounded-lg border border-border-dark/60 bg-background-dark/60 px-4 py-2.5 text-base text-text-light focus:border-primary focus:ring-primary"
+                  placeholder="예: 30"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">회원권 이미지</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files[0]
+                    if (file) {
+                      const key = await handleImageUpload(file)
+                      if (key) {
+                        setFormData({ ...formData, membershipPicUrl: key })
+                      }
+                    }
+                  }}
+                  disabled={uploadingImage}
+                  className="w-full rounded-lg border border-border-dark/60 bg-background-dark/60 px-4 py-2.5 text-base text-text-light focus:border-primary focus:ring-primary file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary file:text-white hover:file:bg-primary/80 disabled:opacity-50"
+                />
+                {uploadingImage && (
+                  <p className="mt-2 text-sm text-primary">업로드 중...</p>
+                )}
+                {formData.membershipPicUrl && (
+                  <div className="mt-2">
+                    <S3Image
+                      key={formData.membershipPicUrl}
+                      imageKey={formData.membershipPicUrl}
+                      alt="회원권 이미지"
+                      className="h-20 w-20 object-cover rounded-lg border border-border-dark/60"
+                      onError={(e) => {
+                        e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjQwIiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5ObyBJbWFnZTwvdGV4dD4KPC9zdmc+'
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
 
-  {/* 이미지 클릭 업로드 박스 */}
-  <div
-    onClick={() => document.getElementById('membershipPicUpload').click()}
-    className="relative w-32 h-32 border border-border-dark/60 rounded-lg bg-background-dark/60 
-               flex items-center justify-center cursor-pointer hover:border-primary/70 transition-colors"
-  >
-     {formData.membershipPicUrl && imageUrls[formData.membershipPicUrl] ? (
-      <img
-        src={imageUrls[formData.membershipPicUrl]}
-        alt="회원권 이미지"
-        className="w-full h-full object-cover rounded-lg"
-      />
-    ) : formData.membershipPicUrl ? (
-      <div className="w-full h-full rounded-lg bg-gray-200 flex items-center justify-center">
-        <span className="text-gray-400">📷</span>
-      </div>
-    ) : (
-      <div className="text-gray-500 text-sm flex flex-col items-center gap-1">
-        <span className="material-symbols-outlined text-3xl">add_photo_alternate</span>
-        <span>이미지 추가</span>
-      </div>
-    )}
-    {uploadingImage && (
-      <div className="absolute inset-0 bg-blue-500/70 flex items-center justify-center rounded-lg">
-        <span className="text-white text-sm">업로드 중...</span>
-      </div>
-    )}
-  </div>
-
-  {/* 숨겨진 파일 입력 */}
-  <input
-    id="membershipPicUpload"
-    type="file"
-    accept="image/*"
-    className="hidden"
-    onChange={async (e) => {
-      const file = e.target.files[0]
-      if (file) {
-        const key = await handleImageUpload(file)
-        if (key) {
-          setFormData({ ...formData, membershipPicUrl: key })
-          // 잠시 후 이미지 URL 업데이트 (S3에 이미지가 완전히 저장될 시간 주기)
-          setTimeout(async () => {
-            const imageUrl = await getImageUrl(key)
-            setImageUrls(prev => ({ ...prev, [key]: imageUrl }))
-          }, 1000)
-        }
-      }
-    }}
-    disabled={uploadingImage}
-  />
-</div>
-
-            <Input label="회원권 이름" value={formData.membershipName} onChange={v => setFormData({ ...formData, membershipName: v })} />
-            <Input label="기간 (일)" type="number" value={formData.membershipDurationDays} onChange={v => setFormData({ ...formData, membershipDurationDays: v })} />
+            {/* 오른쪽 컬럼 */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">회원권 가격 (원)</label>
+                <input
+                  type="number"
+                  value={formData.membershipPrice}
+                  onChange={(e) => setFormData({ ...formData, membershipPrice: e.target.value })}
+                  className="w-full rounded-lg border border-border-dark/60 bg-background-dark/60 px-4 py-2.5 text-base text-text-light focus:border-primary focus:ring-primary"
+                  placeholder="예: 100000"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">할인 금액 (원)</label>
+                <input
+                  type="number"
+                  value={formData.membershipSalePrice}
+                  onChange={(e) => setFormData({ ...formData, membershipSalePrice: e.target.value })}
+                  className="w-full rounded-lg border border-border-dark/60 bg-background-dark/60 px-4 py-2.5 text-base text-text-light focus:border-primary focus:ring-primary"
+                  placeholder="예: 10000"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">최종 판매가 (원)</label>
+                <input
+                  type="text"
+                  value={`₩${finalPrice.toLocaleString()}`}
+                  disabled
+                  className="w-full rounded-lg border border-border-dark/60 bg-gray-700/50 px-4 py-2.5 text-base text-gray-400 cursor-not-allowed"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">판매 상태</label>
+                <select
+                  value={formData.isActive.toString()}
+                  onChange={(e) => setFormData({ ...formData, isActive: e.target.value === 'true' })}
+                  className="w-full rounded-lg border border-border-dark/60 bg-background-dark/60 px-4 py-2.5 text-base text-text-light focus:border-primary focus:ring-primary"
+                >
+                  <option value="true">판매중</option>
+                  <option value="false">판매중지</option>
+                </select>
+              </div>
+            </div>
           </div>
-          <div className="space-y-4">
-            <Input label="회원권 가격 (원)" type="number" value={formData.membershipPrice} onChange={v => setFormData({ ...formData, membershipPrice: v })} />
-            <Input label="할인 금액 (원)" type="number" value={formData.membershipSalePrice} onChange={v => setFormData({ ...formData, membershipSalePrice: v })} />
-            <input
-              type="text"
-              disabled
-              value={`₩${(parseFloat(formData.membershipPrice || 0) - parseFloat(formData.membershipSalePrice || 0)).toLocaleString()}`}
-              className="w-full rounded-lg border border-border-dark/60 bg-gray-700/50 px-4 py-2.5 text-gray-400 cursor-not-allowed"
-            />
-            <select
-              value={formData.isActive.toString()}
-              onChange={(e) => setFormData({ ...formData, isActive: e.target.value === 'true' })}
-              className="w-full rounded-lg border border-border-dark/60 bg-background-dark/60 px-4 py-2.5"
+
+          {/* 버튼 영역 */}
+          <div className="mt-8 flex justify-end gap-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-2.5 text-sm font-semibold text-text-light bg-transparent rounded-lg border border-border-dark/60 hover:bg-gray-800 transition-colors"
             >
-              <option value="true">판매중</option>
-              <option value="false">판매중지</option>
-            </select>
+              취소
+            </button>
+            <button
+              type="submit"
+              disabled={uploadingImage}
+              className="px-6 py-2.5 text-sm font-semibold text-white bg-primary rounded-lg hover:bg-primary/90 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+            >
+              {uploadingImage ? '처리 중...' : '저장'}
+            </button>
           </div>
-        </div>
-        <div className="mt-8 flex justify-end gap-4">
-          <button type="button" onClick={onClose} className="px-6 py-2.5 border rounded-lg">취소</button>
-          <button type="submit" disabled={uploadingImage} className="px-6 py-2.5 bg-primary text-white rounded-lg">
-            {uploadingImage ? '처리 중...' : '저장'}
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
-  </div>
   )
 }
-
-const Input = ({ label, value, onChange, type = 'text' }) => (
-  <div>
-    <label className="block text-sm font-medium text-gray-400 mb-2">{label}</label>
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full rounded-lg border border-border-dark/60 bg-background-dark/60 px-4 py-2.5"
-    />
-  </div>
-)
 
 export default MembershipManagement

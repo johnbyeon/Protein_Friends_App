@@ -120,6 +120,7 @@ const BranchListPage = () => {
           <div className="space-y-6">
              {branches && branches.length > 0 ? (
                branches.map((branch) => {
+                  console.log(JSON.stringify(branch, null, 2))
                   const isMyBranch = user?.gId === branch.gId;
                  return (
                    <div
@@ -144,6 +145,7 @@ const BranchListPage = () => {
                            <h2 className="text-2xl font-bold text-white mb-2">{branch.gName}</h2>
                             <div className="flex items-center gap-1 text-yellow-400">
                               <span className="material-symbols-outlined">star</span>
+                              {console.log(JSON.stringify(branch, null, 2))}
                               <span className="font-bold text-lg">{branch.averageRating?.toFixed(1) || '별점 없음'}</span>
                               <span className="text-white/70 text-sm">({branch.reviewCount || 0})</span>
                             </div>

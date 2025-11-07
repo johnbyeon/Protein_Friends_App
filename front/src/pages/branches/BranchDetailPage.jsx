@@ -2,7 +2,58 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useBranchStore } from '../../stores/branchStore';
 import { useAuthStore } from '../../stores/authStore';
-import { post } from '../../lib/api';
+import { post, getViewUrl } from '../../lib/api';
+
+// S3 이미지 컴포넌트 (트레이너용 - 403 에러 시 fallback)
+const S3Image = ({ imageKey, alt, className, onError }) => {
+  const [imageUrl, setImageUrl] = useState('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiBmaWxsPSIjMTExODI3Ii8+Cjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzNERkEyRiI+TG9hZGluZy4uLjwvdGV4dD4KPC9zdmc+')
+  const [loading, setLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
+
+  useEffect(() => {
+    const loadImage = async () => {
+      try {
+        setLoading(true)
+        setHasError(false)
+        const url = await getViewUrl(imageKey)
+        setImageUrl(url)
+      } catch (error) {
+        console.error('이미지 로드 실패 (403 Forbidden 가능성):', error)
+        setHasError(true)
+        // 403 에러 시 기본 이미지로 표시
+        setImageUrl('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiBmaWxsPSIjMTExODI3Ii8+Cjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzNERkEyRiI+Tm8gSW1hZ2U8L3RleHQ+Cjwvc3ZnPg==')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (imageKey) {
+      loadImage()
+    }
+  }, [imageKey])
+
+  // 403 에러 시 이미지 대신 아이콘 표시
+  if (hasError) {
+    return (
+      <div className={`${className} bg-gray-700 flex items-center justify-center`}>
+        <span className="text-gray-400 text-4xl">👤</span>
+      </div>
+    )
+  }
+
+  return (
+    <img
+      src={imageUrl}
+      alt={alt}
+      className={className}
+      onError={(e) => {
+        console.error('이미지 로드 에러:', e.target.src)
+        setHasError(true)
+        if (onError) onError(e)
+      }}
+    />
+  )
+}
 
 const BranchDetailPage = () => {
   const { gid } = useParams();
@@ -10,7 +61,7 @@ const BranchDetailPage = () => {
   const { user } = useAuthStore();
 
   const [branch, setBranch] = useState(null);
-  const [reviews, setReviews] = useState([]);
+  const [reviewData, setReviewData] = useState({ averageRating: null, totalCount: 0, reviews: [] });
   const [trainers, setTrainers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -34,11 +85,19 @@ const BranchDetailPage = () => {
         try {
           const reviewsData = await fetchBranchReviews(gid);
           console.log('🔍 [BranchDetailPage] reviewsData:', reviewsData);
-          // reviewsData가 객체이고 reviews 필드가 있으면 그 배열을 사용, 아니면 전체를 사용
-          setReviews(reviewsData && reviewsData.reviews ? reviewsData.reviews : (Array.isArray(reviewsData) ? reviewsData : []));
+          // reviewsData가 객체 형태로 옴: { averageRating, totalCount, reviews }
+          if (reviewsData && typeof reviewsData === 'object') {
+            setReviewData({
+              averageRating: reviewsData.averageRating || null,
+              totalCount: reviewsData.totalCount || 0,
+              reviews: Array.isArray(reviewsData.reviews) ? reviewsData.reviews : []
+            });
+          } else {
+            setReviewData({ averageRating: null, totalCount: 0, reviews: [] });
+          }
         } catch (err) {
           console.error('❌ [BranchDetailPage] 리뷰 로드 에러:', err);
-          setReviews([]);
+          setReviewData({ averageRating: null, totalCount: 0, reviews: [] });
         }
 
         // 트레이너 목록 로드 (개별 에러 처리)
@@ -124,7 +183,13 @@ const BranchDetailPage = () => {
       setShowReviewModal(false);
       // 리뷰 목록 새로고침
       const reviewsData = await fetchBranchReviews(gid);
-      setReviews(reviewsData);
+      if (reviewsData && typeof reviewsData === 'object') {
+        setReviewData({
+          averageRating: reviewsData.averageRating || null,
+          totalCount: reviewsData.totalCount || 0,
+          reviews: Array.isArray(reviewsData.reviews) ? reviewsData.reviews : []
+        });
+      }
     } catch (error) {
       console.error('리뷰 등록 중 오류:', error);
       alert('리뷰 등록에 실패했습니다. 다시 시도해주세요.');
@@ -185,14 +250,15 @@ const BranchDetailPage = () => {
               <div>
                 <div className="flex justify-between items-start">
                   <h2 className="text-2xl font-bold text-white mb-2">{branch.gName}</h2>
-                  <div className="flex items-center gap-1 text-yellow-400">
+                  <div className="flex items-center gap-2 text-yellow-400">
                     <span className="material-symbols-outlined">star</span>
                     <span className="font-bold text-lg">
-                      {reviews.length > 0
-                        ? (reviews.reduce((sum, r) => sum + r.gRating, 0) / reviews.length).toFixed(1)
-                        : '별점 없음'
+                      {reviewData.averageRating !== null && reviewData.averageRating !== undefined
+                        ? reviewData.averageRating.toFixed(1)
+                        : '0.0'
                       }
                     </span>
+                    <span className="text-white/60 text-sm">({reviewData.totalCount}개 리뷰)</span>
                   </div>
                 </div>
                 <p className="text-white/70 mb-1 flex items-center gap-2">
@@ -265,25 +331,48 @@ const BranchDetailPage = () => {
 
           {/* Reviews Section */}
           <div className="bg-surface rounded-lg border border-primary/50 p-6">
-            <h2 className="text-2xl font-bold mb-4">리뷰 ({reviews.length})</h2>
-            {reviews.length > 0 ? (
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">리뷰</h2>
+              <div className="flex items-center gap-4">
+                <div className="text-center">
+                  <div className="flex items-center gap-1 text-yellow-400">
+                    <span className="material-symbols-outlined">star</span>
+                    <span className="text-2xl font-bold">
+                      {reviewData.averageRating !== null && reviewData.averageRating !== undefined
+                        ? reviewData.averageRating.toFixed(1)
+                        : '0.0'
+                      }
+                    </span>
+                  </div>
+                  <p className="text-sm text-white/60 mt-1">총 {reviewData.totalCount}개 리뷰</p>
+                </div>
+              </div>
+            </div>
+            {reviewData.reviews.length > 0 ? (
               <div className="space-y-4">
-                {reviews.map((review) => (
-                  <div key={review.id} className="border-b border-gray-700 pb-4">
-                    <div className="flex items-center mb-2">
-                      <div className="flex text-yellow-400">
-                        {[...Array(5)].map((_, i) => (
-                          <span key={i} className={i < review.gRating ? 'text-yellow-400' : 'text-gray-600'}>★</span>
-                        ))}
+                {reviewData.reviews.map((review, index) => (
+                  <div key={review.id || index} className="border-b border-gray-700 pb-4 last:border-0">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <div className="flex text-yellow-400">
+                          {[...Array(5)].map((_, i) => (
+                            <span key={i} className={i < review.gRating ? 'text-yellow-400' : 'text-gray-600'}>★</span>
+                          ))}
+                        </div>
+                        <p className="text-white/80 font-medium">{review.authorName || '익명'}</p>
                       </div>
-                      <p className="ml-4 text-white/80">{review.authorName || '익명'}</p>
+                      {review.createdAt && (
+                        <p className="text-white/50 text-sm">
+                          {new Date(review.createdAt).toLocaleDateString('ko-KR')}
+                        </p>
+                      )}
                     </div>
-                    <p className="text-white/90">{review.gReview}</p>
+                    <p className="text-white/90 leading-relaxed">{review.gReview}</p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-white/70">아직 작성된 리뷰가 없습니다.</p>
+              <p className="text-white/70 text-center py-8">아직 작성된 리뷰가 없습니다.</p>
             )}
           </div>
         </div>
@@ -303,25 +392,61 @@ const BranchDetailPage = () => {
             <h2 className="text-3xl font-bold text-white mb-6">{branch.gName} 트레이너 정보</h2>
             <div className="space-y-6">
               {trainers.length > 0 ? (
-                trainers.map((trainer) => (
-                  <div key={trainer.tId} className="flex items-start gap-6">
-                    <img
-                      alt={`${trainer.tName} 트레이너`}
-                      className="w-32 h-32 rounded-full object-cover border-2 border-primary"
-                      src={trainer.tImageUrl || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="128" height="128"%3E%3Crect width="128" height="128" fill="%23111827"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="12" fill="%233DFA2F"%3ENo Image%3C/text%3E%3C/svg%3E'}
-                      onError={(e) => {
-                        e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="128" height="128"%3E%3Crect width="128" height="128" fill="%23111827"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="12" fill="%233DFA2F"%3ENo Image%3C/text%3E%3C/svg%3E';
-                      }}
-                    />
-                     <div className="flex-1">
-                       <h3 className="text-xl font-bold text-white">{trainer.tName} 트레이너</h3>
-                       <div className="mt-4 space-y-2 text-white/90">
-                         <p>{trainer.tBio || '트레이너 소개가 없습니다.'}</p>
-                         {trainer.tCareer && <p>{trainer.tCareer}</p>}
-                       </div>
-                     </div>
-                  </div>
-                ))
+                trainers.map((trainer) => {
+                  // Jackson 설정이 없어서 응답이 카멜케이스와 소문자 모두 옴
+                  const imageKey = trainer.timageUrl || trainer.tImageUrl
+                  const name = trainer.tname || trainer.tName
+                  const bio = trainer.tbio || trainer.tBio
+                  const career = trainer.tcareer || trainer.tCareer
+                  const specialty = trainer.tspecialty || trainer.tSpecialty
+
+                  console.log('🔍 [Trainer] imageKey:', imageKey)
+
+                  return (
+                    <div key={trainer.tid || trainer.tId} className="flex items-start gap-6 border-b border-gray-700 pb-6 last:border-0">
+                      {imageKey ? (
+                        <S3Image
+                          imageKey={imageKey}
+                          alt={`${name} 트레이너`}
+                          className="w-32 h-32 rounded-full object-cover border-2 border-primary flex-shrink-0"
+                          onError={(e) => {
+                            e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiBmaWxsPSIjMTExODI3Ii8+Cjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzNERkEyRiI+Tm8gSW1hZ2U8L3RleHQ+Cjwvc3ZnPg=='
+                          }}
+                        />
+                      ) : (
+                        <div className="w-32 h-32 rounded-full bg-gray-700 flex items-center justify-center border-2 border-primary flex-shrink-0">
+                          <span className="text-gray-400 text-4xl">👤</span>
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <h3 className="text-2xl font-bold text-white mb-2">{name} 트레이너</h3>
+                        {specialty && (
+                          <p className="text-primary mb-3 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-base">fitness_center</span>
+                            {specialty}
+                          </p>
+                        )}
+                        <div className="mt-4 space-y-3">
+                          {bio && (
+                            <div>
+                              <h4 className="text-sm font-semibold text-primary mb-1">자기소개</h4>
+                              <p className="text-white/90 leading-relaxed whitespace-pre-wrap">{bio}</p>
+                            </div>
+                          )}
+                          {career && (
+                            <div>
+                              <h4 className="text-sm font-semibold text-primary mb-1">경력 및 수상이력</h4>
+                              <p className="text-white/90 leading-relaxed whitespace-pre-wrap">{career}</p>
+                            </div>
+                          )}
+                          {!bio && !career && (
+                            <p className="text-white/60 italic">트레이너 소개가 아직 등록되지 않았습니다.</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })
               ) : (
                 <p className="text-white/70">등록된 트레이너가 없습니다.</p>
               )}

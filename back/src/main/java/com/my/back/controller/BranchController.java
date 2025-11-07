@@ -5,6 +5,9 @@ import com.my.back.dto.BranchStationResponse;
 import com.my.back.dto.BranchTrainerResponse;
 import com.my.back.dto.gym.GymInfoDtos;
 import com.my.back.dto.gym.GymReviewDtos;
+import com.my.back.entity.GymInfo;
+import com.my.back.entity.GymReview;
+import com.my.back.repository.GymReviewRepository;
 import com.my.back.service.BranchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * ==============================================================
@@ -44,25 +48,9 @@ import java.util.Map;
 public class BranchController {
 
     private final BranchService branchService;
+    private final GymReviewRepository gymReviewRepository;
 
-    /**
-     * 전체 지점 목록 조회
-     *
-     * @return 지점 목록
-     */
-    @GetMapping("/branches")
-    public ResponseEntity<List<BranchDetailResponse>> getAllBranches(@AuthenticationPrincipal UserDetails userDetails) {
-        log.info("전체 지점 목록 조회 요청");
-
-        try {
-            List<BranchDetailResponse> branches = branchService.getAllBranches(userDetails);
-            return ResponseEntity.ok(branches);
-
-        } catch (Exception e) {
-            log.error("지점 목록 조회 중 예외 발생", e);
-            return ResponseEntity.internalServerError().build();
-        }
-    }
+    /** * 전체 지점 목록 조회 * * @return 지점 목록 */ @GetMapping("/branches") public ResponseEntity<List<BranchDetailResponse>> getAllBranches(@AuthenticationPrincipal UserDetails userDetails) { log.info("전체 지점 목록 조회 요청"); try { List<BranchDetailResponse> branches = branchService.getAllBranches(userDetails); return ResponseEntity.ok(branches); } catch (Exception e) { log.error("지점 목록 조회 중 예외 발생", e); return ResponseEntity.internalServerError().build(); } }
 
     /**
      * 특정 지점 상세 조회 (공개)

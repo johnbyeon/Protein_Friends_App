@@ -69,10 +69,6 @@ export default function UpdateProduct() {
                 />
               </div>
               <div className="flex items-center gap-4">
-                <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-border-color hover:bg-primary/20">
-                  <span className="material-symbols-outlined text-base">filter_list</span>
-                  필터
-                </button>
                 <button
                   onClick={() => setIsModalOpen(true)}
                   className="bg-primary text-white flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg"

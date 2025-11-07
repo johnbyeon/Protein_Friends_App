@@ -61,10 +61,18 @@ export default function AdminBoardList() {
   // 게시글 목록 불러오기
   useEffect(() => {
     let isMounted = true
-    
+
     const loadBoards = async () => {
       const typeId = currentType?.pTypeId || currentType?.ptypeid
-      if (!typeId) return
+
+      console.log('🔍 [AdminBoardList] loadBoards 호출됨')
+      console.log('  - currentType:', currentType)
+      console.log('  - typeId:', typeId)
+
+      if (!typeId) {
+        console.log('⚠️ [AdminBoardList] typeId가 없어서 로딩 중단')
+        return
+      }
 
       setLoading(true)
       setError(null)
@@ -73,21 +81,7 @@ export default function AdminBoardList() {
         const SERVER_ORIGIN = import.meta.env.VITE_SERVER_ORIGIN || ''
         const token = localStorage.getItem('jwt')
 
-        console.log('🔍 [AdminBoardList] API 호출 전 확인:')
-        console.log('  - 토큰 존재 여부:', !!token)
-        console.log('  - 사용자 역할:', user?.role)
-        console.log('  - 요청 URL:', `${SERVER_ORIGIN}/api/admin/boards/type/${typeId}`)
-        
-        // JWT 토큰 디코딩해서 내용 확인
-        if (token) {
-          try {
-            const payload = JSON.parse(atob(token.split('.')[1]))
-            console.log('🔍 [AdminBoardList] JWT 토큰 내용:', payload)
-            console.log('🔍 [AdminBoardList] JWT 역할 정보:', payload.roles || payload.authorities || payload.role)
-          } catch (e) {
-            console.error('🔍 [AdminBoardList] JWT 디코딩 실패:', e)
-          }
-        }
+        console.log('🔍 [AdminBoardList] API 호출 시작:', `${SERVER_ORIGIN}/api/admin/boards/type/${typeId}`)
 
         const response = await fetch(`${SERVER_ORIGIN}/api/admin/boards/type/${typeId}`, {
           headers: {
@@ -96,7 +90,6 @@ export default function AdminBoardList() {
         })
 
         console.log('🔍 [AdminBoardList] API 응답 상태:', response.status)
-        console.log('🔍 [AdminBoardList] API 응답 헤더:', response.headers)
 
         if (response.status === 401) {
           navigate('/login')
@@ -108,13 +101,14 @@ export default function AdminBoardList() {
         }
 
         const data = await response.json()
-        
+        console.log('✅ [AdminBoardList] 게시글 데이터 로드 완료:', data.length, '개')
+
         // 컴포넌트가 마운트된 상태에서만 상태 업데이트
         if (isMounted) {
           setBoards(data)
         }
       } catch (err) {
-        console.error('게시글 목록 조회 에러:', err)
+        console.error('❌ [AdminBoardList] 게시글 목록 조회 에러:', err)
         if (isMounted) {
           setError(err.message)
         }
@@ -126,12 +120,12 @@ export default function AdminBoardList() {
     }
 
     loadBoards()
-    
+
     // cleanup 함수
     return () => {
       isMounted = false
     }
-  }, [currentType?.ptypeid, navigate])
+  }, [currentType, navigate])
 
   // 게시글 상세 모달 열기
   const handleRowClick = async (pid) => {
@@ -228,13 +222,13 @@ export default function AdminBoardList() {
 
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-white">{currentType.ptypename}</h1>
+        <h1 className="text-3xl font-bold text-white">{currentType.ptypename || currentType.pTypeName || '게시판'}</h1>
         <Link
           to={`${getBasePath()}/boards/${typeAddressName}/new`}
           className="bg-primary text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2 hover:opacity-90 transition-opacity"
         >
           <span className="material-symbols-outlined">add</span>
-          <span>새 {currentType.ptypename} 작성</span>
+          <span>새 {currentType.ptypename || currentType.pTypeName || '게시글'} 작성</span>
         </Link>
       </div>
 

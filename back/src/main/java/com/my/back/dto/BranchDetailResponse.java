@@ -72,6 +72,18 @@ public class BranchDetailResponse {
     private String gImageUrl;
 
     /**
+     * 평균 리뷰 평점
+     */
+    @JsonProperty("averageRating")
+    private Double averageRating;
+
+    /**
+     * 리뷰 개수
+     */
+    @JsonProperty("reviewCount")
+    private Long reviewCount;
+
+    /**
      * 주변 역 정보 목록
      */
     @JsonProperty("stations")

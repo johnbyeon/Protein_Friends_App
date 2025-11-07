@@ -306,10 +306,6 @@ export default function PtTicketManagement() {
                 />
               </div>
               <div className="flex items-center gap-4">
-                <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg border border-border-dark/60 hover:bg-primary/20 transition-colors">
-                  <span className="material-symbols-outlined text-base">filter_list</span>
-                  필터
-                </button>
                 <button
                   onClick={() => setShowAddModal(true)}
                   className="bg-primary text-white flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors"

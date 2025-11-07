@@ -485,6 +485,26 @@ export default function AppRoutes() {
             }
           />
 
+          {/* 마켓 관리 - PT 이용권 관리 */}
+          <Route
+            path="market/pt-passes"
+            element={
+              <RoleGuard allowedRoles={['ADMIN']}>
+                <PtTicketManagement />
+              </RoleGuard>
+            }
+          />
+
+          {/* 마켓 관리 - 기간제 회원권 관리 */}
+          <Route
+            path="market/memberships"
+            element={
+              <RoleGuard allowedRoles={['ADMIN']}>
+                <MembershipManagement />
+              </RoleGuard>
+            }
+          />
+
           {/* 추가 관리자 페이지들... */}
         </Route>
       </Route>

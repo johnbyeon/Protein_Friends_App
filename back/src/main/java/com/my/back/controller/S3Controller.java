@@ -146,11 +146,16 @@ public class S3Controller {
             // 3. DB에서 이미지 확인
             Image image = imageService.getImageByKey(key);
 
-            // 4. 권한 확인 (본인 이미지 또는 PT/회원권 관련 이미지는 모든 로그인 유저 접근 가능)
-            if (!image.getUserId().equals(user.getUId()) && 
-                !"PT_SERVICE".equals(image.getImageType()) && 
-                !"PT_TICKET".equals(image.getImageType()) &&
-                !"MEMBERSHIP_SERVICE".equals(image.getImageType())) {
+            // 4. 권한 확인 (본인 이미지 또는 공개 이미지는 모든 로그인 유저 접근 가능)
+            // 공개 이미지 타입: PT/회원권 관련, 트레이너 프로필, 지점 이미지
+            boolean isPublicImage = "PT_SERVICE".equals(image.getImageType()) ||
+                                   "PT_TICKET".equals(image.getImageType()) ||
+                                   "MEMBERSHIP_SERVICE".equals(image.getImageType()) ||
+                                   "TRAINER".equals(image.getImageType()) ||
+                                   "PROFILE".equals(image.getImageType()) ||
+                                   "GYM".equals(image.getImageType());
+
+            if (!image.getUserId().equals(user.getUId()) && !isPublicImage) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body("접근 권한이 없습니다");
             }
@@ -218,7 +223,9 @@ public class S3Controller {
 
         switch (imageType.toUpperCase()) {
             case "PROFILE":
-                return java.time.Duration.ofDays(7); // 프로필: 7일 (자주 안 바뀜)
+            case "TRAINER":
+            case "GYM":
+                return java.time.Duration.ofDays(7); // 프로필/트레이너/지점: 7일 (자주 안 바뀜)
             case "MEAL":
                 return java.time.Duration.ofHours(24); // 식단: 24시간
             case "INBODY":

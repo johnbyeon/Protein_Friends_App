@@ -336,17 +336,7 @@ public class BranchService {
      */
     @Transactional
     public void deleteBranch(Long gId) {
-        log.info("지점 삭제 - gId: {}", gId);
 
-        GymInfo gym = gymInfoRepository.findById(gId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지점입니다. gId=" + gId));
-
-        // 관련 stations 정보도 삭제
-        gymStationInfoRepository.findByGId(gId).forEach(station -> {
-            gymStationInfoRepository.delete(station);
-        });
-
-        // 지점 삭제
-        gymInfoRepository.delete(gym);
     }
+
 }

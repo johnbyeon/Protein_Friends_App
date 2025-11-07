@@ -78,7 +78,15 @@ export default function BoardForm() {
   // 현재 타입 설정
   useEffect(() => {
     if (boardTypes.length > 0 && typeAddressName) {
-      const type = boardTypes.find(t => t.ptypeaddressName === typeAddressName)
+      console.log('🔍 [BoardForm] boardTypes:', boardTypes)
+      console.log('🔍 [BoardForm] typeAddressName:', typeAddressName)
+
+      // Jackson 설정이 없어서 응답이 모두 소문자로 옴
+      const type = boardTypes.find(t =>
+        (t.ptypeaddressname || t.pTypeAddressName || t.ptypeaddressName) === typeAddressName
+      )
+
+      console.log('🔍 [BoardForm] 찾은 type:', type)
       setCurrentType(type)
     }
   }, [boardTypes, typeAddressName])
@@ -238,7 +246,9 @@ export default function BoardForm() {
       return
     }
 
-    console.log('  - currentType.ptypeid:', currentType.ptypeid)
+    // Jackson 설정이 없어서 응답이 모두 소문자로 옴
+    const typeId = currentType.ptypeid || currentType.pTypeId || currentType.ptypeid
+    console.log('  - currentType.ptypeid:', typeId)
 
     setLoading(true)
 
@@ -246,18 +256,18 @@ export default function BoardForm() {
       const SERVER_ORIGIN = import.meta.env.VITE_SERVER_ORIGIN || ''
       // authStore에서 토큰 가져오기
       const token = useAuthStore.getState().token || localStorage.getItem('jwt')
-      
+
       if (!token) {
         alert('로그인이 필요합니다.')
         navigate('/login')
         return
       }
-      
+
       console.log('🔑 토큰 확인:', token ? '토큰 있음' : '토큰 없음')
       console.log('👤 사용자 정보:', user)
 
       const requestBody = {
-        pTypeId: currentType.ptypeid,
+        pTypeId: typeId,
         pTitle: formData.pTitle.trim(),
         pContent: formData.pContent.trim(),
         pImageUrl: formData.pImageUrl.trim() || null,
@@ -341,7 +351,7 @@ export default function BoardForm() {
         {/* 헤더 */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-text-light mb-2">
-            {isEditMode ? '게시글 수정' : '게시글 작성'} - {currentType.ptypename}
+            {isEditMode ? '게시글 수정' : '게시글 작성'} - {currentType.ptypename || currentType.pTypeName || currentType.ptypename}
           </h1>
           <div className="h-1 w-20 bg-primary rounded"></div>
         </div>

@@ -83,7 +83,7 @@ export default function Calories() {
     }
 
     try {
-      const response = await apiJson(`/food/search?name=${encodeURIComponent(term)}`)
+      const response = await apiJson(`/api/food/search?name=${encodeURIComponent(term)}`)
       if (!response.ok) {
         throw new Error(response.data?.message || '검색에 실패했습니다.')
       }
